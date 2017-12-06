@@ -1,0 +1,1367 @@
+{
+  "goods": [
+      {
+        "id": 1000024,
+        "period": 24,
+        "nextPeriod": true,
+        "title": "凡萨帝原汁机/机械...",
+        "type": 1,
+        "price": 6088.00,
+        "totalPeople": 69,
+        "joinPeople": 69,
+        "lotteryTime": 1492746586281,
+        "winningNumber": 1233442,
+        "minPic": "http://bonn.qiniudn.com/images/Company/20170418/20170418152051741.jpg",
+        "pics": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "description": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "ratings": [
+          {
+            "username": "3******c",
+            "rateTime": 1469282964000,
+            "rateType": 0,
+            "text": "距离上一次分享已经有一段时间了呢，所以来的比较迟了，多谅解哈。要是不谅解我也没办法，你来 咬我呀。这次为大家带来的是活动页面设",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "pic": [
+              "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+              "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+              "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+              "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+            ]
+          },
+          {
+            "username": "9******3",
+            "rateTime": 1469283964090,
+            "rateType": 0,
+            "text": "非常给力",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "8******3",
+            "rateTime": 1469223964000,
+            "rateType": 1,
+            "text": "一般般，性价比合适",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "2******3",
+            "rateTime": 1469283964000,
+            "rateType": 1,
+            "text": "一般般",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "4******e",
+            "rateTime": 1469284964000,
+            "rateType": 2,
+            "text": "下次不再来了，有的不好用",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          }
+        ],
+        "buyHistory": [
+          {
+            "username": "3******c",
+            "buyTime": 1469281964000,
+            "num": 6,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233441
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "2******3",
+            "buyTime": 1469282964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233442
+          },
+          {
+            "username": "4******e",
+            "buyTime": 1469283964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233443
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          },
+          {
+            "username": "9******1",
+            "buyTime": 1469284964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233444
+          }
+        ]
+      },
+      {
+        "id": 1000025,
+        "period": 25,
+        "nextPeriod": true,
+        "title": "苹果6s",
+        "type": 2,
+        "price": 7088.00,
+        "totalPeople": 99,
+        "joinPeople": 99,
+        "lotteryTime": 1492772400000,
+        "winningNumber": 1234441,
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "pics": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "description": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "ratings": [
+          {
+            "username": "3******c",
+            "rateTime": 1469282964000,
+            "rateType": 0,
+            "text": "很牛逼的手机",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "2******3",
+            "rateTime": 1469281974000,
+            "rateType": 1,
+            "text": "性价比还可以",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "4******e",
+            "rateTime": 1469281984000,
+            "rateType": 2,
+            "text": "不喜欢，太贵了",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          }
+        ],
+        "buyHistory": [
+          {
+            "username": "f******c",
+            "buyTime": 1469281964000,
+            "num": 6,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1234441
+          },
+          {
+            "username": "v******3",
+            "buyTime": 1469281964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1235441
+          },
+          {
+            "username": "w******e",
+            "buyTime": 1469281964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233446
+          },
+          {
+            "username": "h******1",
+            "buyTime": 1469281964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233447
+          }
+        ]
+      },
+      {
+        "id": 1000026,
+        "period": 26,
+        "nextPeriod": false,
+        "title": "禅意山房5mm两圈石榴石榴",
+        "type": 8,
+        "price": 17088.00,
+        "totalPeople": 199,
+        "joinPeople": 199,
+        "lotteryTime": 1493118000000,
+        "winningNumber": 1233448,
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "pics": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "description": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "ratings": [
+          {
+            "username": "3******c",
+            "rateTime": 1469282964000,
+            "rateType": 0,
+            "text": "很灵的珠子",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "2******3",
+            "rateTime": 1469281974000,
+            "rateType": 1,
+            "text": "珠子过意得去",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "4******e",
+            "rateTime": 1469281984000,
+            "rateType": 2,
+            "text": "不喜欢，太贵了,下次不会再来了",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          }
+        ],
+        "buyHistory": [
+          {
+            "username": "s******c",
+            "buyTime": 1469281964000,
+            "num": 6,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1253441
+          },
+          {
+            "username": "a******3",
+            "buyTime": 1469281964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233448
+          },
+          {
+            "username": "n******e",
+            "buyTime": 1469281964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233449
+          },
+          {
+            "username": "9******l",
+            "buyTime": 1469281964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233471
+          }
+        ]
+      },
+      {
+        "id": 1000027,
+        "period": 27,
+        "nextPeriod": false,
+        "title": "真难",
+        "type": 4,
+        "price": 2088.00,
+        "totalPeople": 300,
+        "joinPeople": 300,
+        "lotteryTime": 1498017600000,
+        "winningNumber": 1233449,
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "pics": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "description": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "ratings": [
+          {
+            "username": "3******c",
+            "rateTime": 1469282964000,
+            "rateType": 0,
+            "text": "很灵的珠子",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "2******3",
+            "rateTime": 1469281974000,
+            "rateType": 1,
+            "text": "珠子过意得去",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "4******e",
+            "rateTime": 1469281984000,
+            "rateType": 2,
+            "text": "不喜欢，太贵了,下次不会再来了",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          }
+        ],
+        "buyHistory": [
+          {
+            "username": "s******c",
+            "buyTime": 1469281964000,
+            "num": 6,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1253441
+          },
+          {
+            "username": "a******3",
+            "buyTime": 1469281964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233448
+          },
+          {
+            "username": "n******e",
+            "buyTime": 1469281964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233449
+          },
+          {
+            "username": "9******l",
+            "buyTime": 1469281964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233471
+          }
+        ]
+      },
+      {
+        "id": 1000028,
+        "period": 28,
+        "nextPeriod": false,
+        "title": "真他妈的难做啊",
+        "type": 5,
+        "price": 12088.00,
+        "totalPeople": 500,
+        "joinPeople": 150,
+        "lotteryTime": 1679482974000,
+        "winningNumber": "",
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "pics": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "description": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "ratings": [
+          {
+            "username": "3******c",
+            "rateTime": 1469282964000,
+            "rateType": 0,
+            "text": "很灵的珠子",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "2******3",
+            "rateTime": 1469281974000,
+            "rateType": 1,
+            "text": "珠子过意得去",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "4******e",
+            "rateTime": 1469281984000,
+            "rateType": 2,
+            "text": "不喜欢，太贵了,下次不会再来了",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          }
+        ],
+        "buyHistory": [
+          {
+            "username": "s******c",
+            "buyTime": 1469281964000,
+            "num": 6,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1253441
+          },
+          {
+            "username": "a******3",
+            "buyTime": 1469281964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233448
+          },
+          {
+            "username": "n******e",
+            "buyTime": 1469281964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233449
+          },
+          {
+            "username": "9******l",
+            "buyTime": 1469281964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233471
+          }
+        ]
+      },
+      {
+        "id": 1000029,
+        "period": 29,
+        "nextPeriod": false,
+        "title": "真他妈的难做啊",
+        "type": 5,
+        "price": 5088.00,
+        "totalPeople": 300,
+        "joinPeople": 150,
+        "lotteryTime": 1679482974000,
+        "winningNumber": "",
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "pics": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "description": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "ratings": [
+          {
+            "username": "3******c",
+            "rateTime": 1469282964000,
+            "rateType": 0,
+            "text": "很灵的珠子",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "2******3",
+            "rateTime": 1469281974000,
+            "rateType": 1,
+            "text": "珠子过意得去",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "4******e",
+            "rateTime": 1469281984000,
+            "rateType": 2,
+            "text": "不喜欢，太贵了,下次不会再来了",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          }
+        ],
+        "buyHistory": [
+          {
+            "username": "s******c",
+            "buyTime": 1469281964000,
+            "num": 6,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1253441
+          },
+          {
+            "username": "a******3",
+            "buyTime": 1469281964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233448
+          },
+          {
+            "username": "n******e",
+            "buyTime": 1469281964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233449
+          },
+          {
+            "username": "9******l",
+            "buyTime": 1469281964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233471
+          }
+        ]
+      },
+      {
+        "id": 1000030,
+        "period": 30,
+        "nextPeriod": false,
+        "title": "真他妈的难做啊",
+        "type": 5,
+        "price": 788.00,
+        "totalPeople": 500,
+        "joinPeople": 150,
+        "lotteryTime": 1679482974000,
+        "winningNumber": "",
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "pics": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "description": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "ratings": [
+          {
+            "username": "3******c",
+            "rateTime": 1469282964000,
+            "rateType": 0,
+            "text": "很灵的珠子",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "2******3",
+            "rateTime": 1469281974000,
+            "rateType": 1,
+            "text": "珠子过意得去",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "4******e",
+            "rateTime": 1469281984000,
+            "rateType": 2,
+            "text": "不喜欢，太贵了,下次不会再来了",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          }
+        ],
+        "buyHistory": [
+          {
+            "username": "s******c",
+            "buyTime": 1469281964000,
+            "num": 6,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1253441
+          },
+          {
+            "username": "a******3",
+            "buyTime": 1469281964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233448
+          },
+          {
+            "username": "n******e",
+            "buyTime": 1469281964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233449
+          },
+          {
+            "username": "9******l",
+            "buyTime": 1469281964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233471
+          }
+        ]
+      },
+      {
+        "id": 1000031,
+        "period": 31,
+        "nextPeriod": false,
+        "title": "真他妈的难做啊",
+        "type": 5,
+        "price": 1988.00,
+        "totalPeople": 500,
+        "joinPeople": 250,
+        "lotteryTime": 1679482974000,
+        "winningNumber": "",
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "pics": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "description": [
+          "http://bonn.qiniudn.com/images/Company/20170419/20170419153415189.jpg",
+          "http://fuss10.elemecdn.com/b/6c/75bd250e5ba69868f3b1178afbda3jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/f/96/3d608c5811bc2d902fc9ab9a5baa7jpeg.jpeg?imageView2/1/w/180/h/180",
+          "http://fuss10.elemecdn.com/6/ad/779f8620ff49f701cd4c58f6448b6jpeg.jpeg?imageView2/1/w/180/h/180"
+        ],
+        "ratings": [
+          {
+            "username": "3******c",
+            "rateTime": 1469282964000,
+            "rateType": 0,
+            "text": "很灵的珠子",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "2******3",
+            "rateTime": 1469281974000,
+            "rateType": 1,
+            "text": "珠子过意得去",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          },
+          {
+            "username": "4******e",
+            "rateTime": 1469281984000,
+            "rateType": 2,
+            "text": "不喜欢，太贵了,下次不会再来了",
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png"
+          }
+        ],
+        "buyHistory": [
+          {
+            "username": "s******c",
+            "buyTime": 1469281964000,
+            "num": 6,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1253441
+          },
+          {
+            "username": "a******3",
+            "buyTime": 1469281964010,
+            "num": 3,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233448
+          },
+          {
+            "username": "n******e",
+            "buyTime": 1469281964200,
+            "num": 4,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233449
+          },
+          {
+            "username": "9******l",
+            "buyTime": 1469281964300,
+            "num": 1,
+            "avatar": "http://static.galileo.xiaojukeji.com/static/tms/default_header.png",
+            "buyNum": 1233471
+          }
+        ]
+      }
+    ],
+  "lists": [
+    {
+      "postalAddressContactMechId": "10091",
+      "contactName": "唐辰辰",
+      "provinceGeoId": "CN-130000",
+      "provinceGeoName": "河北省",
+      "cityGeoId": "CN-130500",
+      "cityGeoName": "邢台市",
+      "countyGeoId": "CN-130522",
+      "countyGeoName": "临城县",
+      "address": "详细街道地址的",
+      "postalCode": "542700",
+      "mobile": "13566668888",
+      "telephone": "13566668888",
+      "defaultPartyContactMechPurpose": true
+    },
+    {
+      "postalAddressContactMechId": "10090",
+      "contactName": "cjcjc",
+      "provinceGeoId": "CN-110000",
+      "provinceGeoName": "北京",
+      "cityGeoId": "CN-110100",
+      "cityGeoName": "北京市",
+      "countyGeoId": "CN-110101",
+      "countyGeoName": "东城区",
+      "address": "详细街道",
+      "postalCode": "542700",
+      "mobile": "14789564512",
+      "telephone": "14789564512",
+      "defaultPartyContactMechPurpose": false
+    },
+    {
+      "postalAddressContactMechId": "10081",
+      "contactName": "廖康娟",
+      "provinceGeoId": "CN-130000",
+      "provinceGeoName": "河北省",
+      "cityGeoId": "CN-130500",
+      "cityGeoName": "邢台市",
+      "countyGeoId": "CN-130522",
+      "countyGeoName": "临城县",
+      "address": "木头女",
+      "postalCode": "542700",
+      "mobile": "18520365555",
+      "telephone": "18520365555",
+      "defaultPartyContactMechPurpose": false
+    }
+  ]
+}

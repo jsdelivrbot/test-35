@@ -1,0 +1,340 @@
+<template>
+  <div v-title="'修改交易商区域'">
+    <v-back v-show="backSta">
+      <div slot="title" class="Vtitle">修改交易商区域</div>
+    </v-back>
+    <div class="backD" v-bind:class="{'class-b': isB}"></div>
+    <div class="modifyRegion">
+      <ul>
+        <li><span>交易商账号：</span><input class='tel' type="text" @keyup="change" placeholder="请输入交易商账号" v-model='tradeUserNo'></li>
+        <li><span>交易商姓名：</span>{{showTradeUserInfoData.tradeUserName}}</li>
+        <li><span>旧区域编号：</span>{{showTradeUserInfoData.belongMemberOld}}</li>
+        <li><span>新区域编号：</span><input class='tel' type="tel" placeholder="请输入新区域编号" v-model='belongMemberNew'></li>
+      </ul>
+      <div class="determine-box">
+        <div class="determine" @click="determine">提 交</div>
+      </div>
+    </div>
+    <div class="modifyRegionlist">
+      <div class="rolelistTap">
+        <span>历史修改记录</span>
+        <div class="search-left">
+          <div class="search" v-bind:class="{ animation: animationState}">
+            <input type="text" placeholder="请输入交易商账号或姓名" v-model="accountNo" @keyup="changes">
+            <i @click="animation"><img src="../../../assets/search.png" alt=""></i>
+          </div>
+        </div>
+      </div>
+      <div class="rolelistTip">
+        <span>交易商</span>
+        <span>旧区域</span>
+        <span>新区域</span>
+        <span>修改时间</span>
+      </div>
+
+      <ul class="rolelists">
+        <li v-for="(item, index) in getBelongMemberChangeListData">
+          <span><i>{{item.tradeUserName}}</i><i>({{item.tradeUserNo}})</i></span>
+          <span>{{item.belongMemberOld}}</span>
+          <span>{{item.belongMemberNew}}</span>
+          <span>{{item.lastModifiedDate}}</span>
+        </li>
+      </ul>
+
+      <v-empty v-show="emptySta"></v-empty>
+
+    </div>
+
+    <p class="tips" v-show="create"><span>{{tipText}}</span></p>
+
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+import back from 'components/back/back';
+
+  export default{
+    components:{
+      'v-empty': empty,
+      'v-back': back
+    },
+    data() {
+     return{
+        tradeUserNo: null,
+        belongMemberNew: null,
+        animationState: true,
+        accountNo: null,
+        session_token: localStorage.getItem("sessionToken"),
+        showTradeUserInfoData: {},//申请修改区域-交易商账号信息
+        getBelongMemberChangeListData: {},//申请修改区域历史
+        tipText: null,
+        create: false,
+        emptySta: false,
+        backSta: false,
+        isB: false
+      }
+    },
+    methods: {
+      determine: function(){
+        if(this.tradeUserNo != null && this.belongMemberNew != null && this.tradeUserNo != '' && this.belongMemberNew != ''){
+          this.$http.get('/api/updateTradeUserBelongMemberByTradeUserNo?',{params:{ sessionToken: this.session_token, tradeUserNo: this.tradeUserNo, belongMemberNew: this.belongMemberNew }}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.belongMemberNew = null;
+              this.showTradeUserInfoData = {};
+              this.tradeUserNo == '';
+              this.tipText = '修改区域提交成功！';
+              this.tip();
+            }else{
+              this.tipText = response.body.message;
+              this.tip();
+            }
+            
+          }).then((error)=> this.error = error)
+        }else{
+          this.tipText = '请输入修改信息！'
+          this.tip();
+        }
+      },
+      animation: function(){
+        
+        if(this.accountNo == null || this.accountNo == ''){
+          if(this.animationState){
+            this.animationState = false
+          }else{
+            this.animationState = true
+          }
+        }else{
+          this.getBelongMemberChangeList(this.accountNo);
+        }
+      },
+      showTradeUserInfo: function(tradeUserNo){
+        this.$http.get('/api/showTradeUserInfo?',{params:{ sessionToken: this.session_token, tradeUserNo: tradeUserNo }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.showTradeUserInfoData = response.body.data;
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      change: function(){
+        this.belongMemberNew = null;
+        this.showTradeUserInfoData = {};
+        var length = this.tradeUserNo.length;
+        var value = this.tradeUserNo;
+        if (length > 10) {
+            var value = value.substring(0, 10);
+            this.tradeUserNo = value;
+        }
+        if(length == 10){
+          this.showTradeUserInfo(this.tradeUserNo)
+        }
+      },
+      getBelongMemberChangeList: function(tradeUser){
+        this.$http.get('/api/getBelongMemberChangeList?',{params:{ sessionToken: this.session_token, tradeUser: tradeUser }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.getBelongMemberChangeListData = response.body.data.brokerList;
+            if(response.body.data.brokerList == '' || response.body.data.brokerList == null){
+              this.emptySta = true;
+            }else{
+              this.emptySta = false;
+            }
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      changes: function(){
+        if(this.accountNo == ''){
+          this.getBelongMemberChangeList('');
+        }
+      },
+      tip: function(){
+        this.create = true;
+        var this_ = this;
+        clearTimeout(t)
+        var t = setTimeout(function (){
+            this_.create = false;
+        }, 3000);
+      }
+    },
+    mounted(){
+      this.isB = this.toolHelper.isWeiXin();
+      this.backSta = this.toolHelper.isWeiXin();
+      this.getBelongMemberChangeList('');
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .modifyRegionlist
+    margin-top: 0.1rem
+    background-color: #FFF
+    overflow: hidden
+    .rolelists
+      overflow: hidden
+      li
+        position: relative
+        width: 100%
+        height: 0.65rem
+        overflow: hidden
+        &::after
+          position: absolute
+          bottom: 0
+          left: 0
+          content: ''
+          display: block
+          width: 100%
+          border-top: 1px solid #ccc
+          transform: scaleY(0.5) scaleX(0.9)
+        span
+          float: left
+          width: 25%
+          text-align: center
+          line-height: 0.65rem
+          font-size: 0.13rem
+          &:nth-child(1)
+            line-height: 0.2rem
+            padding-top: 0.12rem
+            i
+              display: block
+              margin: 0
+              font-style: normal
+    .rolelistTip
+      position: relative
+      overflow: hidden
+      width: 100%
+      height: 0.48rem
+      &::after
+        position: absolute
+        bottom: 0
+        left: 0
+        content: ''
+        display: block
+        width: 100%
+        border-top: 1px solid #ccc
+        transform: scaleY(0.5) scaleX(0.9)
+      span
+        float: left
+        width: 25%
+        line-height: 0.48rem
+        text-align: center
+        color: #999999
+        font-size: 0.13rem
+    .rolelistTap
+      width: 100%
+      height:0.48rem
+      padding: 0 0.12rem
+      position: relative
+      &::after
+        position: absolute
+        bottom: 0
+        left: 0
+        content: ''
+        display: block
+        width: 100%
+        border-top: 1px solid #ccc
+        transform: scaleY(0.5)
+      .search-left
+        float: right
+        .search
+          position: relative
+          height: 0.35rem
+          width: 0.3rem
+          border-radius: 0.2rem
+          border: 1px solid #ff6000
+          margin-top: 0.06rem
+          background-color: #f3f3f3
+          overflow: hidden
+          padding: 0 0.36rem 0 0.04rem
+          transition: all 1s ease 0s
+          &.animation
+            width: 1.75rem
+            transition: all 1s ease 0s
+          input
+            width: 100%
+            height: 100%
+            background-color: transparent
+            border: none
+            outline: none
+            text-align: center
+          i
+            position: absolute
+            top: 0.015rem
+            right: 0.02rem
+            width: 0.3rem
+            height: 0.3rem
+            img
+              width: 100%
+              height: 100%
+      span
+        position: relative
+        float: left
+        line-height: 0.48rem
+        text-align: center
+        font-size: 0.15rem
+        border-bottom: 1px solid transparent
+        font-weight: bold
+  .modifyRegion
+    background-color: #FFF
+    width: 100%
+    padding: 0.3rem
+    li
+      position: relative
+      width: 100%
+      height: 0.3rem
+      margin-top: 0.2rem
+      line-height: 0.3rem
+      padding: 0 0 0 0.95rem
+      font-size: 0.15rem
+      input[type='tel'],input[type='text']
+        width: 100%
+        outline: none
+      label
+        margin-right: 0.3rem
+        input[type='radio']
+          outline: none
+          width: 0.15rem
+          height: 0.15rem
+          vertical-align: middle
+          margin-top: -0.04rem
+          margin-right:0.05rem 
+          -webkit-appearance: none
+          background: url(../../../assets/13123_03.png) 0 0 no-repeat
+          background-size: 100% 100%
+        input[type='radio']:checked
+          background: url(../../../assets/rada_03.png) 0 0 no-repeat
+          background-size: 100% 100%
+      &::after
+        position: absolute
+        bottom: 0
+        left: 0
+        display: block
+        content: ''
+        width: 100%
+        border-bottom: 1px solid #ff6000
+        transform: scaleY(0.5)
+      &:nth-child(3)::after,&:nth-child(2)::after
+        display: none
+      span
+        position: absolute
+        top: 0
+        left: 0
+        line-height: 0.3rem
+        font-size: 0.15rem
+    .determine
+      height: 0.42rem
+      width: 2.26rem
+      background-color: #ff6000
+      margin: 0.3rem auto 0 auto
+      border-radius: 0.3rem
+      text-align: center
+      color: #fff
+      font-size: 0.15rem
+      line-height: 0.42rem
+</style>

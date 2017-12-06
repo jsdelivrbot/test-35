@@ -1,0 +1,553 @@
+<template>
+    <div>
+        <div class="layer border_1px" @click="layerControl">
+          <span class="left" id='defaultProductId'>{{defaultProductId}} {{defaultProductName}}</span>
+          <span class="right">选择商品 ></span>
+        </div>
+
+        <div style="height:0.1rem"></div>
+
+        <div class="section">
+          <div class="hd">
+            <div class="hd-inner border-bottom-1px">
+              <span class="hd-title">历史交易汇总</span>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="content overview">
+              <ul>
+                <li>成交总额：<span>{{historyAggregateData.turnoverTotalMoney}}</span></li>
+                <li>成交总量：<span>{{historyAggregateData.turnoverTotal}}</span></li>
+                <li>散户成交总额：<span>{{historyAggregateData.individualTurnoverTotalMoney}}</span></li>
+                <li>散户成交总量：<span>{{historyAggregateData.individualTurnoverTotal}}</span></li>
+                <li>配售数量：<span>{{historyAggregateData.placingNum}}</span></li>
+                <li>提货数量：<span>{{historyAggregateData.pickupNum}}</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:0.1rem"></div>
+
+        <div class="section">
+
+          <div class="hd">
+            <div class="hd-inner border-bottom-1px">
+              <span class="hd-title">交易汇总</span>
+              <span class="dete-control column-control" @click="aggregateControl"></span>
+              <span class="curdate">日期：{{curdate}}</span>
+              <div class="stage-box column-dete" v-show="aggregateDateList">
+                <div class="stage-inner">
+                  <ul id="monthList">
+                    <li v-for="(item, index) in aggregateDate" >
+                        <p @click="getAggregateData(aggregateDate[index].dateKey, aggregateDate[index].dateValue)">{{aggregateDate[index].dateValue}}</p>    
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bd">
+            <div class="content overview">
+              <ul>
+                <li>当日成交总额：<span>{{aggregateData.todayTurnoverTotalMoney}}</span></li>
+                <li>当日成交总量：<span>{{aggregateData.todayTurnoverTotal}}</span></li>
+                <li>散户成交总额：<span>{{aggregateData.todayIndividualTurnoverTotalMoney}}</span></li>
+                <li>散户成交总量：<span>{{aggregateData.todayIndividualTurnoverTotal}}</span></li>
+                <li>换手率：<span>{{aggregateData.turnoverRate}}%</span></li>
+                <li>散户参与人数：<span>{{aggregateData.individualJoinNum}}</span></li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="height:0.1rem"></div>
+
+        <div class="section">
+          <div class="hd">
+            <div class="hd-inner border_1px">
+              <span class="hd-title">近7日持仓趋势</span>
+              <div class="legend">
+                <span>主力</span>
+                <span>散户</span>
+              </div>
+              <span class="dete-control column-control" @click="foldingControl"></span>
+              <div class="stage-box column-dete" v-show="foldingDateList">
+                <div class="stage-inner">
+                  <ul id="monthList">
+                    <li v-for="(item, index) in firmHoldTrendDate" >
+                        <p @click="getFirmHoldTrend(firmHoldTrendDate[index].dateKey)">{{firmHoldTrendDate[index].dateValue}}</p>    
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="content chart-polyline">
+              <div id="main-polyline" style="width:100%;height:200px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:0.1rem"></div>
+
+        <div class="section">
+          <div class="hd">
+            <div class="hd-inner border_1px">
+              <span class="hd-title">近7日交易额趋势</span>
+              <div class="legend">
+                <span>主力</span>
+                <span>散户</span>
+              </div>
+              <span class="dete-control column-control" @click="columnControl"></span>
+              <div class="stage-box column-dete" v-show="columnDateList">
+                <div class="stage-inner">
+                  <ul id="monthList">
+                    <li v-for="(item, index) in tradeMoneyTrendDate">
+                        <p @click="getTradeMoneyData(tradeMoneyTrendDate[index].dateKey)">{{tradeMoneyTrendDate[index].dateValue}}</p>  
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="content chart-column">
+              <div id="main-column" style="width:100%;height:200px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stage-cover" v-show="coverShow" @click="coverEvent"></div>
+
+        <div class="layerlist" v-show="layerlist">
+          <div class="list_box">
+            <div class="list_item">
+              <ul class="list_ul">
+                <li class="border-bottom-1px" v-for="(item, index) in getProductDate.productList" @click="changeProduct(getProductDate.productList[index].productNo, getProductDate.productList[index].productName)">
+                  <a href="javascript:;">
+                    <span class="list_id">{{getProductDate.productList[index].productNo}}</span>
+                    <span class="list_name">{{getProductDate.productList[index].productName}}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div class="control" @click="layerControlClose">
+              <a href="javascript:;">取消</a>
+            </div>
+          </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+import 'common/js/jquery-1.8.3.min.js';
+
+const ERR_OK = 'success';
+
+ export default{
+    data() {
+        return {
+            coverShow: false,
+            aggregateDateList: false,
+            foldingDateList: false,
+            columnDateList: false,
+            layerlist: false,
+            getProductDate: {},
+            defaultProductId: '',
+            defaultProductName: '',
+            historyAggregateData: {},
+            aggregateData: {},
+            aggregateDate:[],
+            curdate: '',
+            firmHoldTrendData: {},
+            firmHoldTrendDate: [],
+            tradeMoneyTrendData: {},
+            tradeMoneyTrendDate: [],
+            session_token: localStorage.getItem("session_token"),
+            date:['2017年03月(下)','2017年03月(上)','2017年02月(下)','2017年02月(上)','2017年01月(下)'],
+            datetrend:['2017-03','2017-03','2017-02','2017-02','2017-01']
+        };
+    },
+    created() {
+      // 交易商品列表
+      this.getProductList();
+      // 交易历史交易汇总
+      this.historyAggregate();
+      // 交易交易汇总
+      this.aggregate('');
+      // 近7日持仓趋势
+      this.firmHoldTrend('');
+      // 近7日交易额趋势
+      this.tradeMoneyTrend('');
+    },
+    methods: {
+        coverEvent: function() {
+          this.coverShow = false;
+          this.foldingDateList = false;
+          this.columnDateList = false;
+          this.layerlist = false;
+          this.aggregateDateList = false;
+        },
+        changeProduct: function(productId, productName) {
+          this.layerlist = false;
+          this.coverShow = false;
+          this.defaultProductId = productId;
+          this.defaultProductName = productName;
+          this.historyAggregate();
+          this.aggregate('');
+          this.firmHoldTrend('');
+          this.tradeMoneyTrend('');
+        },
+        layerControl: function() {
+          this.coverShow = true;
+          this.layerlist = true;
+        },
+        layerControlClose: function(){
+          this.coverShow = false;
+          this.layerlist = false;
+        },
+        aggregateControl: function(){
+          this.coverShow = true;
+          this.aggregateDateList = true;
+        },
+        foldingControl: function() {
+          this.coverShow = true;
+          this.foldingDateList = true;
+        },
+        columnControl: function() {
+          this.coverShow = true;
+          this.columnDateList = true;
+        },
+        getAggregateData: function(dete, dateValu) {
+          this.coverShow = false;
+          this.aggregateDateList = false;
+          this.aggregate(dete, dateValu);
+        },
+        getFirmHoldTrend: function(dete) {
+          this.coverShow = false;
+          this.foldingDateList = false;
+          this.firmHoldTrend(dete);
+        },
+        getTradeMoneyData: function(dete) {
+            this.coverShow = false;
+            this.columnDateList = false;
+            this.tradeMoneyTrend(dete);
+        },
+        getProductList: function() {
+
+          this.$http.get('/api/getProductList',{params:{ session_token: this.session_token }}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.getProductDate = response.body.data;
+              this.defaultProductId = this.getProductDate.productList[0].productNo;
+              this.defaultProductName =this.getProductDate.productList[0].productName;
+            }else{
+              alert(response.body.message);
+            }
+            
+          }).then((error)=> this.error = error)
+
+        },
+        historyAggregate: function(){
+
+          this.$http.get('/api/historyTradeTotal',{params:{ session_token: this.session_token, productNo: this.defaultProductId }}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.historyAggregateData = response.body.data;
+            }else{
+              alert(response.body.message);
+            }
+            
+          }).then((error)=> this.error = error)
+          
+        },
+        aggregate: function(date, dateValu){
+          this.aggregateDate = [];
+          this.$http.get('/api/tradeTotal',{params:{ session_token: this.session_token, productNo: this.defaultProductId, date: date}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.aggregateData = response.body.data;
+              this.ArryReverse(this.aggregateData.selectDateList, this.aggregateDate);
+              if(date == ''){
+                this.curdate = this.aggregateData.nowDate;
+              }else{
+                this.curdate = dateValu;
+              }
+            }else{
+              alert(response.body.message);
+            }
+            
+          }).then((error)=> this.error = error)
+
+        },
+        firmHoldTrend: function(date) {
+          this.firmHoldTrendDate = [];
+          this.$http.get('/api/firmHoldTrend',{params:{ session_token: this.session_token, productNo: this.defaultProductId, date: date}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.firmHoldTrendData = response.body.data;
+              // console.log(this.firmHoldTrendData.dateList)
+              this.ArryReverse(this.firmHoldTrendData.selectDateList, this.firmHoldTrendDate);
+              this.folding('main-polyline', this.firmHoldTrendData.dateList, this.firmHoldTrendData.mainHoldList, this.firmHoldTrendData.individualHoldList)
+            }else{
+              alert(response.body.message);
+            }
+            
+          }).then((error)=> this.error = error)
+
+        },
+        tradeMoneyTrend: function(date){
+          this.tradeMoneyTrendDate = [];
+          this.$http.get('/api/tradeMoneyTrend',{params:{ session_token: this.session_token, productNo: this.defaultProductId, date: date}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.tradeMoneyTrendData = response.body.data;
+              this.ArryReverse(this.tradeMoneyTrendData.selectDateList, this.tradeMoneyTrendDate);
+              this.column('main-column', this.tradeMoneyTrendData.dateList, this.tradeMoneyTrendData.mainTradeList, this.tradeMoneyTrendData.individualTradeList)
+            }else{
+              alert(response.body.message);
+            }
+
+          }).then((error)=> this.error = error)
+        },
+        ArryReverse: function(arry, curArry) {
+          for(var i = arry.length-1; i >= 0; i--){
+            curArry.push(arry[i]);
+          }
+        },
+        folding: function(el, v1, v2, v3){
+          let folding = echarts.init(document.getElementById(el));
+          let option_folding = {
+              tooltip : {
+                  trigger: 'axis',
+                  axisPointer: {
+                      type: 'cross',
+                      label: {
+                          backgroundColor: '#6a7985'
+                      }
+                  }
+              },
+              toolbox: {
+                  feature: {
+                      saveAsImage: {}
+                  }
+              },
+              grid: {
+                  left: '3%',
+                  right: '5%',
+                  bottom: '3%',
+                  containLabel: true
+              },
+              xAxis : [
+                  {
+                      type : 'category',
+                      boundaryGap : false,
+                      data : v1,
+                      axisLabel: {
+                         interval: 0
+                      }
+                  }
+              ],
+              yAxis : [
+                  {
+                      type : 'value'
+                  }
+              ],
+              series : [
+                  {
+                      name:'主力',
+                      type:'line',
+                      data:v2,
+                      itemStyle: {
+                        normal: {
+                          color:'#ff6701',
+                           // label: {
+                           //   show: true,
+                           //   position: 'top',
+                           //   formatter: "{c}"
+                           // }
+                        }
+                      }
+                  },
+                  {
+                      name:'散户',
+                      type:'line',
+                      data:v3,
+                      itemStyle: {
+                        normal: {
+                          color:'#54b9ff',
+                           // label: {
+                           //   show: true,
+                           //   position: 'top',
+                           //   formatter: "{c}"
+                           // }
+                        }
+                      }
+                  }
+              ]
+          };
+          folding.setOption(option_folding);
+        },
+        column: function(el, date, v1, v2) {
+          let column = echarts.init(document.getElementById(el));
+          
+          let option_column = {
+              tooltip: {
+                         trigger: 'axis',
+                         axisPointer: {
+                             type: 'shadow'
+                         }
+                     },
+               color: ['#ff954b','#54b9ff'],
+               grid: {
+                    left: '3%',
+                    right: '3%',
+                    bottom: '3%',
+                    top: '3%',
+                    containLabel: true
+                },
+               calculable : true,
+               xAxis : [
+                   {  
+                       // splitArea : {show : true},
+                       type : 'category',
+                       data : date,
+                       axisLabel :{  
+                            interval:0,
+                        }
+                   }
+               ],
+               yAxis : [
+                   {
+                       type : 'value',
+                       axisLabel: {
+                           formatter: '{value}'
+                       },
+                       axisTick: {
+                            alignWithLabel: true
+                        }
+                   }
+               ],
+               series : [
+                   {
+                       type:'bar',
+                       data: v1,
+                       name: "主力",
+                       itemStyle: {
+                         normal: {
+                             color: new echarts.graphic.LinearGradient(
+                                  0, 0, 0, 1,
+                                  [
+                                      {offset: 0, color: '#ff7417'},
+                                      {offset: 0.5, color: '#ff9a56'},
+                                      {offset: 1, color: '#ffb584'}
+                                  ]
+                              ),
+                             barBorderRadius:[5, 5, 0, 0],
+                            //  label: {
+                            //   show: true,
+                            //   position: 'top',
+                            //   formatter: "{c}"
+                            // }
+                         }
+                      },
+                      barGap: '1%',
+                      barWidth: 13
+                   },
+                   {
+                       type:'bar',
+                       data: v2,
+                       name: "散户",
+                       itemStyle: {
+                         normal: {
+                             color: new echarts.graphic.LinearGradient(
+                                  0, 0, 0, 1,
+                                  [
+                                      {offset: 0, color: '#59bbff'},
+                                      {offset: 0.5, color: '#80cbff'},
+                                      {offset: 1, color: '#a8dbff'}
+                                  ]
+                              ),
+                             barBorderRadius:[5, 5, 0, 0],
+                            //  label: {
+                            //   show: true,
+                            //   position: 'top',
+                            //   formatter: "{c}"
+                            // }
+                         }
+                        },
+                        barGap: '1%',
+                        barWidth: 13
+                   }
+               ]
+          };
+          column.setOption(option_column);
+        }
+    }
+ };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .layer
+    height: 0.5rem
+    background-color: #fff
+    font-size: 0.15rem
+    padding: 0 0.12rem
+    color: #999999
+    .right
+      float: right
+      height: 0.5rem
+      line-height: 0.5rem
+      font-size: 0.13rem
+    .left
+      float: left
+      height: 0.5rem
+      line-height: 0.5rem
+  .layerlist
+    position: fixed
+    bottom: 0
+    left: 50%
+    font-size: 0.15rem
+    width: 100%
+    max-width: 640px
+    transform: translateX(-50%)
+    -webkit-transform: translateX(-50%)
+    z-index: 100
+    .control
+      width: 94%
+      height: 0.48rem
+      margin: 0.1rem 3%
+      border-radius: 0.05rem
+      text-align: center
+      line-height: 0.48rem
+      background-color: #fff
+      a
+        color: #666666
+    .list_item
+      width: 94%
+      margin: 0.1rem 3%
+      border-radius: 0.05rem
+      background-color: #fff
+      padding: 0 0.2rem
+      li
+        position: relative
+        width: 100%
+        height: 0.5rem
+        text-align: center
+        line-height: 0.5rem
+        &::after
+          position: absolute
+          bottom: 0
+          left: 0
+          display: block
+          content: ''
+          width: 100%
+          height: 1px
+          background-color: #ccc
+          transform: scaleY(0.5)
+          -webkit-transform: scaleY(0.5)
+        &:nth-last-child(1)::after
+          display: none
+          
+</style>

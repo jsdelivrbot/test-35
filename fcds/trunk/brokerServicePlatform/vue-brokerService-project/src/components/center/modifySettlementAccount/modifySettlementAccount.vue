@@ -1,0 +1,532 @@
+<template>
+  <div v-title="'修改结算账号'">
+    <v-back v-show="backSta">
+      <div slot="title" class="Vtitle">修改结算账号</div>
+    </v-back>
+    <div class="backD" v-bind:class="{'class-b': isB}"></div>
+    <div class="SCommission_box msa">
+      <p>
+        <span>原结算账号：</span><input type="tel" v-model="oldTradeUserNo"  placeholder="请输入原结算账号" @keyup='changes'>
+      </p>
+      <p>
+        <span>原结算账号姓名：</span><b>{{oldTradeUserName}}</b>
+      </p>
+      <p>
+        <span>原手机号码：</span><b>{{oldPhone}}</b>
+      </p>
+      <p class="account">
+        <span>新结算账号：</span><input type="tel" v-model="newTradeUserNo" placeholder="请输入新结算账号" @keyup='changees'>
+      </p>
+      <p class="newname">
+        <span>新结算账号姓名：</span><b>{{newTradeUserName}}</b>
+      </p>
+      <p class="newname" v-show="isIncludeFirstBrokerSta">
+        <label for="male"><span style="width:1.56rem">是否同时修改赠送一级：</span></label><input type="checkbox" v-model="isIncludeFirstBroker" id="male">
+      </p>
+      <!-- <p class="newname">
+        <span>新手机号码：</span><b>{{newPhone}}</b>
+      </p> -->
+      <p class="yzm">
+        <span>验证码：</span><input type="tel" placeholder="请输入验证码" v-model="identifyCode"><timer-btn ref="timerbtn" class="btn btn-default" v-on:run="sendCodes" style="display: inline-block" v-show='verification'></timer-btn>
+      </p>
+      <div class="commissionSubmit">
+        <span @click="commissionSubmit">提交</span>
+      </div>
+    </div>
+
+    <div style="height: 0.1rem"></div>
+
+    <div class="section">
+      <div class="hd">
+        <div class="hd-inner">
+          <span class="hd-title">历史修改记录</span>
+        </div>
+      </div>
+      <div class="content">
+        <div class="msalist">
+          <ul>  
+            <li v-for="item in modifyUserNoHistoryList">
+              <span>原结算账号：{{item.oldTradeUserNo}}</span>
+              <span>原结算账号姓名：{{item.oldTradeUserName}}</span>
+              <span>新结算账号：{{item.newTradeUserNo}}</span>
+              <span>新结算账号姓名：{{item.newTradeUserName}}</span>
+              <span>申请时间：{{item.applyDate}}</span>
+              <span v-if="test(item.auditDate)">修改时间：{{item.auditDate}}</span>
+              <span >状态：{{item.processStatusId}}</span>
+            </li>
+          </ul>
+        <v-empty v-show="emptySta"></v-empty>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 背景遮罩 -->
+    <div class="stage-cover" v-show="coverShow" @click="coverHide"></div>
+
+    <div class="oneBoker" v-show="coverShow">
+      <p><span>赠送一级结算账号：{{getFirstBrokerInfoDate.oldFirstTradeUserNo}}</span></p>
+      <p><span>赠送一级结算账号姓名：{{getFirstBrokerInfoDate.name}}</span></p>
+      <p><span>赠送一级手机号码：{{getFirstBrokerInfoDate.phone}}</span></p>
+      <p class="ff"><span>验证码：</span><input type="tel" placeholder="请输入验证码" style="width:1rem; outline: none" v-model="identifyCodeO"><timer-btn ref="timerbtns" class="btn btn-default" v-on:run="sendCodesO" style="display: inline-block" v-show="newOne"></timer-btn></p>
+      <p><span class="subm" @click="createTopAndFirstModifyUserNoRecordEnter">确认修改</span></p>
+      <span class="close" @click="coverHide"><img src="../../../assets/close_03.png"></span>
+    </div>
+
+    <p class="tips" v-show="create"><span>{{tipText}}</span></p>
+
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+import timerBtn from 'components/login/timerBtn/timerBtn';
+import back from 'components/back/back';
+
+  export default{
+    data(){
+      return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        tipText: null,
+        create: false,
+        coverShow: false,
+        oldTradeUserNo: null,
+        oldTradeUserName: '原结算账号姓名',
+        oldPhone: '原手机号码',
+        newTradeUserNo: null,
+        newTradeUserName: '新结算账号姓名',
+        // newPhone: '新手机号码',
+        amount: null,
+        goodsNo: '000004',
+        verification: false,
+        identifyCode: null,
+        modifyUserNoHistoryList: [],
+        emptySta: false,
+        backSta: false,
+        isB: false,
+        isIncludeFirstBroker: false,
+        isIncludeFirstBrokerSta: false,
+        isSame: 'Y',
+        oldFirstTradeUserNo: null,
+        getFirstBrokerInfoDate: [],
+        newOne: false,
+        identifyCodeO: null,
+        topBrokerUserInfo: []
+      }
+    },
+    components: {
+      'timer-btn': timerBtn,
+      'v-empty': empty,
+      'v-back': back
+    },
+    mounted(){
+      this.isB = this.toolHelper.isWeiXin();
+      this.backSta = this.toolHelper.isWeiXin();
+      this.getLoginAccountRole();
+      this.showModifyUserNoHistoryList();
+    },
+    methods: {
+      coverHide: function(){
+        this.coverShow = false;
+        this.identifyCodeO = '';
+      },
+      test: function(auditDate){
+        if(auditDate != null){
+          return true
+        }else{
+          return false
+        }
+      },
+      changes: function(){
+        var length = this.oldTradeUserNo.length;
+        if (length > 10) {
+            this.oldTradeUserNo = this.oldTradeUserNo.substring(0, 10);
+        }
+        if (length == 10) {
+          this.getOldTradeUserNameAndPhone();
+        }
+        if(length < 10){
+          this.oldTradeUserName = '原结算账号姓名';
+          this.oldPhone = '原手机号码';
+          this.verification = false;
+        }
+      },
+      changees: function(){
+        var length = this.newTradeUserNo.length;
+        if (length > 10) {
+            this.newTradeUserNo = this.newTradeUserNo.substring(0, 10);
+        }
+        if (length == 10) {
+          this.getNewTradeUserName();
+        }
+        if(length < 10){
+          this.newTradeUserName = '新结算账号姓名';
+        }
+      },
+      getOldTradeUserNameAndPhone: function(){
+        this.$http.get('/api/getOldTradeUserNameAndPhone',{params:{ sessionToken: this.sessionToken, oldTradeUserNo: this.oldTradeUserNo }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.oldTradeUserName = response.body.data.oldTradeUserName;
+            this.oldPhone = response.body.data.phone;
+            this.verification = true;
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }      
+        }).then((error)=> this.error = error)
+      },
+      getNewTradeUserName: function(){
+        this.$http.get('/api/getNewTradeUserName',{params:{ sessionToken: this.sessionToken, newTradeUserNo: this.newTradeUserNo }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.newTradeUserName = response.body.data.newTradeUserName;
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }      
+        }).then((error)=> this.error = error)
+      },
+      getIdentifyCodeForModifyUserNo: function(){
+        this.$http.get('/api/getIdentifyCodeForModifyUserNo',{params:{ sessionToken: this.sessionToken, phone: this.oldPhone, oldTradeUserNo: this.oldTradeUserNo }}).then((response) => { 
+          if(response.body.result == ERR_OK){
+            this.$refs.timerbtn.start();
+            this.tipText = '获取验证码成功';
+            this.tip();
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }      
+        }).then((error)=> this.error = error)
+      },
+      sendCodes:function(){
+        this.getIdentifyCodeForModifyUserNo()
+      },
+      commissionSubmit: function(){
+        var length1 = this.oldTradeUserNo.length;
+        var length2 = this.newTradeUserNo.length;
+        if(this.oldTradeUserNo != '' && this.oldTradeUserNo != null && this.newTradeUserNo != '' && this.newTradeUserNo != null && this.identifyCode != '' && this.identifyCode != null && length1 == 10 && length2 == 10){
+          
+          this.$http.get('/api/createModifyUserNoRecord',{params:{ sessionToken: this.sessionToken, phone: this.oldPhone, oldTradeUserNo: this.oldTradeUserNo, newTradeUserNo: this.newTradeUserNo, identifyCode: this.identifyCode, isIncludeFirstBroker: this.isIncludeFirstBroker}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+        
+              
+              this.showModifyUserNoHistoryList();
+              this.oldFirstTradeUserNo = response.body.data.oldFirstTradeUserNo;
+              this.topBrokerUserInfo = response.body.data.topBrokerUserInfo;
+              if(this.isIncludeFirstBroker && response.body.data.isSame == 'N'){
+                //赠送一级修改结算账号
+                this.getFirstBrokerInfo();
+                this.coverShow = true;
+              }else{
+                this.tipText = '申请成功';
+                this.oldTradeUserNo = null;
+                this.oldTradeUserName = '原结算账号姓名';
+                this.oldPhone = '原手机号码';
+                this.newTradeUserNo = null;
+                this.newTradeUserName = '新结算账号姓名';
+                this.identifyCode = null;
+                this.verification = false;
+                this.tip();
+                this.coverShow = false;
+              }
+
+            }else{
+              this.tipText = response.body.message;
+              this.tip();
+            }      
+          }).then((error)=> this.error = error)
+
+        }else{
+          this.tipText = "请输入正确完整的信息";
+          this.tip();
+        }
+
+      },
+      showModifyUserNoHistoryList: function(){
+        this.$http.get('/api/showModifyUserNoHistoryList',{params:{ sessionToken: this.sessionToken }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.modifyUserNoHistoryList = response.body.data.modifyUserNoHistoryList;
+            for(var i=0; i<this.modifyUserNoHistoryList.length; i++){
+              this.modifyUserNoHistoryList[i].applyDate = this.timetrans(this.modifyUserNoHistoryList[i].applyDate); 
+              if(this.modifyUserNoHistoryList[i].auditDate != null){
+                this.modifyUserNoHistoryList[i].auditDate = this.timetrans(this.modifyUserNoHistoryList[i].auditDate);
+              }
+            }
+            if(this.modifyUserNoHistoryList =='' || this.modifyUserNoHistoryList == null){
+              this.emptySta = true;
+            }else{
+              this.emptySta = false;
+            }
+          }else{
+            
+          }      
+        }).then((error)=> this.error = error)
+      },
+      tip: function(){
+        this.create = true;
+        var this_ = this;
+        clearTimeout(t)
+        var t = setTimeout(function (){
+            this_.create = false;
+        }, 3000);
+      },
+      timetrans: function(date){
+        var date = new Date(date);//如果date为10位不需要乘1000
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
+        var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+        var m = (date.getMinutes() <10 ? '0' + date.getMinutes() : date.getMinutes());
+        var s = (date.getSeconds() <10 ? '0' + date.getSeconds() : date.getSeconds());
+        // return Y+M+D+h+m+s;
+        return Y+M+D;
+      },
+      getLoginAccountRole: function(sessionToken){
+        this.$http.get('/api/getLoginAccountRole',{params:{ sessionToken: this.sessionToken}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            if(response.body.data.role == 'ROLE_TOP'){
+              this.isIncludeFirstBroker = true;
+              this.isIncludeFirstBrokerSta = true;
+            }else{
+              this.isIncludeFirstBroker = false;
+              this.isIncludeFirstBrokerSta = false;
+            }
+          }else{
+            
+          }
+        }).then((error)=> this.error = error)
+      },
+      sendCodesO: function(){
+        this.getIdentifyCodeForModifyFirstUserNo();
+      },
+      getFirstBrokerInfo: function(){
+        this.$http.post('/api/getFirstBrokerInfo',{ sessionToken: this.sessionToken, oldFirstTradeUserNo: this.oldFirstTradeUserNo}, {emulateJSON: true}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.getFirstBrokerInfoDate = response.body.data;
+            this.newOne = true;
+          }else{
+            
+          }      
+        }).then((error)=> this.error = error)
+      },
+      getIdentifyCodeForModifyFirstUserNo: function(){
+        this.$http.get('/api/getIdentifyCodeForModifyFirstUserNo',{params:{sessionToken: this.sessionToken, phone: this.getFirstBrokerInfoDate.phone, oldFirstTradeUserNo: this.getFirstBrokerInfoDate.oldFirstTradeUserNo}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.$refs.timerbtns.start();
+            this.tipText = '获取验证码成功';
+            this.tip();
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }      
+        }).then((error)=> this.error = error)
+      },
+      createTopAndFirstModifyUserNoRecordEnter: function(){
+        this.$http.get('/api/createTopAndFirstModifyUserNoRecordEnter',{params:{sessionToken: this.sessionToken, oldFirstTradeUserNo: this.getFirstBrokerInfoDate.oldFirstTradeUserNo, name: this.getFirstBrokerInfoDate.name,phone: this.getFirstBrokerInfoDate.phone,identifyCode: this.identifyCodeO,oldTopTradeUserNo:this.topBrokerUserInfo.oldTopTradeUserNo, newTradeUserNo: this.topBrokerUserInfo.newTradeUserNo,topBrokerUserNo: this.topBrokerUserInfo.topBrokerUserNo}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.tipText = "修改成功";
+            this.tip();
+            this.oldTradeUserNo = null;
+            this.oldTradeUserName = '原结算账号姓名';
+            this.oldPhone = '原手机号码';
+            this.newTradeUserNo = null;
+            this.newTradeUserName = '新结算账号姓名';
+            this.identifyCode = null;
+            this.verification = false;
+            this.coverShow = false;
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }      
+        }).then((error)=> this.error = error)
+      }
+    }
+  };
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .oneBoker
+    width: 3rem
+    background: #fff
+    position: absolute
+    top: 40%
+    left: 50%
+    z-index: 100000002
+    padding: 0.3rem 0.2rem
+    transform: translateX(-50%) translateY(-50%)
+    -webkit-transform: translateX(-50%) translateY(-50%)
+    border-radius: 0.05rem
+    box-shadow: 0 0 30px 0 rgba(0,0,0,0.4)
+    p
+      position: relative
+      line-height: 0.4rem
+      font-size: 0.12rem
+      .subm
+        display: block
+        text-align: center
+        margin: 0.2rem auto 0
+        background-color: #ff6000
+        width: 60%
+        height: 0.35rem
+        line-height: 0.35rem
+        border-radius: 0.5rem
+        color: #fff 
+      &.ff::after
+        position: absolute
+        left: 0
+        bottom: 0
+        content: ''
+        width: 100%
+        border-bottom: 1px solid #ff6000
+        transform: scaleY(0.5)
+        -webkit-transform: scaleY(0.5)
+    .close
+      position: absolute
+      top: -0.08rem
+      right: -0.08rem
+      width: 0.3rem
+      height: 0.3rem
+      img
+        width: 100%
+        height: 100%
+  .msalist
+    overflow: hidden
+    li
+      padding: 0.12rem
+      position: relative
+      overflow: hidden
+      &::after
+        content: ''
+        width: 100%
+        position: absolute
+        left: 0
+        bottom: 0
+        height: 1px
+        background-color: #ccc
+        transform: scaleY(0.5)
+      &:nth-last-child(1)::after
+        display: none
+      span
+        float: left
+        width: 50%
+        font-size: 0.13rem
+        line-height: 0.32rem
+        overflow: hidden
+        height: 0.32rem
+        text-overflow: ellipsis
+        white-space: nowrap
+  button
+    outline: none
+  .SCommission_box
+    padding: 0.2rem 0.3rem
+    background-color: #FFF
+    font-size: 0.14rem
+    line-height: 0.4rem
+    &.msa p span
+      width: 1.2rem
+    &.msa p.yzm span
+     width: 0.8rem 
+    p
+      position: relative
+      width: 100%
+      margin: 0.05rem 0
+      &:nth-child(1)::after,&:nth-last-child(2)::after,&:nth-last-child(3)::after,&.account::after
+        position: absolute
+        bottom: 0
+        left: 0
+        content: ''
+        width: 100%
+        border-bottom: 1px solid #ff6000
+        transform: scaleY(0.5)
+      span
+        display: inline-block
+        width: 1rem
+      input
+        display: inline-block
+        width: 1.2rem
+        border: none
+        outline: none
+      b
+        color: #999999
+      & > i
+        font-style: normal
+        i
+          font-style: normal
+          font-size: 0.12rem
+          color: #999999
+      .SCommissionOption
+        position: relative
+        display: inline-block
+        color: #000
+        border: 1px solid #ff6000
+        width: 1.05rem
+        height: 0.32rem
+        line-height: 0.31rem
+        padding: 0 0.1rem
+        border-radius: 0.05rem
+        .jian
+          position: absolute
+          top: 0.015rem
+          right: 0.015rem
+          width: 0.26rem
+          height: 0.26rem
+          text-align: center
+          line-height: 0.26rem
+          color: #fff
+          border-radius: 0.03rem
+          background: #ff6000 url(../../../assets/v_03.png) center center no-repeat
+          background-size: 80%
+        .optioList
+          display block
+          position: absolute
+          z-index: 1
+          top: 0.37rem
+          left: 0
+          width: 100%
+          text-align: center
+          border: 1px solid #ff6000
+          background-color: #FFF
+          border-radius: 0.05rem
+          padding: 0 0.06rem
+          z-index: 100000002
+          i
+            position: relative
+            display: block
+            font-style: normal
+            height: 0.42rem
+            line-height: 0.42rem
+            color: #000
+            &::after
+              position: absolute
+              content: ''
+              width: 100%
+              border-bottom: 1px solid #ccc
+              bottom: 0
+              left: 0
+              transform: scaleY(0.5)
+            &:nth-last-child(1)::after
+              border: none
+      &.newname::after
+        display: none
+      &.newname input
+        -webkit-appearance: none
+        vertical-align: middle
+        margin-bottom: 0.04rem
+        width: 0.18rem
+        height: 0.18rem
+        background: url(../../../assets/cbn.png)
+        border: none
+        background-size: 100%
+        -webkit-background-size: 100%
+      &.newname input:checked
+        background-image: url(../../../assets/cbC.png)
+    .commissionSubmit
+      text-align: center
+      margin-top: 0.2rem
+      span
+        padding: 0.1rem 0.8rem
+        background-color: #ff6000
+        color: #fff
+        border-radius: 0.5rem
+        font-size: 0.15rem
+</style>

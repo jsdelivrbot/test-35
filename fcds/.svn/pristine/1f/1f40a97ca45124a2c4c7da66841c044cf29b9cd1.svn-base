@@ -1,0 +1,131 @@
+<template>
+  <div id="seniorfranchise">
+      <div class="section">
+          <div class="hd">
+            <div class="hd-inner">
+                <span class="hd-title">高级经纪商</span>
+                <span class="seniorfranchiseDate"><i>更新日期2017年01月</i></span>
+            </div>
+          </div>
+          <div class="content">
+            <ul>
+              <li class="first">
+                <div class="inner">
+                  <div class="item"><p>最后交款日</p></div>
+                  <div class="item">高级经纪商</div>
+                  <div class="item">已交总计</div>
+                </div>
+              </li>
+              <li>
+                <div class="inner">
+                  <div class="item"><p>3-21</p></div>
+                  <div class="item">李松青(442202)</div>
+                  <div class="item extras">3383774.00</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+      </div>
+
+      <div class="section">
+          <div class="hd">
+            <div class="hd-inner">
+                <span class="hd-title">一级经纪商</span>
+                <span class="seniorfranchiseStatistics">已交总计：<i>4,680万</i></span>
+                <span class="seniorfranchiseStatistics">人数总计：<i>35人</i></span>
+            </div>
+          </div>
+          <div class="content">
+            <ul>
+              <li class="first">
+                <div class="inner">
+                  <div class="item"><p>最后交款日</p></div>
+                  <div class="item">一级经纪商</div>
+                  <div class="item">已交总计</div>
+                </div>
+              </li>
+              <li>
+                <div class="inner">
+                  <div class="item"><p>3-21</p></div>
+                  <div class="item">李松青(442202)</div>
+                  <div class="item extras">3383774.00</div>
+                </div>
+              </li>
+              <li>
+                <div class="inner">
+                  <div class="item"><p>3-21</p></div>
+                  <div class="item">李松青(442202)</div>
+                  <div class="item extras">3383774.00</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+      </div>
+  </div>
+</template>
+
+<script>
+
+  export default{
+    created() {
+	   
+    },
+    mounted(){
+      
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  #seniorfranchise
+    .seniorfranchiseDate
+      float: right
+      i
+        font-style: normal
+        color: #999999
+    li
+      width: 100%
+      height: 0.65rem
+      padding: 0 0.12rem
+      &.first
+        height: 0.45rem
+        .inner
+          height: 0.45rem
+          line-height: 0.45rem
+          .item
+            height: 0.45rem
+            line-height: 0.45rem
+      .inner
+        position: relative
+        width: 100%
+        height: 0.65rem
+        &::after
+          display: block
+          position: absolute
+          content: ''
+          bottom: 0
+          left: 0
+          width: 100%
+          height: 1px
+          background-color: #d0d0d0
+          transform: scaleY(0.5)
+          -webkit-transform: scaleY(0.5)
+        .item
+          width: 33.33%
+          position: relative
+          float: left
+          height: 0.65rem
+          text-align: center
+          font-size: 0.14rem
+          line-height: 0.65rem
+          &.extras
+            color: #ff6000
+    .seniorfranchiseStatistics
+      float: right
+      color: #999999
+      margin-right: 0.1rem
+      i
+        font-style: normal
+        color: #ff6000
+        // font-size: 0.14rem
+</style>

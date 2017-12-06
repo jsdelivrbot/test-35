@@ -1,0 +1,386 @@
+<template>
+	<div>
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border-bottom-1px">
+		      <span class="hd-title">资金总览</span>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content overview">
+		      <ul>
+		        <li>净入金：<span>{{funOverview.inMoney}}</span></li>
+		        <li>手续费：<span>{{funOverview.poundage}}</span></li>
+		        <li>红积分：<span>{{funOverview.redScore}}</span></li>
+		        <li>蓝积分：<span>{{funOverview.blueScore}}</span></li>
+		        <li>货款收入：<span>{{funOverview.paymentIn}}</span></li>
+		        <li>佣金支出：<span>{{funOverview.rebateOut}}</span></li>
+		      </ul>
+		    </div>
+		  </div>
+		</div>
+
+		<div style="height:0.1rem"></div>
+
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border_1px">
+		      <span class="hd-title">近7日出入金趋势</span>
+		      <div class="legend">
+		        <span>入金</span>
+		        <span>出金</span>
+		      </div>
+		      <!-- <span class="dete-control column-control" @click="showDetelist"></span> -->
+		      <span class="dete-control column-control" @click="columnRequest"></span>
+		      <span id="column_date" class="opacity_date">{{curdate}}</span>
+		      <!-- <div class="stage-box column-dete" v-show="detailShow">
+		        <div class="stage-inner">
+		          <ul id="monthList">
+		            <li @click="hideDetelist" v-for="(item, index) in columnDateValue" >
+		            	<p @click="getColumnDete(columnDateKey[index])">{{columnDateValue[index]}}</p>	
+		            </li>
+		          </ul>
+		        </div>
+		      </div> -->
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content chart-column">
+		      <div id="main-column" style="width:100%;height:200px;"></div>
+		    </div>
+		  </div>
+		</div>
+
+		<div style="height:0.1rem"></div>
+		
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border_1px">
+		      <span class="hd-title">每日资金分布</span>
+		      <!-- <span class="dete-control column-control" @click="showPie"></span>
+		      <span class="curdate">日期：{{curdate}}</span> -->
+              <span class="dete-control column-control" @click="pieRequest"></span>
+              <span class="curdate" id="J-xl-2">{{curdate}}</span>
+		      <!-- <div class="stage-box column-dete" v-show="pieShow">
+		        <div class="stage-inner">
+		          <ul id="monthList">
+		            <li @click="hidePie" v-for="(item, index) in pieDateValue" >
+		            	<p @click="getPieDete(pieDateKey[index],pieDateValue[index])">{{pieDateValue[index]}}</p>	
+		            </li>
+		          </ul>
+		        </div>
+		      </div> -->
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content chart-column">
+		      <div id="main-pie" style="width:100%;height:200px;"></div>
+		    </div>
+		  </div>
+		</div>
+
+		<div class="stage-cover" v-show="coverShow" @click="hideDetelist"></div>
+		<v-load v-show="load"></v-load>
+	</div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+import 'common/js/jquery-1.8.3.min.js';
+import 'common/js/laydate.dev.js';
+import load from 'components/load/load';
+
+const ERR_OK = 'success';
+
+ export default{
+ 	components:{
+ 		'v-load': load
+ 	},
+ 	data() {
+ 		return {
+ 			detailShow: false,
+ 			pieShow: false,
+ 			coverShow: false,
+ 			funOverview: {},
+ 			inOutMoneyTrend: {},
+ 			fundDistribute: {},
+ 			columnDateValue: [],
+ 			columnDateKey: [],
+ 			pieDateValue: [],
+ 			pieDateKey: [],
+ 			curdate: '',
+            session_token: localStorage.getItem("session_token"),
+            load: true
+ 		}
+ 	},
+ 	created() {
+ 		// 资金总览
+ 		this.$http.get('/api/fundOverview',{params:{ session_token: this.session_token }}).then((response) => { 
+ 			this.load = false;
+ 			if(response.body.result == ERR_OK){ 
+ 				this.funOverview = response.body.data;
+ 			}else{
+ 				alert(response.body.message);
+ 			}
+ 			
+ 		}).then((error)=> this.error = error)
+
+ 		// 近7日出入金趋势
+ 		this.getColumnDete('');
+
+ 		// 每日资金分布
+ 		this.getPieDete('');
+
+ 	},
+ 	methods: {
+        // getValue(selectValue) {
+        //   this.selectValue = selectValue;
+        // },
+        columnRequest: function(){
+        	var _this = this;
+            laydate({
+                elem: '#column_date',
+                min: '2016-10-01', //设定最小日期
+                max: laydate.now(-1), //最大日期
+                choose: function(datas){ //选择日期完毕的回调
+                	var date = datas;
+                	date = date.replace(/-/g,'');
+                    _this.getColumnDete(date);
+                }
+
+            });
+        },
+        pieRequest: function(){
+        	var _this = this;
+            laydate({
+                elem: '#J-xl-2',
+                min: '2016-10-01', //设定最小日期
+                max: laydate.now(-1), //最大日期
+                choose: function(datas){ //选择日期完毕的回调
+                	var date = datas;
+                	date = date.replace(/-/g,'');
+                    _this.getPieDete(date);
+                }
+
+            });
+        },
+ 		showDetelist: function() {
+ 			this.detailShow = true;
+ 			this.coverShow = true;
+ 		},
+ 		hideDetelist: function(){
+ 			this.detailShow = false;
+ 			this.coverShow = false;
+ 			this.pieShow = false;
+ 		},
+ 		showPie: function() {
+ 			this.pieShow = true;
+ 			this.coverShow = true;
+ 		},
+ 		hidePie: function(){
+ 			this.pieShow = false;
+ 			this.coverShow = false;
+ 		},
+ 		getColumnDete: function(date) {
+            // alert(date);
+            this.load = true;
+            this.pieDateValue = [];
+            this.pieDateKey = [];
+            this.$http.get('/api/inOutMoneyTrend',{params:{ session_token: this.session_token, date: date }}).then((response) => { 
+            	this.load = false;
+            	if(response.body.result == ERR_OK){ 
+            		this.inOutMoneyTrend = response.body.data;
+            		this.column('main-column', this.inOutMoneyTrend.dateList, this.inOutMoneyTrend.inMoneyList, this.inOutMoneyTrend.outMoneyList);
+     
+            		this.ArryReverse(this.inOutMoneyTrend.selectDateList, this.pieDateValue, this.pieDateKey);
+
+            	}else{
+            		alert(response.body.message);
+            	}
+            	
+            }).then((error)=> this.error = error)
+        },
+        getPieDete: function(date,dateKey) {
+            // this.curdate = date;
+            this.load = true;
+            this.columnDateValue = [];
+            this.columnDateKey = [];
+            this.$http.get('/api/fundDistribute',{params:{ session_token: this.session_token, date: date }}).then((response) => { this.load = false;
+ 			if(response.body.result == ERR_OK){ 
+ 				this.fundDistribute = response.body.data;
+ 				// console.log(this.fundDistribute)
+
+ 				if(date == ''){
+ 					var _date = this.fundDistribute.nowDate;
+ 					// _date = _date.replace(/年/g,'-');
+ 					// _date = _date.replace(/月/g,'-');
+ 					// _date = _date.replace(/日/g,'');
+ 					this.curdate = _date;
+ 				}else{
+ 					this.curdate = dateKey;
+ 				}
+
+ 				this.pie('main-pie', this.fundDistribute.individualFund, this.fundDistribute.mainFund);
+
+            	this.ArryReverse(this.fundDistribute.selectDateList, this.columnDateValue, this.columnDateKey);
+
+ 			}else{
+ 				alert(response.body.message);
+ 			}
+ 			
+ 			}).then((error)=> this.error = error)
+        },
+        ArryReverse: function(arry, typeDateValue, typeDateKey){
+        	for(var i = arry.length-1; i >= 0; i--){
+        		typeDateValue.push(arry[i].dateValue);
+        		typeDateKey.push(arry[i].dateKey)
+        	}
+
+        },
+        pie: function(el, v1, v2){
+
+	        let pie = echarts.init(document.getElementById(el));
+        	let option_pie = {
+        		tooltip : {
+    		        trigger: 'item',
+    		        formatter: "{a} <br/>{b} : {c} ({d}%)",
+    		        position:[3,3]
+    		    },
+        		color:['#54b9ff', '#ff6600'],
+        	    series : [
+        	        {
+        	        	name: "每日资金",
+        	            type: 'pie',
+        	            radius : '65%',
+        	            center: ['50%', '55%'],
+        	            data:[
+        	                {value:v1, name:'散户资金'},
+        	                {value:v2, name:'主力资金'}
+        	            ],
+        	            itemStyle: {
+        	                emphasis: {
+        	                    shadowBlur: 10,
+        	                    shadowOffsetX: 0,
+        	                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+        	                },
+        	                normal:{
+	                           label:{
+    	                           show:true,
+    	                           formatter: '{b}\n\n{c}\n\n{d}%'
+	                           },
+	                           labelLine:{show:true}
+        	                }
+        	            }
+        	        }
+        	    ]
+        	};
+
+		    pie.setOption(option_pie);
+
+        },
+        column: function(el, x, y1, y2){
+
+	        let column = echarts.init(document.getElementById(el));
+	        let option_column = {
+	        	tooltip: {
+                         trigger: 'axis',
+                         axisPointer: {
+                             type: 'shadow'
+                         }
+                     },
+		         color: ['#ff954b','#54b9ff'],
+		         grid: {
+		              left: '3%',
+		              right: '3%',
+		              bottom: '3%',
+		              top: '3%',
+		              containLabel: true
+		          },
+		         calculable : true,
+		         xAxis : [
+		             {  
+		                 // splitArea : {show : true},
+		                 type : 'category',
+		                 data : x,
+		                 axisLabel :{  
+		                      interval:0,
+		                  }
+		             }
+		         ],
+		         yAxis : [
+		             {
+		                 type : 'value',
+		                 axisLabel: {
+		                     formatter: '{value}万'
+		                 },
+		                 axisTick: {
+		                      alignWithLabel: true
+		                  }
+		             }
+		         ],
+		         series : [
+		             {
+		                 type:'bar',
+		                 data: y1,
+		                 name: "入金",
+		                 itemStyle: {
+		                   normal: {
+		                       color: new echarts.graphic.LinearGradient(
+		                            0, 0, 0, 1,
+		                            [
+		                                {offset: 0, color: '#ff7417'},
+		                                {offset: 0.5, color: '#ff9a56'},
+		                                {offset: 1, color: '#ffb584'}
+		                            ]
+		                        ),
+		                       barBorderRadius:[5, 5, 0, 0],
+		                      //  label: {
+		                      //   show: true,
+		                      //   position: 'top',
+		                      //   formatter: "{c}"
+		                      // }
+		                   }
+		                },
+		                barGap: '1%',
+		                barWidth: 13
+		             },
+		             {
+		                 type:'bar',
+		                 data: y2,
+		                 name: "出金",
+		                 itemStyle: {
+		                   normal: {
+		                       color: new echarts.graphic.LinearGradient(
+		                            0, 0, 0, 1,
+		                            [
+		                                {offset: 0, color: '#59bbff'},
+		                                {offset: 0.5, color: '#80cbff'},
+		                                {offset: 1, color: '#a8dbff'}
+		                            ]
+		                        ),
+		                       barBorderRadius:[5, 5, 0, 0],
+		                      //  label: {
+		                      //   show: true,
+		                      //   position: 'top',
+		                      //   formatter: "{c}"
+		                      // }
+		                   }
+		                  },
+		                  barGap: '1%',
+		                  barWidth: 13
+		             }
+		         ]
+		    };
+
+		    column.setOption(option_column);
+        }
+ 	}
+ };
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+    #laydate_box
+        right: 10px!important
+        left: auto!important
+</style>

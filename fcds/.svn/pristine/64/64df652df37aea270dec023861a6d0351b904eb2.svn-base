@@ -1,0 +1,265 @@
+<template>
+	<div>
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border-bottom-1px">
+		      <span class="hd-title">交易商汇总</span>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content overview">
+		      <ul>
+		        <li>交易商：<span>32480</span></li>
+		        <li>签约量：<span>28354</span></li>
+		        <li>认购客户：<span>4321</span></li>
+		        <li>交易客户：<span>18645</span></li>
+		      </ul>
+		    </div>
+		  </div>
+		</div>
+
+		<div style="height:0.1rem"></div>
+
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border_1px">
+		      <span class="hd-title">近7日新增交易商趋势</span>
+		      <div class="legend">
+		        <span>开户量</span>
+		        <span>签约量</span>
+		      </div>
+		      <span class="dete-control column-control" @click="showDetetrend"></span>
+		      <div class="stage-box column-dete" v-show="detetrend">
+		        <div class="stage-inner">
+		          <ul id="monthList">
+		            <li @click="hideDetetrend" v-for="(item, index) in datetrend" >
+		            	<p @click="getDataId(datetrend[index])">{{datetrend[index]}}</p>	
+		            </li>
+		          </ul>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content chart-polyline">
+		      <div id="main-polyline" style="width:100%;height:200px;"></div>
+		    </div>
+		  </div>
+		</div>
+
+		<div style="height:0.1rem"></div>
+
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border_1px">
+		      <span class="hd-title">近7日活跃情况</span>
+		      <div class="legend">
+		        <span>在线</span>
+		        <span>参与交易</span>
+		      </div>
+		      <span class="dete-control column-control" @click="showDetelist"></span>
+		      <div class="stage-box column-dete" v-show="detailShow">
+		        <div class="stage-inner">
+		          <ul id="monthList">
+		            <li @click="hideDetelist" v-for="(item, index) in date">
+		            	<p @click="getDataId(date[index])">{{date[index]}}</p>	
+		            </li>
+		          </ul>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content chart-column">
+		      <div id="main-column" style="width:100%;height:200px;"></div>
+		    </div>
+		  </div>
+		</div>
+		<div class="stage-cover" v-show="cover" @click="hideDetelist"></div>
+	</div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+
+ export default{
+ 	data() {
+ 		return {
+ 			detailShow: false,
+ 			detetrend: false,
+ 			cover: false,
+ 			plan: 11,
+ 			date:['2017年03月(下)','2017年03月(上)','2017年02月(下)','2017年02月(上)','2017年01月(下)'],
+ 			datetrend:['2017-03','2017-03','2017-02','2017-02','2017-01']
+ 		};
+ 	},
+ 	methods: {
+ 		showDetelist: function() {
+ 			this.detailShow = true;
+ 			this.cover = true;
+ 		},
+ 		hideDetelist: function(){
+ 			this.detailShow = false;
+ 			this.detetrend = false;
+ 			this.cover = false;
+ 		},
+ 		showDetetrend: function(){
+ 			this.detetrend = true;
+ 			this.cover = true;
+ 		},
+ 		hideDetetrend: function(){
+ 			this.detetrend = false;
+ 			this.cover = false;
+ 		},
+ 		getDataId: function(dete) {
+            alert(dete);
+        }
+ 	},
+    mounted() {
+        let column = echarts.init(document.getElementById('main-column'));
+        let pie = echarts.init(document.getElementById('main-polyline'));
+        let option_column = {
+	         color: ['#ff954b','#54b9ff'],
+	         grid: {
+	              left: '3%',
+	              right: '3%',
+	              bottom: '3%',
+	              top: '3%',
+	              containLabel: true
+	          },
+	         calculable : true,
+	         xAxis : [
+	             {  
+	                 // splitArea : {show : true},
+	                 type : 'category',
+	                 data : ['02/25','02/26','02/27','02/28','03/01','03/02','03/03'],
+	                 axisLabel :{  
+	                      interval:0,
+	                  }
+	             }
+	         ],
+	         yAxis : [
+	             {
+	                 type : 'value',
+	                 axisLabel: {
+	                     formatter: '{value}万'
+	                 },
+	                 axisTick: {
+	                      alignWithLabel: true
+	                  }
+	             }
+	         ],
+	         series : [
+	             {
+	                 type:'bar',
+	                 data:[500, 450, 250, 380, 440, 400, 580],
+	                 itemStyle: {
+	                   normal: {
+	                       color: new echarts.graphic.LinearGradient(
+	                            0, 0, 0, 1,
+	                            [
+	                                {offset: 0, color: '#ff7417'},
+	                                {offset: 0.5, color: '#ff9a56'},
+	                                {offset: 1, color: '#ffb584'}
+	                            ]
+	                        ),
+	                       barBorderRadius:[5, 5, 0, 0],
+	                      //  label: {
+	                      //   show: true,
+	                      //   position: 'top',
+	                      //   formatter: "{c}"
+	                      // }
+	                   }
+	                },
+	                barGap: '1%',
+	                barWidth: 13
+	             },
+	             {
+	                 type:'bar',
+	                 data:[400, 360, 180, 220, 390, 300, 430],
+	                 itemStyle: {
+	                   normal: {
+	                       color: new echarts.graphic.LinearGradient(
+	                            0, 0, 0, 1,
+	                            [
+	                                {offset: 0, color: '#59bbff'},
+	                                {offset: 0.5, color: '#80cbff'},
+	                                {offset: 1, color: '#a8dbff'}
+	                            ]
+	                        ),
+	                       barBorderRadius:[5, 5, 0, 0],
+	                      //  label: {
+	                      //   show: true,
+	                      //   position: 'top',
+	                      //   formatter: "{c}"
+	                      // }
+	                   }
+	                  },
+	                  barGap: '1%',
+	                  barWidth: 13
+	             }
+	         ]
+	    };
+
+	    let option_pie = {
+	        grid: {
+	            left: '3%',
+	            right: '6%',
+	            bottom: '3%',
+	            top: '3%',
+	            containLabel: true
+	        },
+	        xAxis: {
+	            type: 'category',
+	            boundaryGap: false,
+	            data: ['02/25','02/26','02/27','02/28','03/01','03/02','03/03'],
+	            axisLabel: {
+	               interval: 0
+	            }
+	        },
+	        yAxis: {
+	            type: 'value'
+	        },
+	        series: [
+	            {
+	                type:'line',
+	                stack: '总量',
+	                data:[120, 132, 101, 134, 90, 230, 210],
+	                itemStyle: {
+	                  normal: {
+	                  	color:'#54b9ff'
+	                     // label: {
+	                     //   show: true,
+	                     //   position: 'top',
+	                     //   formatter: "{c}"
+	                     // }
+	                  }
+	                }
+	            },
+	            {
+	                type:'line',
+	                stack: '总量',
+	                data:[220, 182, 191, 234, 290, 330, 310],
+	                itemStyle: {
+	                  normal: {
+	                  	color:'#ff6701'  
+	                     // label: {
+	                     //   show: true,
+	                     //   position: 'top',
+	                     //   formatter: "{c}"
+	                     // }
+	                  }
+	                }
+	            }
+	        ]
+	    };
+
+	    column.setOption(option_column);
+	    pie.setOption(option_pie);
+    }
+ };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+
+</style>

@@ -1,0 +1,78 @@
+<template>
+  <div id="franchiseDetails" v-title="'手续费明细'">
+      <div class="section">
+          <div class="hd">
+            <div class="hd-inner">
+                <span class="hd-title">手续费{{date}}</span>
+            </div>
+          </div>
+          <div class="content">
+            <div class="details-list">
+              <ul>
+                <li v-for="item in feDetailsData">
+                  <span>
+                    <i>{{item.week}}</i>
+                    <i>{{item.date}}</i>
+                  </span>
+                  <span>&nbsp;{{item.name}}&nbsp;</span>
+                  <span>&nbsp;{{item.rebateAmount}}&nbsp;</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+      </div>
+  </div>
+</template>
+
+<script>
+const ERR_OK = 'success';
+
+  export default{
+    data(){
+      return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        date: this.$route.query.date,
+        rebateTypeId: 'POUNDAGE_REBATE',
+        feDetailsData: [],
+        scroll: '',
+        totalPage: null,
+        pageIndex: null
+      }
+    },
+    created() {
+
+    },
+    methods: {
+      feDetails: function(pageIndex){
+        this.$http.get('/api/findSecondLevelRebateDetail',{params:{ sessionToken: this.sessionToken, rebateTypeId: this.rebateTypeId, month: this.date, pageIndex: pageIndex}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.totalPage = response.body.data.paging.totalPage;
+            this.pageIndex = response.body.data.paging.pageIndex;
+            for (var i = 0; i < response.body.data.rebateList.length; i++) {
+              this.feDetailsData.push(response.body.data.rebateList[i])
+            }
+          }else{
+            
+          }   
+        }).then((error)=> this.error = error)
+      },
+      menu: function() {
+        this.scroll = document.body.scrollTop;
+        if(window.screen.height + this.scroll > document.body.offsetHeight){
+          this.pageIndex++
+          if(this.totalPage > this.pageIndex){
+            this.feDetails(this.pageIndex);
+          }
+        }
+      }
+    },
+    mounted(){
+      this.feDetails(0);
+      window.addEventListener('scroll', this.menu);
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+ 
+</style>

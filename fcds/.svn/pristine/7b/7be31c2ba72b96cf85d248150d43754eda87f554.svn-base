@@ -1,0 +1,44 @@
+<template>
+	<div>
+		<div class="v-back">
+			<span @click="back">返回</span>
+		</div>
+	</div>
+</template>
+
+<script>
+
+ export default{
+	data(){
+		return{
+
+		}
+	},
+	methods: {
+		back: function(){
+			history.back();
+		}
+	}
+ };
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+	.v-back
+		position: fixed
+		top: 0
+		left: 50%
+		max-width: 640px
+		transform: translateX(-50%)
+		-webkit-transform: translateX(-50%)
+		width: 100%
+		height: 0.4rem
+		background-color: rgba(0,0,0,0.8)
+		padding: 0 0.12rem
+		z-index: 111111111111111111
+		span
+			float: left
+			color: #fff
+			line-height: 0.4rem
+			font-szie: 0.14rem
+</style>

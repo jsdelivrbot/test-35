@@ -1,0 +1,245 @@
+<template>
+	<div>
+		<!-- 2017年n月（上/下）返佣汇总(圆环图) -->
+		<div class="section">
+			<div class="hd">
+				<div class="hd-inner">
+					<span class="hd-title">2017年3月（上）返佣汇总</span>
+				</div>
+			</div>
+			<div class="content">
+				<div class="overview-rebate">
+					<canvas id="canvas" class="canvas"> </canvas>
+				</div>
+			</div>
+		</div>
+
+		<!-- 返佣汇总详情 -->
+		<div class="section">
+		  	<div class="content" style="padding:0;">
+		  		<div class="rebate-details">
+		  			<p>
+		  				<span>积分总览</span>
+		  				<span>加盟费详情</span>
+		  				<span>积分详情</span>
+		  			</p>
+		  			<p>
+		  				<span>资产包详情</span>
+		  				<span>手续费详情</span>
+		  				<span>已交加盟费</span>
+		  			</p>
+		  		</div>
+		  	</div>
+		</div>
+
+		<!-- 2017年n月（上/下）返佣汇总(折线图) -->
+		<div class="section">
+		  	<div class="hd">
+			    <div class="hd-inner">
+			      	<span class="hd-title">2017年3月（上）返佣汇总</span>
+	              	<span class="dete-control" @click="pieRequest"></span>
+	              	<span class="curdate" id="J-xl-2"><!-- {{curdate}} --></span>
+			    </div>
+		  	</div>
+		  	<div class="content">
+		    	<div id="polylineRebate" style="width:100%;height:2rem;"></div>
+		  	</div>
+		</div>
+
+	</div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+import 'common/js/jquery-1.8.3.min.js';
+import 'common/js/laydate.dev.js';
+
+export default{
+ 	data(){
+ 	    return {
+ 	        
+ 	    }
+ 	},
+ 	created(){
+ 		
+ 	},
+	methods:{
+		// 返佣总览环状图
+	    wagonRebate: function(el){
+	    	var option = {
+	    		el: el,
+	    		data: {value:142127836.47, name: '返佣总额', title: '2017年3月(上)'},
+	    		series:{
+	    			data:[
+	    				{value:35531959.1175, name: '手续费返佣', color: '#68d0b5'},
+	    				{value:35531959.1175, name: '资产包返佣', color: '#fece94'},
+	    				{value:35531959.1175, name: '加盟费返佣', color: '#ff9d5c'},
+	    				{value:35531959.1175, name: '积分返佣', color: '#92d2ff'}
+	    			]
+	    		},
+	    		r: 130,
+	    		arcwidth: 40
+	    	}
+	    	this.toolHelper.wagon(option);
+	    },
+	    // 返佣总览折线图
+	    polylineRebate: function(el){
+	    	let polylineRebate = echarts.init(document.getElementById(el));
+	    	let option = {
+	    	    tooltip : {
+	    	        trigger: 'axis',
+	    	        axisPointer: {
+	    	            type: 'cross',
+	    	            label: {
+	    	                backgroundColor: '#6a7985'
+	    	            }
+	    	        }
+	    	    },
+	    	    toolbox: {
+	    	        feature: {
+	    	            saveAsImage: {}
+	    	        }
+	    	    },
+	    	    grid: {
+	    	        left: '2%',
+	    	        right: '6%',
+	    	        bottom: '3%',
+	    	        top: '4%',
+	    	        containLabel: true
+	    	    },
+	    	    color: ['#ff6000'],
+	    	    xAxis : [
+	    	        {
+	    	            type : 'category',
+	    	            boundaryGap : false,
+	    	            data : ['02/25','02/26','02/27','02/28','03/01','03/02','03/03'],
+	    	            axisLabel :{  
+		                    interval:0,
+		                },
+		                splitLine: {
+		                    show: true,
+			                lineStyle:{
+			                	color:"#e1e1e1",
+			                	type:"solid"
+			                }
+		                 }
+	    	        }
+	    	    ],
+	    	    yAxis : [
+	    	        {
+	    	            type : 'value'
+	    	        }
+	    	    ],
+	    	    series : [
+	    	        {
+	    	            name:'金额',
+	    	            type:'line',
+	    	            areaStyle: {normal: {}},
+	    	            data:[4100, 4000, 6000, 6500, 5000, 5500, 4400],
+	    	            areaStyle: {
+	    	               normal: {
+	    	                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+	    	                       offset: 0,
+	    	                       color: 'rgba(255, 102, 0, 1)'
+	    	                   }, {
+	    	                       offset: 1,
+	    	                       color: 'rgba(255, 249, 245, 0.2)'
+	    	                   }])
+	    	               }
+	    	           },
+	    	           lineStyle: {
+		    	            normal: {
+		    	                type: 'solid',
+		    	                color:"#ff6000",
+		    	                opacity :"1"
+		    	            }
+	    	 			}
+	    	        }
+	    	    ]
+	    	};
+	    	polylineRebate.setOption(option);
+	    },
+	    // 
+	    pieRequest: function(){
+	    	var _this = this;
+	    	this.coverShow = true;
+	        laydate({
+	            elem: '#J-xl-2',
+	            min: '2016-10-01', //设定最小日期
+	            max: laydate.now(-1), //最大日期
+	            choose: function(datas){ //选择日期完毕的回调
+	            	var date = datas;
+	            	date = date.replace(/-/g,'');
+	                _this.getPieDete(date);
+	                _this.coverShow = false
+	            }
+
+	        });
+	    },
+	},
+	mounted() {
+		// 返佣总览环状图
+	    this.wagonRebate('canvas');
+
+	    this.polylineRebate('polylineRebate');
+	}
+};
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+	#laydate_box
+	    right: 10px!important
+	    left: auto!important
+	// 返佣总览
+	.overview-rebate
+		width: 100%
+		height: 2rem
+		position: relative
+		background-color: #FFF
+		overflow: hidden
+		.canvas
+			position: absolute
+			top: 50%
+			left: 50%
+			transform: translateX(-50%) translateY(-50%) scale(0.5)
+	// 返佣汇总详情
+	.rebate-details
+		p
+			position: relative
+			width: 100%
+			height: 0.5rem
+			span
+				position: relative
+				float: left
+				width: 33.33%
+				height: 100%
+				text-align: center
+				line-height: 0.5rem
+				color: #666666
+				font-size: 0.12rem
+				&::after
+					position: absolute
+					right: 0
+					top: 0
+					display: block
+					content: ''
+					width: 0
+					height: 100%
+					border-right: 1px solid #ccc
+					transform: scaleX(0.9) scaleY(0.5)
+				&:nth-child(3n)::after
+					display: none
+			&::after
+				position: absolute
+				right: 0
+				bottom: 0
+				display: block
+				content: ''
+				width: 100%
+				height: 0
+				border-bottom: 1px solid #ccc
+				transform: scaleX(0.9) scaleY(0.5)
+			&:nth-last-child(1)::after
+				display: none
+</style>

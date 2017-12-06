@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>首页</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+
+  <div class="user_info_d" id="bestBroker"><!-- 市级运营中心 --></div>
+  <div style="height:0.3rem;"></div>
+
+  <div class="stage">
+    <span class="left" id="stageLeftDete"><!-- 2017年01月 --></span>
+    <i></i>
+    <div class="stage-box">
+      <div class="stage-inner">
+        <ul id="monthList">
+          <!-- <li>00001</li>
+          <li>00002</li>
+          <li>00003</li>
+          <li>00004</li>
+          <li>00005</li> -->
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="stage-cover"></div>
+
+  <!-- <div class="r-tap">
+    <span class="left">2017年01月</span>
+    <span class="right"></span>
+  </div> -->
+
+  <div class="r-header"><p>近期返佣总情况</p></div>
+	<div class="box">
+    <div id="container" style="min-width:100%;height:2rem;padding-top:0.1rem"></div>
+  </div>
+  <div style="height:10px;"></div>
+  <div class="r-header" id="collecting"><p><!-- 1月返佣汇总 --></p></div>
+  <div class="box box2">
+    <canvas id="myCanvas" width="700px" height="480px"></canvas>
+  </div>
+  <div style="height:10px;"></div>
+  <div class="r-header" id="detailed"><p><!-- 1月返佣明细 --></p></div>
+  <div class="box box2 teshu">
+    <ul class="roletype" id="roletype">
+      <!-- <li>
+        <div class="left"><img src="images/icon_07.png" alt=""></div>
+        <div class="right">
+          <span class="right-l">加盟费返佣明细</span><span class="right-r">35846.51</span><i></i>
+        </div>
+      </li>
+      <li>
+        <div class="left"><img src="images/icon_10.png" alt=""></div>
+        <div class="right">
+          <span class="right-l">商品包返佣明细</span><span class="right-r">35846.51</span><i></i>
+        </div>
+      </li>
+      <li>
+        <div class="left"><img src="images/icon_12.png" alt=""></div>
+        <div class="right">
+          <span class="right-l">手续费返佣明细</span><span class="right-r">35846.51</span><i></i>
+        </div>
+      </li>
+      <li>
+        <div class="left"><img src="images/icon_14.png" alt=""></div>
+        <div class="right">
+          <span class="right-l">积分返佣明细</span><span class="right-r">35846.51</span><i></i>
+        </div>
+      </li> -->
+    </ul>
+  </div>
+
+  <div id="logout" onclick="window.location='logout.html'"><span>退出登录</span></div>
+
+  <p class="tips" id="tips">&nbsp;</p>
+
+  <script src="js/jquery-1.8.3.min.js"></script>
+  <script src="js/mo.js"></script>
+  <script src="js/jquery.cookie.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/highcharts.js"></script>
+  <script src="js/exporting.js"></script>
+  <script type="text/javascript">
+    $(".loader_cover_box").css("display","block");
+    $(".stage i").click(function(event) {
+      $(".stage-cover").css("display","block");
+      $(".stage-box").css("display","block");
+    });
+    $(".stage-cover").click(function(event) {
+      $(".stage-cover").css("display","none");
+      $(".stage-box").css("display","none");
+    });
+
+    var session_token = $.cookie('session_token');
+    var url=decodeURI(location.href);
+    var month=url.split("?")[1];
+    app.ajaxHelper.submitRequest({
+        url: '/api/findSummary',
+        data: {
+            session_token: session_token,
+            month: month
+        },
+        success: function (data) {
+             
+            if (data.result == "success") {
+                $(".loader_cover_box").css("display","none");
+                $("#bestBroker").html(data.data.role);
+                var monthListLength = data.data.monthList.length;
+                var curMonth = data.data.monthList[monthListLength-1];
+                if(month){ 
+                  $("#stageLeftDete").html(month);
+                  $("#collecting p").html(month+"返佣汇总");
+                  $("#detailed p").html(month+"返佣明细");
+                  curMonth = month;
+                }else{
+                  $("#stageLeftDete").html(data.data.monthList[monthListLength-1]);
+                  $("#collecting p").html(data.data.monthList[monthListLength-1]+"返佣汇总");
+                  $("#detailed p").html(data.data.monthList[monthListLength-1]+"返佣明细");
+                }
+
+                $(function () {
+                  $('#container').highcharts({
+                      chart: {
+                          type: 'line'
+                      },
+                      title: {  
+                              text: '<%=showName%>',  
+                              align: 'left',  
+                              x: 0  
+                          },
+                      subtitle: {
+                          text: ''
+                      },
+                      xAxis: {
+                          categories: data.data.xAxisList
+                      },
+                      credits: {
+                          enabled:false
+                  },
+                  exporting: {
+                          enabled:false
+                  },
+                  legend: {
+                    enabled: false
+                  },
+                      yAxis: {
+                          title:'',
+                          labels: {
+                              formatter: function () {
+                                  return this.value;
+                              }
+                          }
+                      },
+                      plotOptions: {
+                          line: {
+                              dataLabels: {
+                                  enabled: true
+                              },
+                              enableMouseTracking: false
+                          }
+                      },
+                      series: [{
+                          name: 'Tokyo',
+                          data: data.data.valueList
+                      }]
+                  });
+              })
+                
+                var minFloat = 0.0000000000001;
+                var a = parseFloat(data.data.poundageRebateRatio)+minFloat;
+                var b = parseFloat(data.data.packageRebateRatio)+minFloat;
+                var c = parseFloat(data.data.transBizFranchiseRebateRatio)+minFloat;
+                var d = parseFloat(data.data.scoreRebateRatio)+minFloat;
+
+                var y_data = [];
+
+                if(a==minFloat&&b==minFloat&&c==minFloat&&d==minFloat){
+                  y_data=[
+                    {bgcolor:'#ccc',value:100},
+                    {bgcolor:'#e1e97a',value:0},
+                    {bgcolor:'#8bddf1',value:0},
+                    {bgcolor:'#fe86b3',value:0}
+                  ];
+                  cal(350,220,150,(y_data[0].value/2/100)*360+90,'rgba(0,0,0,0)','暂无返佣','请继续加油！')
+                }else{
+                  y_data=[
+                    {bgcolor:'#ff954b',value:a},
+                    {bgcolor:'#e1e97a',value:b},
+                    {bgcolor:'#8bddf1',value:c},
+                    {bgcolor:'#fe86b3',value:d}
+                  ];
+                }
+
+                // var aj = (y_data[0].value/2/100)*360+90;
+                // var bj = ((y_data[0].value+(y_data[1].value/2))/100*360+90);
+                // var cj = ((y_data[0].value+y_data[1].value+(y_data[2].value/2))/100*360+90);
+                // var dj = ((y_data[0].value+y_data[1].value+y_data[2].value+(y_data[3].value/2))/100*360+90);
+
+                var aj = (25/2/100)*360+90;
+                var bj = ((25+(25/2))/100*360+90);
+                var cj = ((25+25+(25/2))/100*360+90);
+                var dj = ((25+25+25+(25/2))/100*360+90);
+
+                yuanhuan(ctx,y_data,{cood:{x:350,y:220},radius:140});
+                // if(data.data.poundageRebate>0&&a>10){
+                //   cal(350,220,150,aj,'#ff954b',data.data.poundageRebate,'')
+                // }
+                // if(data.data.packageRebate>0&&b>10){
+                //   cal(350,220,150,bj,'#e1e97a',data.data.packageRebate,'')
+                // }
+                // if(data.data.transBizFranchiseRebate>0&&c>10){
+                //   cal(350,220,150,cj,'#8bddf1',data.data.transBizFranchiseRebate,'')
+                // }
+                // if(data.data.scoreRebate>0&&d>10){
+                //   cal(350,220,150,dj,'#f76864',data.data.scoreRebate,'')
+                // }
+
+                cal(350,220,150,aj,'#ff954b',data.data.poundageRebate,'')
+                cal(350,220,150,bj,'#e1e97a',data.data.packageRebate,'')
+                cal(350,220,150,cj,'#8bddf1',data.data.transBizFranchiseRebate,'')
+                cal(350,220,150,dj,'#fe86b3',data.data.scoreRebate,'')
+
+               function drawBeauty(beauty){　　
+                // var mycv = document.getElementById("myCanvas");　　
+                // var myctx = mycv.getContext("2d");
+                ctx.drawImage(beauty, 252, 135);　　
+               }　　
+               function load() {　　
+                  var beauty = new Image();
+                  beauty.src = "images/brandlogo1.png";　　
+                  if (beauty.complete) {
+                    drawBeauty(beauty);　　
+                  } else {
+                    beauty.onload = function() {
+                      drawBeauty(beauty);　　
+                    };
+                    beauty.onerror = function() {
+                      window.alert('加载失败，请重试');　　
+                    };　　
+                  };
+               } 
+               load();
+
+              function detailedListHtml(poundageRebate,packageRebate,transBizFranchiseRebate,scoreRebate) {
+                var franchiseUrl = '\'franchise.html?'+curMonth+'\'';
+                var feeUrl = '\'fee.html?'+curMonth+'\'';
+                var integralUrl = '\'integral.html?'+curMonth+'\'';
+                var packageUrl = '\'package.html?'+curMonth+'\'';
+                var html = '<li onclick="window.location='+encodeURI(franchiseUrl)+'"><div class="left"><img src="images/icon_07.png" alt=""></div><div class="right"><span class="right-l">加盟费返佣明细</span><span class="right-r">'+transBizFranchiseRebate+'</span><i></i></div></li><li onclick="window.location='+encodeURI(packageUrl)+'"><div class="left"><img src="images/icon_10.png" alt=""></div><div class="right"><span class="right-l">资产包返佣明细</span><span class="right-r">'+packageRebate+'</span><i></i></div></li><li onclick="window.location='+encodeURI(feeUrl)+'"><div class="left"><img src="images/icon_12.png" alt=""></div><div class="right"><span class="right-l">手续费返佣明细</span><span class="right-r">'+poundageRebate+'</span><i></i></div></li><li onclick="window.location='+encodeURI(integralUrl)+'"><div class="left"><img src="images/icon_14.png" alt=""></div><div class="right"><span class="right-l">积分返佣明细</span><span class="right-r">'+scoreRebate+'</span><i></i></div></li>';
+
+                return html;
+              }
+
+              $(data.data).each(function(i){
+                var listHtml = detailedListHtml(this.poundageRebate,this.packageRebate,this.transBizFranchiseRebate,this.scoreRebate);
+                $('#roletype').append(listHtml);
+              })
+
+              for(var i=(monthListLength-1);i >= 0; i--){
+                var thisUrl = '\'index.html?'+data.data.monthList[i]+'\'';
+                var thisMot = data.data.monthList[i];
+                  $('#monthList').append('<li data-url="'+thisMot+'" onclick="window.location='+encodeURI(thisUrl)+'">'+data.data.monthList[i]+'</li>');
+              }
+
+            }else if(data.result == "noSession"){
+                window.location.href="login.html";
+            }else {
+                $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+            }
+        }
+    });
+    
+    $(".stage-cover").on('touchmove', function(event) {
+        event.preventDefault();
+      })
+
+    // $("#monthList").on('click', 'li', function(){
+    //   $(".loader_cover_box").css("display","block");
+    //   ctx.clearRect(0,0,700,480)
+    //   var month = $(this).attr("data-url");
+    //   app.ajaxHelper.submitRequest({
+    //       url: '/api/findSummary',
+    //       data: {
+    //           session_token: session_token,
+    //           month: month
+    //       },
+    //       success: function (data) {
+    //           if (data.result == "success") {
+    //               $(".loader_cover_box").css("display","none");
+    //               $("#bestBroker").html(data.data.role);
+    //               var monthListLength = data.data.monthList.length;
+    //               if(month){ 
+    //                 $("#stageLeftDete").html(month);
+    //                 $("#collecting p").html(month+"返佣汇总");
+    //                 $("#detailed p").html(month+"返佣明细");
+    //               }else{
+    //                 $("#stageLeftDete").html(data.data.monthList[monthListLength-1]);
+    //                 $("#collecting p").html(data.data.monthList[monthListLength-1]+"返佣汇总");
+    //                 $("#detailed p").html(data.data.monthList[monthListLength-1]+"返佣明细");
+    //               }
+
+    //               $(function () {
+    //                 $('#container').highcharts({
+    //                     chart: {
+    //                         type: 'line'
+    //                     },
+    //                     title: {  
+    //                             text: '<%=showName%>',  
+    //                             align: 'left',  
+    //                             x: 0  
+    //                         },
+    //                     subtitle: {
+    //                         text: ''
+    //                     },
+    //                     xAxis: {
+    //                         categories: data.data.xAxisList
+    //                     },
+    //                     credits: {
+    //                         enabled:false
+    //                 },
+    //                 exporting: {
+    //                         enabled:false
+    //                 },
+    //                 legend: {
+    //                   enabled: false
+    //                 },
+    //                     yAxis: {
+    //                         title:'',
+    //                         labels: {
+    //                             formatter: function () {
+    //                                 return this.value;
+    //                             }
+    //                         }
+    //                     },
+    //                     plotOptions: {
+    //                         line: {
+    //                             dataLabels: {
+    //                                 enabled: true
+    //                             },
+    //                             enableMouseTracking: false
+    //                         }
+    //                     },
+    //                     series: [{
+    //                         name: 'Tokyo',
+    //                         data: data.data.valueList
+    //                     }]
+    //                 });
+    //             });
+                  
+    //               var minFloat = 0.0000000000001;
+    //               var a = parseFloat(data.data.poundageRebateRatio)+minFloat;
+    //               var b = parseFloat(data.data.packageRebateRatio)+minFloat;
+    //               var c = parseFloat(data.data.transBizFranchiseRebateRatio)+minFloat;
+    //               var d = parseFloat(data.data.scoreRebateRatio)+minFloat;
+
+    //               var y_data = [];
+
+    //               if(a==minFloat&&b==minFloat&&c==minFloat&&d==minFloat){
+    //                 y_data=[
+    //                   {bgcolor:'#ccc',value:100},
+    //                   {bgcolor:'#e1e97a',value:0},
+    //                   {bgcolor:'#8bddf1',value:0},
+    //                   {bgcolor:'#fe86b3',value:0}
+    //                 ];
+    //                 cal(350,220,150,(y_data[0].value/2/100)*360+90,'rgba(0,0,0,0)','暂无返佣','请继续加油！')
+    //               }else{
+    //                 y_data=[
+    //                   {bgcolor:'#ff954b',value:a},
+    //                   {bgcolor:'#e1e97a',value:b},
+    //                   {bgcolor:'#8bddf1',value:c},
+    //                   {bgcolor:'#fe86b3',value:d}
+    //                 ];
+    //               }
+
+    //               // var aj = (y_data[0].value/2/100)*360+90;
+    //               // var bj = ((y_data[0].value+(y_data[1].value/2))/100*360+90);
+    //               // var cj = ((y_data[0].value+y_data[1].value+(y_data[2].value/2))/100*360+90);
+    //               // var dj = ((y_data[0].value+y_data[1].value+y_data[2].value+(y_data[3].value/2))/100*360+90);
+
+    //               var aj = (25/2/100)*360+90;
+    //               var bj = ((25+(25/2))/100*360+90);
+    //               var cj = ((25+25+(25/2))/100*360+90);
+    //               var dj = ((25+25+25+(25/2))/100*360+90);
+
+    //               yuanhuan(ctx,y_data,{cood:{x:350,y:220},radius:140});
+    //               // if(data.data.poundageRebate>0&&a>10){
+    //               //   cal(350,220,150,aj,'#ff954b',data.data.poundageRebate,'')
+    //               // }
+    //               // if(data.data.packageRebate>0&&b>10){
+    //               //   cal(350,220,150,bj,'#e1e97a',data.data.packageRebate,'')
+    //               // }
+    //               // if(data.data.transBizFranchiseRebate>0&&c>10){
+    //               //   cal(350,220,150,cj,'#8bddf1',data.data.transBizFranchiseRebate,'')
+    //               // }
+    //               // if(data.data.scoreRebate>0&&d>10){
+    //               //   cal(350,220,150,dj,'#f76864',data.data.scoreRebate,'')
+    //               // }
+
+    //               cal(350,220,150,aj,'#ff954b',data.data.poundageRebate,'')
+    //               cal(350,220,150,bj,'#e1e97a',data.data.packageRebate,'')
+    //               cal(350,220,150,cj,'#8bddf1',data.data.transBizFranchiseRebate,'')
+    //               cal(350,220,150,dj,'#fe86b3',data.data.scoreRebate,'')
+
+    //              function drawBeauty(beauty){　　
+    //               // var mycv = document.getElementById("myCanvas");　　
+    //               // var myctx = mycv.getContext("2d");
+    //               ctx.drawImage(beauty, 252, 135);　　
+    //              }　　
+    //              function load() {　　
+    //                 var beauty = new Image();
+    //                 beauty.src = "images/brandlogo1.png";　　
+    //                 if (beauty.complete) {
+    //                   drawBeauty(beauty);　　
+    //                 } else {
+    //                   beauty.onload = function() {
+    //                     drawBeauty(beauty);　　
+    //                   };
+    //                   beauty.onerror = function() {
+    //                     window.alert('加载失败，请重试');　　
+    //                   };　　
+    //                 };
+    //              } 
+    //              load();
+
+    //             function detailedListHtml(poundageRebate,packageRebate,transBizFranchiseRebate,scoreRebate) {
+    //               var franchiseUrl = '\'franchise.html?'+month+'\'';
+    //               var feeUrl = '\'fee.html?'+month+'\'';
+    //               var integralUrl = '\'integral.html?'+month+'\'';
+    //               var packageUrl = '\'package.html?'+month+'\'';
+    //               var html = '<li onclick="window.location='+encodeURI(franchiseUrl)+'"><div class="left"><img src="images/icon_07.png" alt=""></div><div class="right"><span class="right-l">加盟费返佣明细</span><span class="right-r">'+transBizFranchiseRebate+'</span><i></i></div></li><li onclick="window.location='+encodeURI(packageUrl)+'"><div class="left"><img src="images/icon_10.png" alt=""></div><div class="right"><span class="right-l"> 资产包返佣明细</span><span class="right-r">'+packageRebate+'</span><i></i></div></li><li onclick="window.location='+encodeURI(feeUrl)+'"><div class="left"><img src="images/icon_12.png" alt=""></div><div class="right"><span class="right-l">手续费返佣明细</span><span class="right-r">'+poundageRebate+'</span><i></i></div></li><li onclick="window.location='+encodeURI(integralUrl)+'"><div class="left"><img src="images/icon_14.png" alt=""></div><div class="right"><span class="right-l">积分返佣明细</span><span class="right-r">'+scoreRebate+'</span><i></i></div></li>';
+
+    //               return html;
+    //             }
+
+    //             $(data.data).each(function(i){
+    //               var listHtml = detailedListHtml(this.poundageRebate,this.packageRebate,this.transBizFranchiseRebate,this.scoreRebate);
+    //               $('#roletype').html(listHtml);
+    //             })
+
+    //             var monthListAll = '';
+    //             for(var i=(monthListLength-1);i >= 0; i--){
+    //               var thisUrl = '\'index.html?'+data.data.monthList[i]+'\'';
+    //               var thisMot = data.data.monthList[i];
+    //                 monthListAll += '<li data-url="'+thisMot+'">'+data.data.monthList[i]+'</li>'
+    //             }
+    //             $('#monthList').html(monthListAll);
+
+    //           } else {
+    //               $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+    //           }
+    //       }
+    //   });
+    //   $(".stage-cover").css("display","none");
+    //   $(".stage-box").css("display","none");
+    // })
+    
+    $(".loader_cover_box").on('touchmove', function(event) {
+      event.preventDefault();
+    });
+  </script>
+</body>
+</html>

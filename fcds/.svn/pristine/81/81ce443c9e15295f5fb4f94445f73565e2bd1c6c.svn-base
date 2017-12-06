@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>我的排名</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+	<div class="home_header">
+		<div class="h_user_info_box">
+			<div class="h_user_box">
+				<div class="h_user_bg"></div>
+				<div class="h_user_img" style="background-image: url(images/34.jpg);"></div>
+			</div>
+			<div class="h_user_info_d">
+				<div class="h_user_info_d_box" id="user_info">
+					<!-- <P>马云</P>
+					<P>4301020001</P>
+					<P>团队总人数：86人</P>
+					<P>归属地：广东省广州一市</P>
+					<span class="grade"></span> -->
+					<!-- <span class="logout" id="logout">退出登录</span> -->
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="ranging" id="ranging">
+		<!-- <div class="home_package">
+			<div class="home_package_header">
+				<span class="home_package_header_icon"><img src="images/ico_03.png" alt=""></span>
+				<p class="theme_title">净入金</p>
+				<p class="time">2016-12-24</p>
+			</div>
+			<div class="home_package_num">
+				<p>全国排名第<b>2</b>（名）</p>
+				<p>120800（元）</p>
+			</div>
+		</div>
+
+		<div class="home_package">
+			<div class="home_package_header">
+				<span class="home_package_header_icon"><img src="images/ico_06.png" alt=""></span>
+				<p class="theme_title">交易额</p>
+				<p class="time">2016-12-24</p>
+			</div>
+			<div class="home_package_num">
+				<p>全国排名第<b>3</b>（名）</p>
+				<p>628800（元）</p>
+			</div>
+		</div>
+
+		<div class="home_package">
+			<div class="home_package_header">
+				<span class="home_package_header_icon"><img src="images/ico_08.png" alt=""></span>
+				<p class="theme_title">开户量</p>
+				<p class="time">2016-12-24</p>
+			</div>
+			<div class="home_package_num">
+				<p>全国排名第<b>3</b>（名）</p>
+				<p>328（人）</p>
+			</div>
+		</div>
+
+		<div class="home_package">
+			<div class="home_package_header">
+				<span class="home_package_header_icon"><img src="images/ico_10.png" alt=""></span>
+				<p class="theme_title">一级经济商</p>
+				<p class="time">2016-12-24</p>
+			</div>
+			<div class="home_package_num">
+				<p>全国排名第<b>3</b>（名）</p>
+				<p>134（人）</p>
+			</div>
+		</div> -->
+	</div>
+	<div style="height:70px"></div>
+	<script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/common.js"></script>
+	<script type="text/javascript">
+		$(function(){
+
+			$(".loader_cover_box").css("display","block");
+
+			var session_token = new Object();
+			session_token.session_token=$.cookie('session_token');
+			var session = JSON.stringify(session_token);
+
+			var rankingParam = new Object();
+			rankingParam.session_token=$.cookie('session_token');
+			rankingParam.productId=GetQueryString("pid");
+			var rankingParamInfo = JSON.stringify(rankingParam);
+
+			var links = '<div class="Nav"><div class="navin"><ul><li><a href="#" class="homebox" onclick="window.location = \'index.html?pid='+GetQueryString("pid")+'\'"><i class="home"></i>首页</a></li><li  onclick="window.location= \'package.html?pid='+GetQueryString("pid")+'\'"><a href="#" class="cartbox"><i class="shopcart"></i>商品包</a></li><li onclick="window.location= \'detailed.html?pid='+GetQueryString("pid")+'\'"><a href="#" class="comdybox"><i class="comdy"></i>出售明细</a></li></ul></div></div>'
+			$("body").append(links);
+			// 交易商信息
+			$.ajax({  
+			    type: "post",
+			    url: "/member-server-front/broker/queryBrokerUser",
+			    data:session,
+			    dataType: "json",
+			    success: function(data) {
+
+	    		    if(data.status < 0){
+	    	    		window.location.href="login.html";
+	    	    	}else{
+
+	    	    		$(".loader_cover_box").css("display","none");
+
+		                function userInfoHtml(name,accountNo,count,brokerUserName,level) {
+
+			                var html = '<P>'+name+'</P><P>'+accountNo+'</P><P>团队总人数：'+count+'人</P><P>归属地：'+brokerUserName+'</P><span class="grade '+level+'"></span><span class="logout" id="logout">退出登录</span>';
+
+			                return html;
+		                }
+		                
+		                $(data.data).each(function(i){
+		                	var infoHtml = userInfoHtml(this.name,this.accountNo,this.count,this.brokerUserName,this.level);
+		                	$('#user_info').append(infoHtml);
+		                  })
+
+	    	    	}
+    
+
+			    },
+			    error: function(err) {
+			        alert(data.message);
+			    }     
+			});
+
+			// 经济商排名请求
+			$.ajax({  
+			    type: "post",
+			    url: "/member-server-front/broker/queryRankingDetail",
+			    data:rankingParamInfo,
+			    dataType: "json",
+			    success: function(data) {
+	    		    if(data.status < 0){
+	    	    		window.location.href="login.html";
+	    	    	}else{
+
+		                function rankingHtml(date,netIncomeR,netIncome,tradingVolumeR,tradingVolume,accountOpenCountR,accountOpenCount,brokerUserCountR,brokerUserCount) {
+
+			                var html = '<div class="home_package"><div class="home_package_header"><span class="home_package_header_icon"><img src="images/ico_03.png" alt=""></span><p class="theme_title">日均净入金</p><p class="time">'+date+'</p></div><div class="home_package_num"><p>全国排名第<b>'+netIncomeR+'</b>（名）</p><p>'+netIncome+'（元）</p></div></div>'+'<div class="home_package"><div class="home_package_header"><span class="home_package_header_icon"><img src="images/ico_06.png" alt=""></span><p class="theme_title">交易额</p><p class="time">'+date+'</p></div><div class="home_package_num"><p>全国排名第<b>'+tradingVolumeR+'</b>（名）</p><p>'+tradingVolume+'（元）</p></div></div>'+'<div class="home_package"><div class="home_package_header"><span class="home_package_header_icon"><img src="images/ico_08.png" alt=""></span><p class="theme_title">开户量</p><p class="time">'+date+'</p></div><div class="home_package_num"><p>全国排名第<b>'+accountOpenCountR+'</b>（名）</p><p>'+accountOpenCount+'（人）</p></div></div>'+'<div class="home_package"><div class="home_package_header"><span class="home_package_header_icon"><img src="images/ico_10.png" alt=""></span><p class="theme_title">一级经纪商</p><p class="time">'+date+'</p></div><div class="home_package_num"><p>全国排名第<b>'+brokerUserCountR+'</b>（名）</p><p>'+brokerUserCount+'（人）</p></div></div>';
+
+			                return html;
+		                }
+		                
+		                $(data.data).each(function(i){
+		                	var rankingInfoHtml = rankingHtml(this.date,this.netIncomeR,this.netIncome,this.tradingVolumeR,this.tradingVolume,this.accountOpenCountR,this.accountOpenCount,this.brokerUserCountR,this.brokerUserCount);
+		                	$('#ranging').append(rankingInfoHtml);
+		                  })
+
+		                var outdate = new Date();  
+		                outdate.setTime(outdate.getTime() + (10*60*1000)); 
+		                $.cookie('placingId', data.data.placingId,{expires:outdate});
+
+	    	    	}    
+
+			    },
+			    error: function(err) {
+			        alert(data.message);
+			    }     
+			});
+
+			$(document).on("click","#logout",function(){
+				$.cookie('session_token', null);
+	     		window.location.href="login.html";
+			})
+
+		});	
+	</script>
+</body>
+</html>

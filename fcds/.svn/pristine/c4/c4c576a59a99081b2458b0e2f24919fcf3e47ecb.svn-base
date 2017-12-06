@@ -1,0 +1,92 @@
+<template>
+  <div>
+    <div class="setPassword">
+      <ul>
+        <li><span>设置密码：</span><input type="password" placeholder="请输入密码" v-model="loginPassword"></li>
+        <li><span>确认密码：</span><input type="password" placeholder="请再次输入密码" v-model="confirmLoginPassword"></li>
+      </ul>
+      <div class="determine-box">
+        <div class="determine" @click="determine">确 认</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import 'common/js/jquery-1.8.3.min.js';
+import timerBtn from 'components/login/timerBtn/timerBtn';
+
+const ERR_OK = 'success';
+
+  export default{
+    data() {
+	     return{
+        loginPassword: null,
+        confirmLoginPassword: null
+       }
+    },
+    components: {
+       'timer-btn': timerBtn
+     },
+    methods:{
+      determine: function(){
+        this.$http.get('/api/setPassword?',{params:{ loginPassword: this.loginPassword, confirmLoginPassword: this.confirmLoginPassword, accountNo: this.$route.query.brokerUserNo,tempToken: this.$route.query.tempToken}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            alert(response.body.message)
+            this.$router.push({ path: '/login' });
+          }else{
+            // this.$refs.timerbtn.stop();
+            alert(response.body.message)
+          }
+          
+        }).then((error)=> this.error = error)
+      }
+    },
+    mounted(){
+      
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .setPassword
+    background-color: #FFF
+    width: 100%
+    padding: 0.3rem
+    li
+      position: relative
+      width: 100%
+      height: 0.3rem
+      margin-top: 0.2rem
+      line-height: 0.3rem
+      padding: 0 0 0 0.95rem
+      font-size: 0.15rem
+      input[type='tel'],input[type='password']
+        width: 100%
+        outline: none
+      &::after
+        position: absolute
+        bottom: 0
+        left: 0
+        display: block
+        content: ''
+        width: 100%
+        border-bottom: 1px solid #ff6000
+        transform: scaleY(0.5)
+      span
+        position: absolute
+        top: 0
+        left: 0
+        line-height: 0.3rem
+        font-size: 0.15rem
+    .determine
+      height: 0.42rem
+      width: 2.26rem
+      background-color: #ff6000
+      margin: 0.3rem auto 0 auto
+      border-radius: 0.3rem
+      text-align: center
+      color: #fff
+      font-size: 0.15rem
+      line-height: 0.42rem
+</style>

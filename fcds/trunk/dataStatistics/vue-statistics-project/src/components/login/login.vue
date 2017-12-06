@@ -1,0 +1,229 @@
+<template>
+	<div id="login" :style="{backgroundImage: 'url(' + img + ')'}">
+		<div class="wrapper">
+			<div class="logo"><img src="../../assets/logo.png" alt=""></div>
+			<div class="login_info">
+				<p class="tip" id="tip"></p>
+				<div class="in_info_box">
+					<p class="in_info">
+						<span>手机号码：</span><input type="tel" name="phone" id="phone" placeholder="您的手机号" v-model='phone' @keyup='phoneChange'>
+					</p>
+				</div>
+				<div class="in_info_box">
+					<p class="in_info pr">
+						<span>动态密码：</span><input type="tel" placeholder="您的动态密码" v-model='sendcode'><timer-btn ref="timerbtn" class="btn btn-default" v-on:run="sendCode" v-show="verification"></timer-btn>
+					</p>
+				</div>
+				<a href="javascript:;" class="login_btn" @click="isLogin">登录</a>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+
+import 'common/js/jquery-1.8.3.min.js';
+import timerBtn from 'components/timerBtn/timerBtn';
+
+const ERR_OK = 'success';
+
+ export default{
+ 	data() {
+ 		return {
+ 			phone: '',
+ 			verification: false,
+ 			sendcode: '',
+ 			img: require('../../assets/bg.jpg')
+ 		}
+ 	},
+ 	components: {
+      'timer-btn': timerBtn
+    },
+	methods:{
+		isLogin: function() {	
+			
+			if(this.phone != '' && this.sendcode != ''){
+				this.$http.get('/api/login',{params:{ phone: this.phone, dynamicPassword: this.sendcode}}).then((response) => { 
+					if(response.body.result == ERR_OK){ 
+						$("#tip").html('<span class="tip_text">登录成功</span>');
+						localStorage.setItem('session_token', response.body.data.session_token);
+						localStorage.setItem('date', Date.parse(new Date()));
+						this.$router.push({ path: '/main/capital' });
+					}else{
+						$("#tip").html('<span class="tip_text">'+response.body.message+'</span>')
+					}
+					
+				}).then((error)=> this.error = error)
+			}else{
+				$("#tip").html('<span class="tip_text">请输入的你手机号码和动态密码</span>')
+			}
+
+		},
+		phoneChange: function(){
+
+			var length = $("#phone").val().length;
+			var value = $("#phone").val();
+			if (length > 11) {
+			    value = value.substring(0, 11);
+			    $("#phone").attr("value", value);
+			}
+			if (length == 11) {
+				this.verification = true;
+			}
+
+		},
+		sendCode:function(){
+
+			this.$refs.timerbtn.start()
+            // this.$refs.timerbtn.setDisabled(true); //设置按钮不可用
+            this.$http.get('/api/getDynamicPassword?',{params:{ phone: this.phone }}).then((response) => { 
+            	if(response.body.result == ERR_OK){ 
+            		$("#tip").html('<span class="tip_text">获取动态密码成功</span>');
+            	}else{
+            		// this.$refs.timerbtn.stop();
+            		$("#tip").html('<span class="tip_text">'+response.body.message+'</span>')
+            	}
+            	
+            }).then((error)=> this.error = error)
+
+        }
+	},
+	mounted() {
+		//移动端兼容
+		var verification = this.verification;
+		var autoScale = function() {
+		        var ratio = 375 / 590,
+		            winW = document.documentElement.clientWidth,
+		            winH = document.documentElement.clientHeight,
+		            ratio2 = winW / winH,
+		            scale;
+
+		        if (ratio < ratio2) {
+		            scale = (winH / 590).toString().substring(0, 6);
+		        } else {
+		            scale = (winW / 375).toString().substring(0, 6);
+		        }
+		        var cssText = '-webkit-transform: scale(' + scale + '); -webkit-transform-origin: center center; opacity: 1;';
+		        $('.wrapper').attr('style', cssText);
+		    }
+		setTimeout(function() {
+		    if (document.documentElement.clientWidth / document.documentElement.clientHeight != 375 / 590) {
+		        autoScale();
+		    } else {
+
+		    }
+		}, 300);
+		var roleType = '';
+		var roleNo = '';
+
+	}
+
+ };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+	#login
+		position: fixed
+		top: 0
+		left: 50%
+		width: 100%
+		height: 100%
+		max-width: 640px
+		transform: translateX(-50%)
+		-wenkit-transform: translateX(-50%)
+		background: 0 0 no-repeat
+		-webkit-background-size: cover
+		background-size: cover
+		.wrapper
+			position: absolute
+			left: 50%
+			top: 50%
+			width: 375px
+			height: 590px
+			margin: -295px 0 0 -187px
+			height: 590px
+			font-size: 15px
+			*
+				box-sizing: border-box
+				margin: 0 auto
+			.logo 
+				margin-top: 30px
+				width: 180px
+				height: 175px
+				img
+					width: 100%
+			.login_info
+				overflow: hidden
+				margin-top: 50px
+				width: 320px
+				height: 285px
+				border-radius: 5px
+				p.tip
+					position: absolute
+					top: 40%
+					left: 0
+					width: 100%
+					color: #ff6000
+					text-align: center
+					font-size: 15px
+					line-height: 40px
+				.in_info_box
+					margin: 20px auto
+					width: 300px
+					height: 40px
+					background-color: rgba(255,255,255,0.8)
+					border-radius: 5px
+					p.in_info
+						position: relative
+						overflow: hidden
+						padding-left: 70px
+						width: 256px
+						height: 40px
+						font-size: 15px
+						line-height: 40px
+						span
+							position: absolute
+							bottom: 0
+							left: 0
+						input
+							width: 100%
+							outline: 0
+							border: none
+							font-size: 15px
+							-webkit-appearance: none
+							margin: 0
+							background-color: transparent
+						.btn
+							float: right
+							color: #000
+							font-weight: 400
+							font-size: 15px
+							line-height: 40px
+							position: absolute
+							top: 0
+							right: 0
+							button
+								background-color: transparent
+								border: none
+								outline: none
+						&.pr
+							padding-right: 90px
+							padding-left: 70px
+				.login_btn
+					display: block
+					margin: 15px auto
+					width: 300px
+					height: 40px
+					background-color: #ff6000
+					color: #fff
+					text-align: center
+					line-height: 38px
+					border-radius: 5px
+	.tip_text
+		padding: 2px 10px
+		background-color: #ff6000
+		border-radius: 10px
+		text-align: center
+		color: #fff
+		-webkit-animation: note 0s ease 2s forwards
+</style>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>积分汇总</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="stylesheet" href="css/fcds.css">
+  <link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+
+  <div class="loader_cover_box">
+    <div class="loader">加载中...</div>
+  </div>
+
+  <div class="rebate">
+      <div>
+        <div class="rebate-header" ><span>积分汇总</span> <span id="times" style="float:right;font-size:0.12rem"><!-- 2017/03/01 至 2017/04/18 --></span></div>
+        <div class="inregral-header">
+          <div class="inner" >
+            <span style="float:left;width:auto">红积分总额</span>
+            <span style="float:right;width:auto" id="summaryData"></span>
+          </div>
+        </div>
+        <div class="summaryData">
+          <div id="main-pie" style="width:100%;height:200px;"></div>
+        </div>
+      </div>
+      <div class="rebate-header" ><span>积分明细</span></div>
+      <div class="rebate-list" id="container">
+        <div class="inregral-header">
+          <div class="inner">
+            <span id="roleTypeName"></span>
+            <span>已消费红积分</span>
+            <span>红积分总额</span>
+          </div>
+        </div>
+        <ul class="rebate-box width33" id="rebateList">
+
+           <!-- <li>
+             <div class="inner">
+               <div class="item teshu">
+                 <p>周三</p>
+                 <p>04-19</p>
+               </div>
+               <div class="item">陈细枝</div>
+               <div class="item">3.33</div>
+             </div>
+           </li> -->
+
+        </ul>
+        <div class="dropload-down"><div class="dropload-load"><span class="loading"></span>加载中...</div></div>
+      </div>
+  </div>
+
+  <p class="tips" id="tips">&nbsp;</p>
+
+  <script src="js/jquery-1.8.3.min.js"></script>
+  <script src="js/mo.js"></script>
+  <script src="js/jquery.cookie.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/echarts.min.js"></script>
+  <script type="text/javascript">
+    $(function(){
+      var totalPage = 0;
+      var page = 0;
+      $(".loader_cover_box").css("display","block");
+      var session_token = $.cookie('session_token');
+      app.ajaxHelper.submitRequest({
+          url: '/api/findScoreSummary',
+          data: {
+              session_token: session_token
+          },
+          success: function (data) {
+              var state = data.result;
+              if (state == "success") {
+                $("#summaryData").html(formatNum(data.data.useRedScore));
+                $("#times").html(data.data.startDate + ' 至 ' + data.data.endDate);
+                pie('main-pie',data.data.notUseRedScore,data.data.useRedScore)
+              } else if (state > "error") {
+                  
+              } else if (state < "noSession") {
+                  $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+                  // window.location.href = "login.html";
+              }
+          }
+      })
+
+      app.ajaxHelper.submitRequest({
+          url: '/api/findScoreDetail',
+          data: {
+              session_token: session_token
+          },
+          success: function (data) {
+              totalPage = data.data.paging.totalPage;
+              var state = data.result;
+              
+              var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+              var urls = '';
+              if(data.data.roleType == 'TO_TOP_BROKER_USER'){
+                $("#roleTypeName").html('一级经纪商');
+              }else{
+                $("#roleTypeName").html('交易商');
+              }
+              if (state == "success") {
+                  $(".loader_cover_box").css("display","none");
+                  function detailedListHtml(name,no,specMoneySum,purchaseScoreSum) {
+                    var html = '<li><div class="inner"><div class="item teshu"><p>'+ name +'</p><p>（'+ no +'）</p></div><div class="item">'+ purchaseScoreSum +'</div><div class="item">'+ specMoneySum +'</div></div></li>';
+
+                    return html;
+                  }
+                  $(data.data.detailList).each(function(i){
+                    var listHtml = detailedListHtml(this.name,this.no,this.specMoneySum,this.purchaseScoreSum);
+                    $('#rebateList').append(listHtml);
+                  })
+                  if(data.data.detailList == ''){
+                    // $("#container").html(emptyHtml)
+                  }
+              } else if (state > "error") {
+                  errors(emptyHtml);
+              } else if (state < "noSession") {
+                  $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+                  // window.location.href = "login.html";
+              }
+          }
+      })
+
+        // 分页
+      $(window).scroll(function(){
+          var wh=$("#container").height();
+          var s= wh - $(window).scrollTop() - $(window).height();
+          if(s < 0 ){
+            page++;
+            if(totalPage > page){
+                $(".dropload-down").css("display","block");
+                var session_token = $.cookie('session_token');
+                var pageIndex = page;
+                app.ajaxHelper.submitRequest({
+                    url: '/api/findScoreDetail',
+                    data: {
+                        session_token: session_token,
+                        pageIndex: pageIndex
+                    },
+                    success: function (data) {
+                        var state = data.result;
+                        totalPage = data.data.paging.totalPage;
+                        var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+                        if (state == "success") {
+
+                          $(".dropload-down").css("display","none");
+                          function detailedListHtml(name,no,specMoneySum,purchaseScoreSum) {
+                            var html = '<li><div class="inner"><div class="item teshu"><p>'+ name +'</p><p>（'+ no +'）</p></div><div class="item">'+ purchaseScoreSum +'</div><div class="item">'+ specMoneySum +'</div></div></li>';
+
+                            return html;
+                          }
+                          $(data.data.detailList).each(function(i){
+                            var listHtml = detailedListHtml(this.name,this.no,this.specMoneySum,this.purchaseScoreSum);
+                            $('#rebateList').append(listHtml);
+                          })
+
+                        } else if (state > "error") {
+                            errors(emptyHtml);
+                        } else if (state < "noSession") {
+                            $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+                            window.location.href = "login.html";
+                        }
+                    }
+                })
+            }
+          }
+        });
+
+        $(".loader_cover_box").on('touchmove', function(event) {
+          event.preventDefault();
+        });
+
+        function pie (el, v1, v2){
+
+          var pie = echarts.init(document.getElementById(el));
+          var option_pie = {
+            tooltip : {
+                trigger: 'item',
+                formatter: function(p,params){
+                  console.log(p)
+                  var aaa = params.split('_');
+                  var color = ['#54b9ff', '#ff6600'];
+            return '<span style="display:inline-block;width:10px;height:10px;background-color:'+color[p.dataIndex]+';border-radius: 50%;margin:0 5px;"></span>' + p.name + '</br><span style="padding: 0 20px; color:#fff">' +formatNum(p.value) + '</span>';
+          },
+                position:[3,3]
+            },
+            color:['#54b9ff', '#ff6600', '#000000'],
+              series : [
+                  {
+                    name: "每日资金",
+                      type: 'pie',
+                      radius : '55%',
+                      center: ['50%', '55%'],
+                      data:[
+                          {value:v1, name:'未消费红积分总额'},
+                          {value:v2, name:'已消费红积分总额'}
+                      ],
+                      itemStyle: {
+                          emphasis: {
+                              shadowBlur: 10,
+                              shadowOffsetX: 0,
+                              shadowColor: 'rgba(0, 0, 0, 0.5)'
+                          },
+                          normal:{
+                             label:{
+                                 show:true,
+                                 // formatter: '{b}\n\n{c}\n\n{d}%'
+                                 formatter: function(p,params){
+                                    return p.name + '\n\n' + formatNum(p.value);
+                                 }
+                             },
+                             labelLine:{show:true}
+                          }
+                      }
+                  }
+              ]
+          };
+
+        pie.setOption(option_pie);
+        }
+
+        function formatNum(strNum) {
+          if (strNum.length <= 3) {
+            return strNum;
+          }
+          if (!/^(\+|-)?(\d+)(\.\d+)?$/.test(strNum)) {
+            return strNum;
+          }
+          var a = RegExp.$1, b = RegExp.$2, c = RegExp.$3;
+          var re = new RegExp();
+          re.compile("(\\d)(\\d{3})(,|$)");
+            while (re.test(b)) {
+              b = b.replace(re, "$1,$2$3");
+            }
+            return a + "" + b + "" + c;
+          }
+    });
+  </script>
+</body>
+</html>

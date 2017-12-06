@@ -1,0 +1,270 @@
+<template>
+  <div v-title="'申请委卖'">
+    
+    <div class="section">
+      <div class="hd">
+        <div class="hd-inner no">
+            <span class="hd-title">申请委卖</span>
+            <span class="hd-analysis">
+              <router-link to="/sellingCommissionDetails">
+                <i>委卖明细></i>
+              </router-link>
+            </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="SCommission_box">
+      <p>
+        <span>交易商账号：</span><input type="tel" v-model="tradeUserNo"  placeholder="请输入交易商账号" @keyup='changes'>
+      </p>
+      <p>
+        <span>交易商姓名：</span><b>{{name}}</b>
+      </p>
+      <p>
+        <span>手机号码：</span><b>{{phone}}</b>
+      </p>
+      <p>
+        <span>选择商品：</span><b class="SCommissionOption">{{goodsNo}}<i class="jian" @click="showCover">></i> <b class="optioList" v-show="coverShow"><i v-for="item in optioListData" @click="getOptioListItem(item)">{{item}}</i></b></b>
+      </p>
+      <p>
+        <span>委卖数量：</span><input type="number" placeholder="请输入委卖数量" v-model="amount"><i>块<i>（最低5块）</i></i>
+      </p>
+      <p>
+        <span>验证码：</span><input type="number" placeholder="请输入验证码" v-model="dynamicPassword"><timer-btn ref="timerbtn" class="btn btn-default" v-on:run="sendCodes" style="display: inline-block" v-show='verification'></timer-btn>
+      </p>
+      <div class="commissionSubmit">
+        <span @click="sendInfo">提交</span>
+      </div>
+    </div>
+
+    <!-- 背景遮罩 -->
+    <div class="stage-cover" v-show="coverShow" @click="coverHide"></div>
+
+    <p class="tips" v-show="create"><span>{{tipText}}</span></p>
+
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+import timerBtn from 'components/login/timerBtn/timerBtn';
+
+  export default{
+    data(){
+      return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        tipText: null,
+        create: false,
+        optioListData: ['000001','000002','000003','000004','000005','000006','000007'],
+        coverShow: false,
+        tradeUserNo: '',
+        name: '交易商姓名',
+        phone: '交易商手机号码',
+        amount: null,
+        goodsNo: '000001',
+        verification: false,
+        dynamicPassword: null
+      }
+    },
+    components: {
+      'timer-btn': timerBtn
+    },
+    methods: {
+      getOptioListItem: function(item){
+        this.coverHide();
+        this.goodsNo = item;
+      },
+      coverHide: function(){
+        this.coverShow = false;
+      },
+      showCover: function(){
+        this.coverShow = true;
+      },
+      getTradeUserBelongToTopOrFirst: function(){
+        this.$http.get('/api/getTradeUserBelongToTopOrFirst',{params:{ sessionToken: this.sessionToken, tradeUserNo: this.tradeUserNo }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.name = response.body.data.tradeUserName;
+            this.phone = response.body.data.phone
+            this.tipText = '获取交易商信息成功';
+            this.verification = true;
+            this.tip();
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }      
+        }).then((error)=> this.error = error)
+      },
+      changes: function(){
+        var length = this.tradeUserNo.length;
+        if (length > 10) {
+            this.tradeUserNo = this.tradeUserNo.substring(0, 10);
+        }
+        if (length == 10) {
+          this.getTradeUserBelongToTopOrFirst();
+        }
+        if(length < 10){
+          this.name = '交易商姓名';
+          this.phone = '交易商手机号码';
+        }
+      },
+      createEntrustSell: function(){
+        this.$http.get('/api/createEntrustSell',{params:{ sessionToken: this.sessionToken, tradeUserNo: this.tradeUserNo, goodsNo: this.goodsNo, amount: this.amount,phone: this.phone, dynamicPassword: this.dynamicPassword }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.tipText = '申请委卖成功';
+            this.tip();
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }      
+        }).then((error)=> this.error = error)
+      },
+      sendCodes:function(){
+        // this.$refs.timerbtn.setDisabled(true); //设置按钮不可用 
+        if(this.phone != '' && this.phone != null){
+          this.$refs.timerbtn.start();
+          this.$http.get('/api/doSendCaptchaSms',{params:{ phone: this.phone, tradeUserNo: this.tradeUserNo, sessionToken: this.sessionToken }}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.tipText = '获取验证码成功！';
+              this.tip();
+            }else{
+              this.tipText = response.body.message;
+              this.tip();
+            } 
+          }).then((error)=> this.error = error)
+        }else{
+          this.tipText = '没有手机号码';
+          this.tip();
+        }
+      },
+      sendInfo: function(){
+        if(this.amount >= 5 && this.amount != '' && this.amount != null && this.dynamicPassword != '' && this.dynamicPassword != null, this.tradeUserNo != '' && this.tradeUserNo != null){
+          this.createEntrustSell();
+          this.tradeUserNo = null;
+          this.name = '交易商姓名';
+          this.phone = '交易商手机号码';
+          this.goodsNo = '000001'
+          this.amount = null;
+          this.dynamicPassword = null;
+        }else{ 
+          if(this.amount < 5){
+            this.tipText = '委卖最低5块';
+            this.tip();
+          }else{
+            this.tipText = '请输入完整的信息';
+            this.tip();
+          }
+        }
+      },
+      tip: function(){
+        this.create = true;
+        var this_ = this;
+        clearTimeout(t)
+        var t = setTimeout(function (){
+            this_.create = false;
+        }, 3000);
+      }
+    }
+  };
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  button
+    outline: none
+  .SCommission_box
+    padding: 0.2rem 0.3rem
+    background-color: #FFF
+    font-size: 0.14rem
+    line-height: 0.4rem
+    p
+      position: relative
+      width: 100%
+      margin: 0.05rem 0
+      &:nth-child(1)::after,&:nth-last-child(2)::after,&:nth-last-child(3)::after
+        position: absolute
+        bottom: 0
+        left: 0
+        content: ''
+        width: 100%
+        border-bottom: 1px solid #ff6000
+        transform: scaleY(0.5)
+      span
+        display: inline-block
+        width: 1rem
+      input
+        display: inline-block
+        width: 1.2rem
+        border: none
+        outline: none
+      b
+        color: #999999
+      & > i
+        font-style: normal
+        i
+          font-style: normal
+          font-size: 0.12rem
+          color: #999999
+      .SCommissionOption
+        position: relative
+        display: inline-block
+        color: #000
+        border: 1px solid #ff6000
+        width: 1.05rem
+        height: 0.32rem
+        line-height: 0.31rem
+        padding: 0 0.1rem
+        border-radius: 0.05rem
+        .jian
+          position: absolute
+          top: 0.015rem
+          right: 0.015rem
+          background-color: #ff6000
+          width: 0.26rem
+          height: 0.26rem
+          text-align: center
+          line-height: 0.26rem
+          color: #fff
+          border-radius: 0.03rem
+          transform: rotate(90deg)
+        .optioList
+          display block
+          position: absolute
+          z-index: 1
+          top: 0.37rem
+          left: 0
+          width: 100%
+          text-align: center
+          border: 1px solid #ff6000
+          background-color: #FFF
+          border-radius: 0.05rem
+          padding: 0 0.06rem
+          z-index: 100000002
+          i
+            position: relative
+            display: block
+            font-style: normal
+            height: 0.42rem
+            line-height: 0.42rem
+            color: #000
+            &::after
+              position: absolute
+              content: ''
+              width: 100%
+              border-bottom: 1px solid #ccc
+              bottom: 0
+              left: 0
+              transform: scaleY(0.5)
+            &:nth-last-child(1)::after
+              border: none
+    .commissionSubmit
+      text-align: center
+      margin-top: 0.2rem
+      span
+        padding: 0.1rem 0.8rem
+        background-color: #ff6000
+        color: #fff
+        border-radius: 0.5rem
+        font-size: 0.15rem
+</style>

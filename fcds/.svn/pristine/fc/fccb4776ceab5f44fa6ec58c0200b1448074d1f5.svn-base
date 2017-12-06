@@ -1,0 +1,200 @@
+<template>
+	<div>
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border_1px">
+		      <span class="hd-title">经纪商汇总</span>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content overview">
+		      <ul>
+		        <li>高级经纪商：<span>{{brokerUserSummaryDate.topBrokerUserCount}}</span></li>
+		        <li>一级经纪商：<span>{{brokerUserSummaryDate.firstBrokerUserCount}}</span></li>
+		        <li>加盟费收入：<span>{{brokerUserSummaryDate.franchiseCost}}</span></li>
+		        <li>佣金支出：<span>{{brokerUserSummaryDate.rebateOut}}</span></li>
+		      </ul>
+		    </div>
+		  </div>
+		</div>
+
+		<div style="height:0.1rem"></div>
+
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border_1px">
+		      <span class="hd-title">{{defaultTypeNam}}排名TOP10</span>
+		      <!-- <div class="legend">
+		        <span>入金</span>
+		        <span>出金</span>
+		      </div> -->
+		      <span class="dete-control column-control teshu" @click="showDetelist"></span>
+		      <div class="stage-box column-dete teshu" v-show="detailShow">
+		        <div class="stage-inner">
+		          <ul id="monthList">
+		            <!-- <li v-for="(item, index) in ringTpye">{{ringTpye[index]}}</li> -->
+                    <li v-for="(item, index) in brokerUserTop10Data.rankingTypeList" >
+                        <p @click="getbrokerUserTop10Data(brokerUserTop10Data.rankingTypeList[index].rankingTypeKey, brokerUserTop10Data.rankingTypeList[index].rankingTypeValue)">{{brokerUserTop10Data.rankingTypeList[index].rankingTypeValue}}</p>   
+                    </li>
+		          </ul>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content chart-column">
+		      <div id="main-transverse-column" style="width:100%;height:400px;"></div>
+		    </div>
+		  </div>
+		</div>
+		<div class="stage-cover" v-show="detailShow" @click="hideDetelist"></div>
+	</div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+const ERR_OK = 'success';
+
+ export default{
+ 	data() {
+ 		return {
+ 			detailShow: false,
+            ringTpye: ['交易金','交易额','开户量','招商量','红积分','手续费','持仓量','签约量','盈亏额'],
+            session_token: localStorage.getItem("session_token"),
+            brokerUserSummaryDate: {},
+            brokerRankingType: '',
+            brokerUserTop10Data: {},
+            brokerUserTop10DataName: [],
+            brokerUserTop10DataValue: [],
+            defaultTypeNam: ''
+ 		};
+ 	},
+    created() {
+
+        this.brokerUserSummary();
+
+        this.brokerUserTop10('', '');
+
+    },
+ 	methods: {
+ 		showDetelist: function() {
+ 			this.detailShow = true;
+ 		},
+ 		hideDetelist: function(){
+ 			this.detailShow = false
+ 		},
+        getbrokerUserTop10Data: function(type, name) {
+            this.detailShow = false;
+            this.brokerUserTop10(type, name);
+        },
+        brokerUserSummary: function (){
+
+            this.$http.get('/api/brokerUserSummary',{params:{ session_token: this.session_token }}).then((response) => { 
+                if(response.body.result == ERR_OK){ 
+                    this.brokerUserSummaryDate = response.body.data;
+                }else{
+                    
+                }
+                
+            }).then((error)=> this.error = error)
+
+        },
+        brokerUserTop10: function(brokerRankingType, name) {
+
+            this.$http.get('/api/brokerUserTop10',{params:{ session_token: this.session_token, brokerRankingType: brokerRankingType}}).then((response) => { 
+                if(response.body.result == ERR_OK){ 
+                    this.brokerUserTop10DataName = [];
+                    this.brokerUserTop10DataValue = [];
+                    this.brokerUserTop10Data = response.body.data;
+
+                    if(name == ''){
+                        this.defaultTypeNam = "净入金";
+                    }else{
+                        this.defaultTypeNam = name;
+                    }
+
+                    for(var i = 0; i < this.brokerUserTop10Data.top10List.length; i++){
+                        this.brokerUserTop10DataName.push(this.brokerUserTop10Data.top10List[i].tradeUserName);
+                    }
+                    for(var i = this.brokerUserTop10Data.top10List.length - 1; i >= 0; i--){
+                        this.brokerUserTop10DataValue.push(this.brokerUserTop10Data.top10List[i].value)
+                    }
+                    this.top10List('main-transverse-column', this.brokerUserTop10DataName, this.brokerUserTop10DataValue);
+                }else{
+                    
+                }
+                
+            }).then((error)=> this.error = error)
+
+        },
+        top10List: function(el, name, value) {
+
+            let transverse_column = echarts.init(document.getElementById(el));
+            let transverse_column_option = {
+                     tooltip: {
+                         trigger: 'axis',
+                         axisPointer: {
+                             type: 'shadow'
+                         }
+                     },
+                     grid: {
+                         left: '3%',
+                         right: '6%',
+                         bottom: '3%',
+                         top: '3%',
+                         containLabel: true
+                     },
+                     xAxis: {
+                         type: 'value',
+                         boundaryGap: [0, 0.01],
+                         axisLabel : {
+                             formatter: ''
+                         },
+                     },
+                     yAxis: {
+                         type: 'category',
+                         data: name
+                     },
+                     series: [
+                         {
+                             name: '数额',
+                             type: 'bar',
+                             data: value,
+                             itemStyle: {
+                                 normal: {
+                                     color: new echarts.graphic.LinearGradient(
+                                          1, 0, 0, 0,
+                                          [
+                                              {offset: 0, color: '#ff7417'},
+                                              {offset: 0.5, color: '#ff9a56'},
+                                              {offset: 1, color: '#ffb584'}
+                                          ]
+                                      ),
+                                     barBorderRadius:[0, 5, 5, 0],
+                                     // label: {
+                                     //         show: true,
+                                     //         position: 'right',
+                                     //         formatter: "{c}"
+                                     //     }
+                                 }
+                               },
+                               barWidth: 20
+                         }
+                     ]
+                 };
+
+            transverse_column.setOption(transverse_column_option);
+
+        }
+ 	}
+ };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+    .stage-box
+        &.teshu
+            height: 3.3rem!important
+    .dete-control
+        &.teshu
+            background-image: url(../../assets/type.png)!important
+</style>

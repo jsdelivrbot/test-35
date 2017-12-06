@@ -1,0 +1,85 @@
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import VueResource from 'vue-resource';
+import 'common/stylus/index.styl';
+import App from './App';
+import {deadline} from 'common/js/deadline.js';
+import 'vue-event-calendar/dist/style.css';
+import tool from 'common/js/tool.js';
+import VueAwesomeSwiper from 'vue-awesome-swiper';
+
+
+Vue.use(VueRouter);
+Vue.use(VueResource);
+Vue.prototype.toolHelper = tool;
+Vue.use(VueAwesomeSwiper);
+
+const login = require('components/login/login.vue');
+const main = require('components/main/main.vue');
+const home = require('components/home/home.vue');
+const rebate = require('components/rebate/rebate.vue');
+const ranking = require('components/ranking/ranking.vue');
+const center = require('components/center/center.vue');
+
+const routes = [
+  { path: '/login', component: login},
+  { 
+    path: '/main', 
+    component: main,
+    meta: {
+      requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+    },  
+    children:[
+      { path: 'home', component: home, meta: {requireAuth: true}},
+      { path: 'rebate', component: rebate, meta: {requireAuth: true}},
+      { path: 'ranking', component: ranking, meta: {requireAuth: true}},
+      { path: 'center', component: center, meta: {requireAuth: true}},
+    ]
+  }
+];
+
+const router = new VueRouter({
+  routes,
+  linkActiveClass: 'active'
+});
+
+router.beforeEach((to, from, next) => {
+
+  if (to.meta.requireAuth) {
+    const day = deadline();
+    if(day >= 30){
+      localStorage.clear();
+    }
+
+    if(localStorage.getItem("session_token")) {  
+      
+      next();
+
+    }else { 
+
+      next({
+        path: '/login',
+        query: {redirect: to.fullPath}  // 将跳转的路由path作为参数，登录成功后跳转到该路由
+      })
+
+    }
+  }else {
+
+    next();
+
+  }
+})
+
+router.push({ path: '/main/home' }) 
+
+new Vue({
+    router,
+    render: h => h(App)
+}).$mount('#app');
+
+Vue.directive('title', {
+  inserted: function (el, binding) {
+    document.title = el.innerText
+    el.remove()
+  }
+})

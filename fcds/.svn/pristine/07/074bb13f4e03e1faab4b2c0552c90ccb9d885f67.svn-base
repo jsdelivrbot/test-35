@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>查看持仓市值</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+
+	<div class="position_item">
+		<div class="hd">
+			<div class="hd_inner"><span>近7日持仓市值趋势</span><b id='change_date'></b></div>
+		</div>
+		<div class="bd" style="background-color: #fff;">
+			<div id="main-column" style="width:100%;height:180px;"></div>
+		</div>
+	</div>
+
+	<div class="position_item">
+		<div class="hd">
+			<div class="hd_inner"><span>近5个月持仓市值趋势</span><b id='change'></b><i>最高值</i><i>最低值</i></div>
+		</div>
+		<div class="bd" style="background-color: #fff;">
+			<div id="main" style="width:100%;height:180px;"></div>
+		</div>
+	</div>
+
+	<div style="height:70px"></div>
+	<p class="tips" id="tips">&nbsp;</p>
+	<script src="js/jquery-1.8.3.min.js"></script>
+	<script src="js/mo.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/datePicker.js"></script>
+    <script src="js/echarts.min.js"></script>
+	<script type="text/javascript">
+		$(function() {    
+			
+			$(".loader_cover_box").css("display","block");
+
+        	
+
+			var links = '<div class="Nav"><div class="navin"><ul><li onclick="window.location = \'index.html\'"><a href="#" class="homebox"><i class="home"></i>首页</a></li><li><a href="#" class="cartbox" onclick="window.location= \'ranking.html\'"><i class="shopcart"></i>排名</a></li><li ><a href="#" class="comdybox" onclick="window.location= \'broker.html\'"><i class="comdy"></i>交易商</a></li></ul></div></div>'
+			$("body").append(links);
+
+		    // 经济商排名查询
+        	var session_token=$.cookie('session_token');
+        	var userNo = GetQueryString("userNo");
+        	var date = null;
+        	var dateM = null;
+
+        	findStockMarketDate();
+        	findStockMarketMonth();
+
+	        var $change = $("#change_date");
+	        var calendar = new datePicker();
+	        calendar.init({
+	          'trigger': '#change_date', /*按钮选择器，用于触发弹出插件*/
+	          'type': 'date',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+	          'minDate':'1900-1-1',/*最小日期*/
+	          'maxDate':'2100-12-31',/*最大日期*/
+	          'onSubmit':function(){/*确认时触发事件*/
+	            var theSelectData=calendar.value;
+	            // $change.html(theSelectData);
+	            // var arr = theSelectData.substring(5);
+	            date = theSelectData;
+	            findStockMarketDate()
+	          },
+	          'onClose':function(){/*取消时触发事件*/
+	          }
+	        });
+
+	        var $change0 = $("#change");
+	        var calendar0 = new datePicker();
+	        calendar0.init({
+	          'trigger': '#change', /*按钮选择器，用于触发弹出插件*/
+	          'type': 'ym',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+	          'minDate':'1900-1-1',/*最小日期*/
+	          'maxDate':'2100-12-31',/*最大日期*/
+	          'onSubmit':function(){/*确认时触发事件*/
+	            var theSelectData=calendar0.value;
+	            // $change0.html(theSelectData);
+	            var arr = theSelectData.substring(5);
+	            dateM = theSelectData;
+	            findStockMarketMonth()
+	          },
+	          'onClose':function(){/*取消时触发事件*/
+	          }
+	        });
+
+	        column();
+
+	        function folding(v1, v2){
+	          var folding = echarts.init(document.getElementById('main-column'));
+	          var option_folding = {
+	              tooltip : {
+	                  trigger: 'axis',
+	                  axisPointer: {
+	                      type: 'cross',
+	                      label: {
+	                          backgroundColor: '#6a7985'
+	                      }
+	                  }
+	              },
+	              toolbox: {
+	                  feature: {
+	                      saveAsImage: {}
+	                  }
+	              },
+	              grid: {
+	                  left: '2%',
+	                  right: '6%',
+	                  bottom: '3%',
+	                  top: '3%',
+	                  containLabel: true
+	              },
+	              xAxis : [
+	                  {
+	                      type : 'category',
+	                      boundaryGap : false,
+	                      data : v1,
+	                      axisLabel: {
+	                         interval: 0
+	                      },
+                          splitLine: {
+                              show: true,
+          	                lineStyle:{
+          	                	color:"#e1e1e1",
+          	                	type:"solid"
+          	                }
+                          },
+                          axisLine: {onZero: false}
+	                  }
+	              ],
+	              yAxis : [
+	                  {
+	                      type : 'value',
+	                      axisLabel: {
+	                          formatter: '{value}万'
+	                      }
+	                  }
+	              ],
+	              series : [
+	                  {
+	                  		name:'市值',
+	                      	type:'line',
+	                      	data:v2,
+	                      	itemStyle: {
+	                        normal: {
+	                          color:'#ff6701',
+	                        }
+	                      }
+	                  }
+	              ]
+	          };
+	          folding.setOption(option_folding);
+	        }
+
+	        function column(v1, v2, v3){
+	          var folding = echarts.init(document.getElementById('main'));
+	          var option_folding = {
+	              tooltip : {
+	                  trigger: 'axis',
+	                  axisPointer: {
+	                      type: 'cross',
+	                      label: {
+	                          backgroundColor: '#6a7985'
+	                      }
+	                  }
+	              },
+	              toolbox: {
+	                  feature: {
+	                      saveAsImage: {}
+	                  }
+	              },
+	              grid: {
+	                  left: '2%',
+	                  right: '8%',
+	                  bottom: '3%',
+	                  top: '3%',
+	                  containLabel: true
+	              },
+	              xAxis : [
+	                  {
+	                      type : 'category',
+	                      boundaryGap : false,
+	                      data : v1,
+	                      axisLabel: {
+	                         interval: 0
+	                      },
+                          splitLine: {
+                              show: true,
+          	                lineStyle:{
+          	                	color:"#e1e1e1",
+          	                	type:"solid"
+          	                }
+                          },
+                          axisLine: {onZero: false}
+	                  }
+	              ],
+	              yAxis : [
+	                  {
+	                      type : 'value',
+	                      axisLabel: {
+	                          formatter: '{value}万'
+	                      }
+	                  }
+	              ],
+	              series : [
+	                  {
+	                      name:'最高值',
+	                      type:'line',
+	                      data:v2,
+	                      itemStyle: {
+	                        normal: {
+	                          color:'#ff6701',
+	                        }
+	                      }
+	                  },
+	                  {
+	                      name:'最低值',
+	                      type:'line',
+	                      data:v3,
+	                      itemStyle: {
+	                        normal: {
+	                          color:'#54b9ff',
+	                        }
+	                      }
+	                  }
+	              ]
+	          };
+	          folding.setOption(option_folding);
+	        }
+
+
+	        function findStockMarketDate(){
+    	        app.ajaxHelper.submitRequest({
+    	            url: '/api/findStockMarketDate',
+    	            data: {
+    	                session_token: session_token,
+    	                date: date,
+    	                userNo: userNo
+    	            },
+    	            success: function (data) {
+    	                var state = data.result;
+    	                var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+    	                if (state == "success") {
+    	                	$(".loader_cover_box").css("display","none");
+
+    	                	for(var i=0;i < data.data.valueList.length;i++){
+    	                		data.data.valueList[i] = parseInt(data.data.valueList[i]/10000);
+    	                	}
+
+    		                folding(data.data.xAxisList, data.data.valueList);
+
+    	                } else if (state == "error") {
+    	                    // $('#rankingList').html(emptyHtml)
+    	                } else if (state == "noSession") {
+    	                    window.location.href = "login.html";
+    	                }
+    	            }
+    	        })
+	        }               
+	        
+	        function findStockMarketMonth(){
+    	        app.ajaxHelper.submitRequest({
+    	            url: '/api/findStockMarketMonth',
+    	            data: {
+    	                session_token: session_token,
+    	                date: dateM,
+    	                userNo: userNo
+    	            },
+    	            success: function (data) {
+    	                var state = data.result;
+    	                var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+    	                if (state == "success") {
+    	                	$(".loader_cover_box").css("display","none");
+
+    	                	for(var i=0;i < data.data.maxValueList.length;i++){
+    	                		data.data.maxValueList[i] = parseInt(data.data.maxValueList[i]/10000);
+    	                	}
+
+    	                	for(var i=0;i < data.data.minValueList.length;i++){
+    	                		data.data.minValueList[i] = parseInt(data.data.minValueList[i]/10000);
+    	                	}
+
+    		                column(data.data.xAxisList, data.data.maxValueList, data.data.minValueList);
+
+    	                } else if (state == "error") {
+    	                    // $('#rankingList').html(emptyHtml)
+    	                } else if (state == "noSession") {
+    	                    window.location.href = "login.html";
+    	                }
+    	            }
+    	        })
+	        }
+		});   
+	</script>
+</body>
+</html>

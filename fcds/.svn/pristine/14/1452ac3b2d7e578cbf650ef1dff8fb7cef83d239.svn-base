@@ -1,0 +1,170 @@
+<template>
+	<div>
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border-bottom-1px">
+		      <span class="hd-title">资金总览</span>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content overview">
+		      <ul>
+		        <li>净入金：<span>275,437,031.28</span></li>
+		        <li>手续费：<span>275,437,031.28</span></li>
+		        <li>红积分：<span>56,133,208.20</span></li>
+		        <li>蓝积分：<span>56,133,208.20</span></li>
+		        <li>货款收入：<span>56,133,208.20</span></li>
+		        <li>佣金支出：<span>56,133,208.20</span></li>
+		      </ul>
+		    </div>
+		  </div>
+		</div>
+
+		<div style="height:0.1rem"></div>
+
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border_1px">
+		      <span class="hd-title">近7日出入金趋势</span>
+		      <div class="legend">
+		        <span>入金</span>
+		        <span>出金</span>
+		      </div>
+		      <span class="dete-control column-control" @click="showDetelist"></span>
+		      <div class="stage-box column-dete" v-show="detailShow">
+		        <div class="stage-inner">
+		          <ul id="monthList">
+		            <li @click="hideDetelist" v-for="(item, index) in date">
+		            	<router-link :to="{ path: 'capital', query: { month: date[index]}}" >
+		            		{{date[index]}}
+		            	</router-link>
+		            </li>
+		          </ul>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content chart-column">
+		      <div id="main-column" style="width:100%;height:200px;"></div>
+		    </div>
+		  </div>
+		</div>
+		<div class="stage-cover" v-show="detailShow" @click="hideDetelist"></div>
+	</div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+
+ export default{
+ 	data() {
+ 		return {
+ 			detailShow: false,
+ 			plan: 11,
+ 			date:['2017年03月(下)','2017年03月(上)','2017年02月(下)','2017年02月(上)','2017年01月(下)']
+ 		};
+ 	},
+ 	methods: {
+ 		showDetelist: function() {
+ 			this.detailShow = true;
+ 		},
+ 		hideDetelist: function(){
+ 			this.detailShow = false;
+ 			alert(this.$route.query.month);
+ 		}
+ 	},
+    mounted() {
+ 
+        let column = echarts.init(document.getElementById('main-column'));
+        let option_column = {
+	         color: ['#ff954b','#54b9ff'],
+	         grid: {
+	              left: '3%',
+	              right: '3%',
+	              bottom: '3%',
+	              top: '3%',
+	              containLabel: true
+	          },
+	         calculable : true,
+	         xAxis : [
+	             {  
+	                 // splitArea : {show : true},
+	                 type : 'category',
+	                 data : ['02/25','02/26','02/27','02/28','03/01','03/02','03/03'],
+	                 axisLabel :{  
+	                      interval:0,
+	                  }
+	             }
+	         ],
+	         yAxis : [
+	             {
+	                 type : 'value',
+	                 axisLabel: {
+	                     formatter: '{value}万'
+	                 },
+	                 axisTick: {
+	                      alignWithLabel: true
+	                  }
+	             }
+	         ],
+	         series : [
+	             {
+	                 type:'bar',
+	                 data:[500, 450, 250, 380, 440, 400, 580],
+	                 itemStyle: {
+	                   normal: {
+	                       color: new echarts.graphic.LinearGradient(
+	                            0, 0, 0, 1,
+	                            [
+	                                {offset: 0, color: '#ff7417'},
+	                                {offset: 0.5, color: '#ff9a56'},
+	                                {offset: 1, color: '#ffb584'}
+	                            ]
+	                        ),
+	                       barBorderRadius:[5, 5, 0, 0],
+	                      //  label: {
+	                      //   show: true,
+	                      //   position: 'top',
+	                      //   formatter: "{c}"
+	                      // }
+	                   }
+	                },
+	                barGap: '1%',
+	                barWidth: 13
+	             },
+	             {
+	                 type:'bar',
+	                 data:[400, 360, 180, 220, 390, 300, 430],
+	                 itemStyle: {
+	                   normal: {
+	                       color: new echarts.graphic.LinearGradient(
+	                            0, 0, 0, 1,
+	                            [
+	                                {offset: 0, color: '#59bbff'},
+	                                {offset: 0.5, color: '#80cbff'},
+	                                {offset: 1, color: '#a8dbff'}
+	                            ]
+	                        ),
+	                       barBorderRadius:[5, 5, 0, 0],
+	                      //  label: {
+	                      //   show: true,
+	                      //   position: 'top',
+	                      //   formatter: "{c}"
+	                      // }
+	                   }
+	                  },
+	                  barGap: '1%',
+	                  barWidth: 13
+	             }
+	         ]
+	    };
+
+	    column.setOption(option_column);
+    }
+ };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+
+</style>

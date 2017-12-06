@@ -1,0 +1,421 @@
+<template>
+  <div v-title="'返佣'">
+    <!-- 2017年n月（上/下）返佣汇总(圆环图) -->
+    <div class="section">
+      <div class="hd">
+        <div class="hd-inner">
+          <span class="hd-title">{{date}}返佣汇总</span>
+          <span class="dete-control" @click="motlistcontrol"></span>
+          <div class="motlist" v-show="motlistSta">
+            <div class="listinner">
+              <ul>
+                <li @click="curmot(item)" v-for="item in monthList">{{item}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="overview-rebate">
+          <canvas id="canvas" class="canvas"> </canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 返佣汇总详情 -->
+    <div class="section">
+        <div class="content" style="padding:0;">
+          <div class="rebate-details">
+            <p>
+              <span><router-link to="/integralSummary">积分总览</router-link></span>        
+              <span><router-link to="/seniorfranchise" v-show="senior">已交加盟费</router-link><p v-show="ones" @click="oneFranchise">已交加盟费</p></span>
+              <span><router-link to="/integral">积分详情</router-link></span>
+            </p>
+            <p>
+              <span><router-link to="/package">商品包详情</router-link></span>
+              <span><router-link to="/fee">手续费详情</router-link></span>
+              <span><router-link to="/franchise" v-show="senior">加盟费详情</router-link></span>
+            </p>
+          </div>
+        </div>
+    </div>
+
+    <!-- 近七日返佣汇总(折线图) -->
+    <div class="section">
+        <div class="hd">
+          <div class="hd-inner">
+              <span class="hd-title">近七日返佣趋势</span>
+                  <span class="dete-control" @click="pieRequest"></span>
+                  <span class="curdate" id="J-xl-2"><!-- {{curdate}} --></span>
+          </div>
+        </div>
+        <div class="content">
+          <div id="polylineRebate" style="width:100%;height:2rem;"></div>
+        </div>
+    </div>
+    <!-- 背景遮罩 -->
+    <div class="stage-cover" v-show="coverShow" @click="coverHide"></div>
+    
+    <div class="onesfranchisecover" v-show="onesf">
+      <p>您当前已交加盟费金额为 <b>{{getFranchiseTotalByBrokerData}}</b> 万元</p>
+      <div class="close" @click="coverHide"><img src="../../assets/close_03.png"></div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+import 'common/js/jquery-1.8.3.min.js';
+import 'common/js/laydate.dev.js';
+
+const ERR_OK = 'success';
+
+export default{
+  data(){
+      return {
+          coverShow: false, //背景遮罩状态
+          onesf: false,
+          sessionToken: localStorage.getItem("sessionToken"),
+          findCycleRebateLineDataData: {},
+          motlistSta: false,
+          monthList: {},
+          curmonth: null,
+          senior: false,
+          date: null,
+          ones: false,
+          getFranchiseTotalByBrokerData: null //一级已加加盟费
+      }
+  },
+  created(){
+    this.getLoginAccountRole();
+  },
+  methods:{
+    // 背景遮罩隐藏
+    coverHide: function(){
+      this.coverShow = false;
+      this.motlistSta = false;
+      this.onesf = false;
+    },
+    // 返佣总览环状图
+      wagonRebate: function(el,totalCycleRebate,month,v1,v2,v3,v4){
+        var option = {
+          el: el,
+          data: {value:totalCycleRebate, name: '返佣总额', title: month},
+          series:{
+            data:[
+              {value:v1, name: '手续费返佣', color: '#68d0b5', describe: v1},
+              {value:v2, name: '商品包返佣', color: '#fece94', describe: v2},
+              {value:v3, name: '加盟费返佣', color: '#ff9d5c', describe: v3},
+              {value:v4, name: '积分返佣', color: '#92d2ff', describe: v4}
+            ]
+          },
+          r: 130,
+          arcwidth: 40
+        }
+        this.toolHelper.wagon1(option);
+      },
+      // 返佣总览折线图
+      polylineRebate: function(el,xAxisList,valueList){
+        let polylineRebate = echarts.init(document.getElementById(el));
+        let option = {
+            tooltip : {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '2%',
+                right: '6%',
+                bottom: '3%',
+                top: '4%',
+                containLabel: true
+            },
+            color: ['#ff6000'],
+            xAxis : [
+                {
+                    type : 'category',
+                    boundaryGap : false,
+                    data : xAxisList,
+                    axisLabel :{  
+                        interval:0,
+                    },
+                    splitLine: {
+                        show: true,
+                      lineStyle:{
+                        color:"#e1e1e1",
+                        type:"solid"
+                      }
+                     }
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value'
+                }
+            ],
+            series : [
+                {
+                    name:'金额',
+                    type:'line',
+                    areaStyle: {normal: {}},
+                    data: valueList,
+                    areaStyle: {
+                       normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                               offset: 0,
+                               color: 'rgba(255, 102, 0, 1)'
+                           }, {
+                               offset: 1,
+                               color: 'rgba(255, 102, 0, 0.01)'
+                           }])
+                       }
+                   },
+                   lineStyle: {
+                      normal: {
+                          type: 'solid',
+                          color:"#ff6000",
+                          opacity :"1"
+                      }
+              }
+                }
+            ]
+        };
+        polylineRebate.setOption(option);
+      },
+      // 2017年n月（上/下）返佣汇总(折线图)日期选择
+      pieRequest: function(){
+        var _this = this;
+        this.coverShow = true;
+        $("#laydate_box").css("display","block");
+        $("#laydate_table").css("display","block");
+          laydate({
+              elem: '#J-xl-2',
+              min: '2016-10-01', //设定最小日期
+              max: laydate.now(-1), //最大日期
+              choose: function(datas){ //选择日期完毕的回调
+                var date = datas;
+                date = date.replace(/-/g,'');
+                  // _this.getPieDete(date);
+                  _this.findCycleRebateLineData(date);
+                  _this.coverShow = false
+              }
+
+          });
+      },
+      findCycleRebateLineData: function(date){
+        this.$http.get('/api/findCycleRebateLineData',{params:{ sessionToken: this.sessionToken, date: date}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.findCycleRebateLineDataData = response.body.data;
+            this.polylineRebate('polylineRebate',this.findCycleRebateLineDataData.xAxisList,this.findCycleRebateLineDataData.valueList);
+          }else{
+            alert(response.body.message)
+          }   
+        }).then((error)=> this.error = error)
+      },
+      motlistcontrol: function(){
+        this.coverShow = true;
+        this.motlistSta = true;
+      },
+      curmot: function(month){
+        this.coverShow = false;
+        this.motlistSta = false;
+        this.date = month;
+        this.curmonth = month;
+        this.findCycleRebatePieData(this.curmonth);
+      },
+      findCycleRebatePieData: function(month){
+        this.$http.get('/api/findCycleRebatePieData',{params:{ sessionToken: this.sessionToken, month: month}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            if(month == null){
+              month = response.body.data.monthList[response.body.data.monthList.length - 1];
+              this.date = response.body.data.monthList[response.body.data.monthList.length - 1];
+            }else{
+              month = month
+            }
+            this.monthList = this.toolHelper.arrayFlashback(response.body.data.monthList);
+            this.pieData = response.body.data;
+            var a = parseFloat(this.pieData.totalCycleRebate);
+            var b = parseFloat(this.pieData.poundageRebate);
+            var c = parseFloat(this.pieData.packageRebate);
+            var d = parseFloat(this.pieData.transBizFranchiseRebate);
+            var e = parseFloat(this.pieData.scoreRebate);
+            this.wagonRebate('canvas',a,month,b,c,d,e);
+          }else{
+            alert(response.body.message)
+          }   
+        }).then((error)=> this.error = error)
+      },
+      getLoginAccountRole: function(){
+        this.$http.get('/api/getLoginAccountRole?',{params:{ sessionToken: this.sessionToken }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            if(response.body.data.role == 'ROLE_TOP'){
+              this.senior = true;
+              this.ones = false;
+            }else if(response.body.data.role == 'ROLE_FIRST'){
+              this.senior = false;
+              this.ones = true;
+            }
+          }else{
+
+          }       
+        }).then((error)=> this.error = error)
+      },
+      oneFranchise: function(){
+        this.coverShow = true;
+        this.onesf = true;
+      },
+      getFranchiseTotalByBroker: function(){
+        this.$http.get('/api/getFranchiseTotalByBroker?',{params:{ sessionToken: this.sessionToken }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.getFranchiseTotalByBrokerData = this.toolHelper.fmoney((response.body.data.payAmountSum/10000),2);
+          }else{
+
+          }       
+        }).then((error)=> this.error = error)
+      }
+  },
+  mounted() {
+      $("body").removeClass('dash');
+      // 返佣总览折线图
+      this.findCycleRebateLineData('');
+
+      this.findCycleRebatePieData();
+
+      this.getFranchiseTotalByBroker();
+  }
+};
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .onesfranchisecover
+    position: fixed
+    top: 40%
+    left: 50%
+    transform: translateX(-50%) translateY(-50%)
+    width: 2.9rem
+    height: 1.08rem
+    background-color: #FFF
+    z-index: 100000005
+    border-radius: 5px
+    box-shadow: 0 0 50px 0 rgba(0,0,0,0.2)
+    line-height: 1.08rem
+    text-align: center
+    color: #666666
+    b
+      color: #ff6000
+      font-size: 0.18rem
+    .close
+      position: absolute
+      top: -0.04rem
+      right: -0.04rem
+      width: 0.28rem
+      height: 0.28rem
+      img
+        display: block
+        width: 100%
+        height: 100%
+  .motlist
+    position: absolute
+    width: 1.2rem
+    height: 3rem
+    top: 0.4rem
+    right:0
+    border-radius: 5px
+    background-color: #fff
+    z-index: 100000002
+    .listinner
+      width: 100%
+      height: 100%
+      overflow: auto
+      padding: 0.1rem 0.05rem
+      li
+        position: relative
+        text-align: center
+        height: 0.45rem
+        line-height: 0.45rem
+        font-size: 0.12rem
+        color: #666
+        &::after
+          position: absolute
+          bottom: 0
+          left: 0
+          width: 100%
+          content: ''
+          border-bottom: 1px solid #ccc
+          transform: scaleY(0.5)
+    &::after
+      display: block
+      position: absolute
+      top: -9px
+      right: 8px
+      content: ''
+      border: 5px solid transparent
+      border-bottom-color: #fff
+  .curdate
+    opacity: 0
+  #laydate_box
+      right: 10px!important
+      left: auto!important
+  // 返佣总览
+  .overview-rebate
+    width: 100%
+    height: 2rem
+    position: relative
+    background-color: #FFF
+    overflow: hidden
+    .canvas
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translateX(-50%) translateY(-50%) scale(0.5)
+  // 返佣汇总详情
+  .rebate-details
+    p
+      position: relative
+      width: 100%
+      height: 0.5rem
+      span
+        position: relative
+        float: left
+        width: 33.33%
+        height: 100%
+        text-align: center
+        line-height: 0.5rem
+        color: #666666
+        font-size: 0.12rem
+        &::after
+          position: absolute
+          right: 0
+          top: 0
+          display: block
+          content: ''
+          width: 0
+          height: 100%
+          border-right: 1px solid #ccc
+          transform: scaleX(0.9) scaleY(0.5)
+        &:nth-child(3n)::after
+          display: none
+      &::after
+        position: absolute
+        right: 0
+        bottom: 0
+        display: block
+        content: ''
+        width: 100%
+        height: 0
+        border-bottom: 1px solid #ccc
+        transform: scaleX(0.9) scaleY(0.5)
+      &:nth-last-child(1)::after
+        display: none
+</style>

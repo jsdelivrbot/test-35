@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>钻石vip</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+
+	<div class="v_search">
+		<div class="left">
+			<div class="v_search_box">
+				<span><input id='v_tradeUser' type="text" placeholder="请输入经纪商账号或姓名"></span>
+				<span id="v_search_btn"><i>查询</i></span>
+			</div>
+		</div>
+		<div class="right"><span class="change_date" id="change_date">&nbsp;</span></div>
+	</div>
+
+	<div style="height:0.5rem"></div>
+
+	<div class="vip_list">
+		<ul id='vip_box'>
+			<!-- <li>
+				<div class="hd">
+					<div class="left">
+						<p><span>王百万</span><b>VIP4</b></p>
+						<p>4422030475</p>
+					</div>
+					<div class="right">抢购时间</div>
+				</div>
+				<div class="bd">
+					<span>交易额：5682万</span>
+					<span>积分消费：6452万</span>
+					<span>达标数量：23</span>
+					<span>达标月份：2017-05</span>
+				</div>
+				<div class="fd">
+					<span>直接推荐人姓名：王千万</span>
+					<span>交易账号：4422020064</span>
+					<span>是否成为钻石VIP：是</span>
+					<span>抢购时间：2017-03-24</span>
+				</div>
+			</li> -->
+		</ul>
+	</div>
+
+	<div class="modifyCover viptime" id='vipCover'>
+		<ul class="viplist" id="viplist">
+			<!-- <li><p><b>VIP1</b>抢购时间</p> <p>2017-06-02</p></li> -->
+		</ul>
+		<span class="close" id="close"><img src="images/close_03.png"></span>
+	</div>
+
+	<div style="height:70px"></div>
+	<p class="tips" id="tips">&nbsp;</p>
+	<script src="js/jquery-1.8.3.min.js"></script>
+	<script src="js/mo.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/datePicker.js"></script>
+	<script type="text/javascript">
+		$(function() {    
+			
+			$(".loader_cover_box").css("display","block");
+
+        	
+
+			// var links = '<div class="Nav"><div class="navin"><ul><li onclick="window.location = \'index.html\'"><a href="#" class="homebox"><i class="home"></i>首页</a></li><li><a href="#" class="cartbox" onclick="window.location= \'ranking.html\'"><i class="shopcart"></i>排名</a></li><li ><a href="#" class="comdybox" onclick="window.location= \'broker.html\'"><i class="comdy"></i>交易商</a></li></ul></div></div>'
+			// $("body").append(links);
+
+		    // vip
+        	var session_token=$.cookie('session_token');
+        	var brokerUserNo = GetQueryString("brokerUserNo");
+        	var tradeUser = null;
+        	var month = null;
+	        
+        	getDiamondImportantList();
+
+	        $("#v_search_btn").click(function(){
+	        	tradeUser = $("#v_tradeUser").val();
+	        	month = $change.html();
+	        	getDiamondImportantList();
+	        });
+
+	        var $change = $("#change_date");
+	        var calendar = new datePicker();
+	        calendar.init({
+	          'trigger': '#change_date', /*按钮选择器，用于触发弹出插件*/
+	          'type': 'ym',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+	          'minDate':'1900-1-1',/*最小日期*/
+	          'maxDate':'2100-12-31',/*最大日期*/
+	          'onSubmit':function(){/*确认时触发事件*/
+	            var theSelectData=calendar.value;
+	            $change.html(theSelectData);
+	            tradeUser = $("#v_tradeUser").val();
+	            month = theSelectData;
+	            getDiamondImportantList();
+	          },
+	          'onClose':function(){/*取消时触发事件*/
+	          }
+	        });
+	        
+
+
+	        function getDiamondImportantList(){
+	        	$('#vip_box').html('');
+    	        app.ajaxHelper.submitRequest({
+    	            url: '/api/getDiamondImportantList',
+    	            data: {
+    	                session_token: session_token,
+    	                brokerUserNo: brokerUserNo,
+    	                tradeUser: tradeUser,
+    	                month: month
+    	            },
+    	            success: function (data) {
+    	                var state = data.result;
+    	                var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+    	                if (state == "success") {
+    	                	$(".loader_cover_box").css("display","none");
+    		                function detailedListHtml(tradeUserName,tradeUserNo,vipLevel,tradingVolume,scoreConsume,standardVolume,standardMonth,referralTradeUserName,referralTradeUserNo,referralUserIsDiamondVip,referralUserBuyImportantDate,buyImportantDate) {
+    	   						
+    	   						var referralSta = 'none';
+    	   						var buyTimeSta = 'none';
+    	   						var buyTimeMordeSta = 'none';
+    	   						var standardMonthSta = 'none';
+    	   						var referralUserBuyImportantDateSta = 'none';
+
+    		                	if(buyImportantDate != 'more'){
+    		                		buyTimeSta = 'block';
+    		                		buyTimeMordeSta = 'none';
+    		                	}else{
+    		                		buyTimeSta = 'none';
+    		                		buyTimeMordeSta = 'block';
+    		                	}
+
+    		                	if(standardMonth != null){
+    		                		standardMonthSta = 'block';
+    		                	}else{
+    		                		standardMonthSta = 'none';
+    		                	}
+
+    		                	if(referralTradeUserName == null){
+    		                		referralTradeUserName = '';
+    		                		referralTradeUserNo = '';
+    		                		referralUserBuyImportantDateSta = 'none'
+    		                	}else{
+    		                		referralTradeUserName = referralTradeUserName;
+    		                		referralTradeUserNo = referralTradeUserNo;
+    		                		referralUserBuyImportantDateSta = 'block';
+    		                	}
+
+    		                	if(referralUserBuyImportantDate == null){
+    		                		referralUserBuyImportantDateSta = 'none'
+    		                	}else{
+    		                		referralUserBuyImportantDateSta = 'block';
+    		                	}
+
+    			                var html = '<li><div class="hd"><div class="left"><p><span>'+tradeUserName+'</span><b>VIP'+vipLevel+'</b></p><p id="brokerUserNo">'+tradeUserNo+'</p></div><div class="right" style="display:'+buyTimeMordeSta+'" id="changge">抢购时间</div><div class="right" style="color:#999999;display:'+buyTimeSta+'">抢购时间:'+buyImportantDate+'</div></div><div class="bd"><span>交易额：'+tradingVolume+'</span> <span>积分消费：'+scoreConsume+'</span> <span>达标数量：'+standardVolume+'</span> <span style="display:'+standardMonthSta+'">达标月份：'+standardMonth+'</span></div><div class="fd"><span>直接推荐人姓名：'+referralTradeUserName+'</span> <span>交易账号：'+referralTradeUserNo+'</span> <span>是否成为钻石VIP：'+referralUserIsDiamondVip+'</span> <span style="display: '+referralUserBuyImportantDateSta+'">抢购时间：'+referralUserBuyImportantDate+'</span></div></li>';
+
+    			                return html;
+    		                }
+    		                
+
+    		                if(data.data.diamondImportantList != ''){
+    		                	$(data.data.diamondImportantList).each(function(i){
+    		                		var listHtml = detailedListHtml(this.tradeUserName,this.tradeUserNo,this.vipLevel,this.tradingVolume,this.scoreConsume,this.standardVolume,this.standardMonth,this.referralTradeUserName,this.referralTradeUserNo,this.referralUserIsDiamondVip,this.referralUserBuyImportantDate,this.buyImportantDate);
+    		                		$('#vip_box').append(listHtml);
+    		                	})
+    		                }else{
+    		                	$('#vip_box').append(emptyHtml);
+    		                }
+
+    		                $("#change_date").html(data.data.currentMonth)
+
+    	                } else if (state > "error") {
+    	                    $('#rankingList').html(emptyHtml)
+    	                } else if (state < "noSession") {
+    	                    window.location.href = "login.html";
+    	                }
+    	            }
+    	        })
+	        };
+
+	        $(document).on('click','#changge',function(){
+	        	$("#viplist").html('');
+	        	var brokerUserNo = $(this).parents().find('#brokerUserNo').html();
+	        	$("#vipCover").css("display","block");
+    	        app.ajaxHelper.submitRequest({
+    	            url: '/api/getDiamondVipBuyDate',
+    	            data: {
+    	                session_token: session_token,
+    	                userNo: brokerUserNo
+    	            },
+    	            success: function (data) {
+    	                var state = data.result;
+    	                var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+    	                if (state == "success") {
+    	                	$(".loader_cover_box").css("display","none");
+
+    	                	function viplisthtml(level, buyImportantDate){
+    	                		var d = new Date(buyImportantDate);
+    	                		buyImportantDate = formatDate(d);
+    	                		var html = '<li><p><b>VIP'+level+'</b>抢购时间</p> <p>'+buyImportantDate+'</p></li>';
+
+    	                		return html;
+    	                	}
+
+    	                	$(data.data.buyDateList).each(function(i){
+    	                		var vipHtml = viplisthtml(this.level, this.buyImportantDate);
+    	                		$("#viplist").append(vipHtml)
+    	                	});
+    	      
+    	                } else if (state == "error") {
+    	                    // $('#rankingList').html(emptyHtml)
+    	                } else if (state == "noSession") {
+    	                    window.location.href = "login.html";
+    	                }
+    	            }
+    	        })
+	        })
+
+	        $("#close").click(function(){
+	        	$("#vipCover").css("display","none");
+	        });
+
+	        function formatDate (now){
+	          var year=now.getFullYear();
+	          var month=now.getMonth()+1; 
+	          var date=now.getDate();
+	          if(month<10 && date<10){
+	            return year+"-0"+month+"-0"+date;
+	          }
+
+	          if(month<10 && date>10){
+	            return year+"-0"+month+"-"+date;
+	          }
+	          
+	          if(month>10 && date<10){
+	            return year+"-"+month+"-0"+date;
+	          }
+
+	          if(month>10 && date>10){
+	            return year+"-"+month+"-"+date;
+	          }
+	        }
+
+		});   
+	</script>
+</body>
+</html>

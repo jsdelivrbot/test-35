@@ -1,0 +1,108 @@
+<template>
+  <div id="franchise" v-title="'加盟费详情'">
+      <v-back v-show="backSta">
+        <div slot="title" class="Vtitle">加盟费详情</div>
+      </v-back>
+      <div class="backD" v-bind:class="{'class-b': isB}"></div>
+      <div class="section">
+          <div class="hd">
+            <div class="hd-inner">
+                <span class="hd-title">加盟费详情明细</span>
+            </div>
+          </div>
+          <div class="content">
+            <div class="details-list">
+              <ul>
+                <li v-for="item in franchiseData">
+                  <router-link :to="{ path: '/franchiseDetails', query:{date: item.rebateCycle } }">
+                    <span>{{item.rebateCycle}}</span>
+                    <span>{{item.rebateAmountSum}}</span>
+                  </router-link>
+                </li>
+                <v-empty v-show="emptySta"></v-empty>
+              </ul>
+            </div>
+          </div>
+      </div>
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+import back from 'components/back/back';
+
+  export default{
+    components:{
+      'v-empty': empty,
+      'v-back': back
+    },
+    data(){
+      return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        rebateTypeId: 'FRANCHISE_REBATE',
+        franchiseData: [],
+        emptySta: false,
+        backSta: false,
+        isB: false
+      }
+    },
+    created() {
+	   
+    },
+    methods: {
+      franchise: function(){
+        this.$http.get('/api/findTotalRebateDetail',{params:{ sessionToken: this.sessionToken, rebateTypeId: this.rebateTypeId}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            var a = [];
+            for(var i=response.body.data.rebateList.length-1; i >= 0; i--){
+              a.push(response.body.data.rebateList[i]);
+            }
+            this.franchiseData = a;
+            if(response.body.data.rebateList == '' || response.body.data.rebateList == null){
+              this.emptySta = true;
+            }else{
+              this.emptySta = false;
+            }
+          }else{
+            
+          }   
+        }).then((error)=> this.error = error)
+      }
+    },
+    mounted(){
+      this.isB = this.toolHelper.isWeiXin();
+      this.backSta = this.toolHelper.isWeiXin();
+      this.franchise();
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  #franchise
+    .details-list
+      padding: 0 0.12rem
+      li
+        position: relative
+        width: 100%
+        height: 0.65rem
+        overflow: hidden
+        &::after
+         display: block
+         position: absolute
+         bottom: 0
+         left: 0
+         content: ''
+         width: 100%
+         border-bottom: 1px solid #ccc
+         transform: scaleY(0.5) 
+        span
+          float: left
+          width: 50%
+          line-height: 0.65rem
+          text-align: center
+          font-size: 0.14rem
+          &:nth-child(2)
+            color: #ff6000
+            font-family: "黑体"!important
+</style>

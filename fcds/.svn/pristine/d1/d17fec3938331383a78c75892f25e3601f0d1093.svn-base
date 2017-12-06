@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>登录</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds_login.css">
+    <link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+    <div class="loader_cover_box">
+      <div class="loader">加载中...</div>
+    </div>
+	<div class="wrapper">
+		<div class="logo"><img src="images/logo.png" alt=""></div>
+		<div class="login_info">
+			<p class="tip" id="tip"></p>
+			<div class="in_info_box">
+				<p class="in_info">
+					<span>手机号码：</span><input type="tel" name='phone' id="phone" placeholder="您的手机号码">
+				</p>
+			</div>
+            <div class="in_info_box roleType">
+                <p>选择登录身份</p>
+            </div>
+			<div class="in_info_box">
+				<p class="in_info pr">
+					<span>动态密码：</span><input type="tel" name='DynamicPassword' id="DynamicPassword" placeholder="您的动态密码"><b id="verification_btn">获取动态密码</b>
+				</p>
+			</div>
+			<a href="javascript:;" class="login_btn" id="login">登录</a>
+		</div>
+	</div>
+
+    <div class="cover">
+        <div class="blank"></div>
+        <div class="roleTypeList">
+            <ul id="roleItem">
+                <!-- <li>深圳运营中心</li>
+                <li>深圳一市</li>
+                <li>深圳二市</li>
+                <li>深圳一市南山区</li> -->
+            </ul>
+            <div class="close">取消</div>
+        </div>
+    </div>
+
+	<script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/mo.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+	<script type="text/javascript">
+		$(function() {
+            //移动端兼容
+            var autoScale = function() {
+                    var ratio = 375 / 590,
+                        winW = document.documentElement.clientWidth,
+                        winH = document.documentElement.clientHeight,
+                        ratio2 = winW / winH,
+                        scale;
+
+                    if (ratio < ratio2) {
+                        scale = (winH / 590).toString().substring(0, 6);
+                    } else {
+                        scale = (winW / 375).toString().substring(0, 6);
+                    }
+                    var cssText = '-webkit-transform: scale(' + scale + '); -webkit-transform-origin: center center; opacity: 1;';
+                    $('.wrapper').attr('style', cssText);
+                }
+            setTimeout(function() {
+                if (document.documentElement.clientWidth / document.documentElement.clientHeight != 375 / 590) {
+                    autoScale();
+                } else {
+
+                }
+            }, 300);
+            var roleType = '';
+            var roleNo = '';
+
+            $(".roleType p").click(function(event) {
+                $(".cover").css("display","block");
+                $(".cover .roleTypeList").removeClass('fadeOut').addClass('fadeIn');
+            });
+
+            $(".roleTypeList .close,.cover .blank").click(function(event) {
+                $(".cover .roleTypeList").removeClass('fadeIn').addClass('fadeOut');
+                setTimeout(function() {
+                  $(".cover").css("display", "none");
+                }, 800);
+            });
+
+            $(".cover .roleTypeList").on('click', 'li', function() {
+                roleType = $(this).attr("data-roletype");
+                roleNo = $(this).attr("data-roleno");
+                $(".roleType p").html($(this).html());
+                $(".cover .roleTypeList").removeClass('fadeIn').addClass('fadeOut');
+                setTimeout(function() {
+                  $(".cover").css("display", "none");
+                }, 800);
+            });
+
+            // 显示获取密码按钮
+            $("#phone").keyup(function() {
+                //截取前11个字符
+                var length = $("#phone").val().length;
+                var value = $("#phone").val();
+                if (length > 11) {
+                    value = value.substring(0, 11);
+                    $("#phone").attr("value", value);
+                }
+                if (length == 11) {
+                    $("#verification_btn").css("display", "block");
+                    // $(".loader_cover_box").css("display", "block");
+                    app.ajaxHelper.submitRequest({
+                        url: '/api/getLoginRole',
+                        data: {
+                            phone: value
+                        },
+                        success: function (data) {
+                            if (data.result == "success") {
+                                if(data.data.roleList.length > 1){
+                                    $(".wrapper .login_info .in_info_box.roleType").css("display","block");
+                                    for (var i = 0; i < data.data.roleList.length-1; i++) {
+                                        $('#roleItem').append('<li data-roleNo="'+data.data.roleList[i].roleNo+'" data-roleType="'+data.data.roleList[i].roleType+'">'+data.data.roleList[i].roleName+'</li>');
+                                    }
+                                }else{
+                                    roleType = data.data.roleList[0].roleType;
+                                    roleNo = data.data.roleList[0].roleNo;
+                                }
+                                
+                            }else {
+                                $(".loader_cover_box").css("display", "none");
+                                $("#tip").html('<span class="tip_text">不是有效的手机号码</span>');
+                            }
+                        }
+                    })
+                }
+            })
+
+            // 获取密码请求
+            $("#verification_btn").click(function() {
+                var phone = $("#phone").val();
+                app.ajaxHelper.submitRequest({
+                    url: '/api/getDynamicPassword',
+                    data: {
+                        phone: phone
+                    },
+                    success: function (data) {
+                        if (data.result == "success") {
+                            $("#tip").html('<span class="tip_text">动态密码已发送</span>');
+                            $('#verification_btn').unbind("click")
+                        } else {
+                            $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+                        }
+                    }
+                })
+            })
+
+            var wait = 60;
+            function time(o) {
+                document.getElementById("verification_btn").onclick = null;
+                if (wait == 0) {
+
+                    // 获取密码请求
+                    $("#verification_btn").click(function() {
+                        var phone = $("#phone").val();
+                        app.ajaxHelper.submitRequest({
+                            url: '/api/getDynamicPassword',
+                            data: {
+                                phone: phone
+                            },
+                            success: function (data) {
+                                if (data.result == "success") {
+                                    $("#tip").html('<span class="tip_text">动态密码已发送</span>');
+                                } else {
+                                    $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+                                }
+                            }
+                        })
+                    })
+
+                    o.removeAttribute("disabled");
+                    o.innerHTML = "获取验证码";
+                    wait = 60;
+                    document.getElementById("verification_btn").onclick = function() {
+                        time(this);
+                    }
+                } else {
+
+                    $('#verification_btn').unbind("click")
+
+                    o.setAttribute("disabled", true);
+                    o.innerHTML = "重新发送(" + wait + ")";
+                    wait--;
+                    setTimeout(function() {
+                        time(o)
+                    }, 1000)
+                }
+            }
+            document.getElementById("verification_btn").onclick = function() {
+                time(this);
+            }
+            // 登录请求
+            $("#login").click(function() {
+                var phone = $("#phone").val();
+                var dynamicPassword = $("#DynamicPassword").val();
+                if(roleNo == '' && roleType ==''){
+                    $("#tip").html('<span class="tip_text">请选择登录身份</span>');
+                }else{
+                    app.ajaxHelper.submitRequest({
+                        url: '/api/login',
+                        data: {
+                            phone: phone,
+                            dynamicPassword: dynamicPassword,
+                            roleType: roleType,
+                            roleNo: roleNo
+
+                        },
+                        success: function (data) {
+                            var state = data.result;
+                            if (state == "success") {
+                                $.cookie('session_token', data.data.session_token, {
+                                    expires: 30
+                                });
+                                window.location.href = "index.html";
+                            } else if (state > "error") {
+                                $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+                            } else if (state < "noSession") {
+                                $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+                                window.location.href = "login.html";
+                            }
+                        }
+                    }) 
+                }     
+            })
+            
+            $(".identity span").click(function(event) {
+                $(this).addClass('cur').siblings().removeClass('cur');
+            });
+        });
+	</script>
+</body>
+</html>

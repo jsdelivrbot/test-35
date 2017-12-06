@@ -1,0 +1,334 @@
+<template>
+  <div v-title="'委卖明细'">
+    <div class="modifyRegionlist">
+      <div class="rolelistTap">
+        <span>委卖明细</span>
+        <div class="search-left">
+          <div class="search" v-bind:class="{ animation: animationState}">
+            <input type="text" placeholder="请输入交易商账号或姓名" v-model="tradeUser" @keyup="changes">
+            <i @click="animation"><img src="../../../assets/search.png" alt=""></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="SCDetails_tap">
+      <div class="item" v-bind:class="{ atv: adoptSta}" @click="adopt"><b>审核通过</b></div>
+      <div class="item" v-bind:class="{ atv: examineSta}" @click="examine"><b>审核中</b></div>
+      <div class="item" v-bind:class="{ atv: failSta}" @click="fail"><b>审核未通过</b></div>
+    </div>
+
+    <div class="SCDetailsList adoptList" v-show="adoptSta">
+      <ul>
+        <li class="item" v-for="item in adoptListData">
+            <div class="hd">
+              <div class="hd-inner border_1px">
+                <span class="hd-title small">{{item.name}}</span><i>（{{item.tradeUserNo}}）</i>
+              </div>
+            </div>
+            <div class="bd">
+              <div class="content overview">
+                <ul>
+                  <li>商品名：<span>{{item.goodsNo}}</span></li>
+                  <li>委卖数量：<span>{{item.amount}}块</span></li>
+                  <li>申请时间：<span>{{item.createdDate}}</span></li>
+                  <li>审核时间：<span>{{item.lastModifiedDate}}</span></li>
+                  <!-- <li>审核状态：<span>{{item.status}}</span></li> -->
+                  <li>备注：<span>{{item.comment}}</span></li>
+                </ul>
+              </div>
+            </div>
+        </li>
+      </ul>
+      
+      <v-empty v-show="emptySta1"></v-empty>
+
+    </div>
+    <div class="SCDetailsList examineList" v-show="examineSta">
+      <ul>
+        <li class="item" v-for="item in examineListData">
+          <div class="hd">
+            <div class="hd-inner border_1px">
+              <span class="hd-title small">{{item.name}}</span><i>（{{item.tradeUserNo}}）</i>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="content overview">
+              <ul>
+                <li>商品名：<span>{{item.goodsNo}}</span></li>
+                <li>委卖数量：<span>{{item.amount}}块</span></li>
+                <li>申请时间：<span>{{item.createdDate}}</span></li>
+                <!-- <li>审核时间：<span>{{item.lastModifiedDate}}</span></li> -->
+                <!-- <li>审核状态：<span>{{item.status}}</span></li> -->
+                <!-- <li>备注：<span>{{item.comment}}</span></li> -->
+              </ul>
+            </div>
+          </div>
+        </li>
+
+        <v-empty v-show="emptySta2"></v-empty>
+
+      </ul>
+    </div>
+    <div class="SCDetailsList failList" v-show="failSta">
+      <ul>
+        <li class="item" v-for="item in failListData">
+          <div class="hd">
+            <div class="hd-inner border_1px">
+              <span class="hd-title small">{{item.name}}</span><i>（{{item.tradeUserNo}}）</i>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="content overview">
+              <ul>
+                <li>商品名：<span>{{item.goodsNo}}</span></li>
+                <li>委卖数量：<span>{{item.amount}}块</span></li>
+                <li>申请时间：<span>{{item.createdDate}}</span></li>
+                <li>审核时间：<span>{{item.lastModifiedDate}}</span></li>
+                <!-- <li>审核状态：<span>{{item.status}}</span></li> -->
+                <li>备注：<span>{{item.comment}}</span></li>
+              </ul>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <v-empty v-show="emptySta3"></v-empty>
+
+    </div>
+
+    
+
+    <p class="tips" v-show="create"><span>{{tipText}}</span></p>
+
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+
+  export default{
+    components:{
+      'v-empty': empty
+    },
+    data() {
+     return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        animationState: true,
+        accountNo: null,
+        tipText: null,
+        create: false,
+        emptySta1: false,
+        emptySta2: false,
+        emptySta3: false,
+        adoptSta: true,
+        examineSta: false,
+        failSta: false,
+        tradeUser: '',
+        adoptListData: [],
+        examineListData: [],
+        failListData: []
+      }
+    },
+    mounted(){
+      this.getListEntrustSell();
+    },
+    methods: {
+      animation: function(){
+        
+        if(this.tradeUser == null || this.tradeUser == ''){
+          if(this.animationState){
+            this.animationState = false;
+          }else{
+            this.animationState = true;
+          }
+        }else{
+          this.getListEntrustSell();
+        }
+      },
+      changes: function(){
+        if(this.tradeUser == ''){
+          this.getListEntrustSell();
+        }
+      },
+      tip: function(){
+        this.create = true;
+        var this_ = this;
+        clearTimeout(t)
+        var t = setTimeout(function (){
+            this_.create = false;
+        }, 3000);
+      },
+      adopt: function(){
+        this.adoptSta = true;
+        this.examineSta = false;
+        this.failSta = false;
+      },
+      examine: function(){
+        this.adoptSta = false;
+        this.examineSta = true;
+        this.failSta = false;
+      },
+      fail: function(){
+        this.adoptSta = false;
+        this.examineSta = false;
+        this.failSta = true;
+      },
+      getListEntrustSell: function(){
+        this.$http.get('/api/getListEntrustSell',{params:{ sessionToken: this.sessionToken, tradeUser: this.tradeUser }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.adoptListData = response.body.data.listPassed;
+            this.examineListData = response.body.data.listPassing;
+            this.failListData = response.body.data.listNoPassed;
+            for(var i=0; i < this.adoptListData.length; i++){
+              this.adoptListData[i].createdDate = this.timetrans(this.adoptListData[i].createdDate);
+              this.adoptListData[i].lastModifiedDate = this.timetrans(this.adoptListData[i].lastModifiedDate);
+            }
+            for(var i=0; i < this.examineListData.length; i++){
+              this.examineListData[i].createdDate = this.timetrans(this.examineListData[i].createdDate);
+              this.examineListData[i].lastModifiedDate = this.timetrans(this.examineListData[i].lastModifiedDate);
+            }
+            for(var i=0; i < this.failListData.length; i++){
+              this.failListData[i].createdDate = this.timetrans(this.failListData[i].createdDate);
+              this.failListData[i].lastModifiedDate = this.timetrans(this.failListData[i].lastModifiedDate);
+            }
+            if(this.adoptListData == ''){
+              this.emptySta1 = true;
+            }else{
+              this.emptySta1 = false;
+            }
+
+            if(this.examineListData == ''){
+              this.emptySta2 = true;
+            }else{
+              this.emptySta2 = false;
+            }
+
+            if(this.failListData == ''){
+              this.emptySta3 = true;
+            }else{
+              this.emptySta3 = false;
+            }
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }      
+        }).then((error)=> this.error = error)
+      },
+      timetrans: function(date){
+        var date = new Date(date);//如果date为10位不需要乘1000
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
+        var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
+        var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+        var m = (date.getMinutes() <10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+        var s = (date.getSeconds() <10 ? '0' + date.getSeconds() : date.getSeconds());
+        // return Y+M+D+h+m+s;
+        return Y+M+D;  
+      }
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .SCDetails_tap
+    position: relative
+    display:flex
+    background-color: #FFF
+    width: 100%
+    height: 0.5rem
+    line-height: 0.5rem
+    margin: 0.1rem 0
+    &::after
+      position: absolute
+      bottom: 0
+      left: 0
+      content: ''
+      width: 100%
+      border-bottom: 1px solid #ccc
+      transform: scaleY(0.5)
+    &::before
+      position: absolute
+      top: 0
+      content: ''
+      width: 100%
+      border-bottom: 1px solid #ccc
+      transform: scaleY(0.5)
+    .item
+      flex: 1
+      text-align: center
+      font-size: 0.15rem
+      position: relative
+      &.atv
+        b
+          position: relative
+          color: #ff6000
+          padding: 0 0.1rem
+          &::after
+            position: absolute
+            bottom: 0
+            left: 0
+            content: ''
+            width: 100%
+            border-bottom: 1px solid #ff6000
+            z-index: 1
+      &::after
+        position: absolute
+        top: 0
+        right: 0
+        content: ''
+        height: 100%
+        border-right: 1px solid #ccc
+        transform: scale(0.5)
+      &:nth-child(3)::after
+        border: none
+      b
+        display: inline-block
+        color: #999999
+  .SCDetailsList
+    overflow: hidden
+    .item
+      padding: 0.1rem
+      position: relative
+      background-color: #fff
+      font-size: .12rem
+      margin-top: 0.1rem
+      .hd
+        width: 100%
+        height: .47rem
+        padding: 0 .12rem
+        line-height: .47rem
+        .hd-inner
+          height: .47rem
+          position: relative
+          i
+            font-style: normal
+            font-size: 0.13rem
+            color: #999999
+          .hd-title
+            font-size: .15rem
+            font-weight: 700
+            &.small
+              font-weight: 300
+              font-size: 0.18rem
+            &::after
+              display: block
+              position: absolute
+              left: 0
+              bottom: 0
+              width: 100%
+              border-top: 1px solid #ccc
+              content: ""
+              transform: scaleY(.5)
+              -webkit-transform: scaleY(.5)
+      .content
+        padding: .12rem
+        overflow: hidden
+        li
+          float: left
+          width: 50%
+          font-size: .14rem
+          line-height: .3rem
+          color: #999999
+</style>

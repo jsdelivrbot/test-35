@@ -1,0 +1,373 @@
+<template>
+  <div>
+    <!-- 积分汇总 -->
+    <div class="section" >
+      <div class="hd">
+        <div class="hd-inner">
+          <span class="hd-title">积分汇总</span>
+          <span class="seniorfranchiseDate"><i>{{findScoreSummaryData.startDate}} 至 {{findScoreSummaryData.endDate}}</i></span>
+        </div>
+      </div>
+      <div class="content">
+        <div class="overview-rebate">
+          <canvas id="canvas" class="canvas"> </canvas>
+        </div>
+      </div>
+      <div class="integralNum">
+        <p class="item">
+          <span>{{findScoreSummaryData.notUseRedScore}}</span>
+          <span>未消费红积分总额</span>
+        </p>
+        <p class="item">
+          <span>{{findScoreSummaryData.useRedScore}}</span>
+          <span>已消费红积分总额</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="integralUseDetailed">
+      <ul>
+        <li>
+          <span>一级经纪商</span>
+          <span>已消费红积分</span>
+          <span>红积分总额</span>
+        </li>
+        <li v-for="item in findScoreDetailData">
+          <span>
+            <i>{{item.name}}</i>
+            <i>（{{item.no}}）</i>
+          </span>
+          <span>{{item.purchaseScoreSum}}</span>
+          <span>{{item.specMoneySum}}</span>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+import 'common/js/jquery-1.8.3.min.js';
+import 'common/js/laydate.dev.js';
+const ERR_OK = 'success';
+
+export default{
+  data(){
+      return {
+          coverShow: false, //背景遮罩状态
+          sessionToken: localStorage.getItem("sessionToken"),
+          findScoreSummaryData: {},
+          findScoreDetailData: [],
+          scroll: '',
+          pageIndex: null,
+          totalPage: null
+      }
+  },
+  created(){
+    
+  },
+  methods:{
+    // 背景遮罩隐藏
+    coverHide: function(){
+      this.coverShow = false;
+    },
+    // 返佣总览环状图
+      wagonRebate: function(el,totalRedScore,useRedScore,notUseRedScore){
+        var option = {
+          el: el,
+          data: {value:totalRedScore, name: '红积分总额'},
+          series:{
+            data:[
+              {value: useRedScore, name: '已消费红积分', color: '#38aafa'},
+              {value:notUseRedScore, name: '未消费红积分', color: '#ff6600'}
+            ]
+          },
+          r: 130,
+          arcwidth: 2,
+          percent: true
+        }
+        this.toolHelper.wagon(option);
+      },
+      // 返佣总览折线图
+      polylineRebate: function(el){
+        let polylineRebate = echarts.init(document.getElementById(el));
+        let option = {
+            tooltip : {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '2%',
+                right: '6%',
+                bottom: '3%',
+                top: '4%',
+                containLabel: true
+            },
+            color: ['#ff6000'],
+            xAxis : [
+                {
+                    type : 'category',
+                    boundaryGap : false,
+                    data : ['02/25','02/26','02/27','02/28','03/01','03/02','03/03'],
+                    axisLabel :{  
+                        interval:0,
+                    },
+                    splitLine: {
+                        show: true,
+                      lineStyle:{
+                        color:"#e1e1e1",
+                        type:"solid"
+                      }
+                     }
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value'
+                }
+            ],
+            series : [
+                {
+                    name:'金额',
+                    type:'line',
+                    areaStyle: {normal: {}},
+                    data:[4100, 4000, 6000, 6500, 5000, 5500, 4400],
+                    areaStyle: {
+                       normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                               offset: 0,
+                               color: 'rgba(255, 102, 0, 1)'
+                           }, {
+                               offset: 1,
+                               color: 'rgba(255, 102, 0, 0.01)'
+                           }])
+                       }
+                   },
+                   lineStyle: {
+                      normal: {
+                          type: 'solid',
+                          color:"#ff6000",
+                          opacity :"1"
+                      }
+              }
+                }
+            ]
+        };
+        polylineRebate.setOption(option);
+      },
+      // 2017年n月（上/下）返佣汇总(折线图)日期选择
+      pieRequest: function(){
+        var _this = this;
+        this.coverShow = true;
+          laydate({
+              elem: '#J-xl-2',
+              min: '2016-10-01', //设定最小日期
+              max: laydate.now(-1), //最大日期
+              choose: function(datas){ //选择日期完毕的回调
+                var date = datas;
+                date = date.replace(/-/g,'');
+                  // _this.getPieDete(date);
+                  alert(date);
+                  _this.coverShow = false
+              }
+
+          });
+      },
+      findScoreSummary: function(){
+        this.$http.get('/api/findScoreSummary',{params:{ sessionToken: this.sessionToken}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.findScoreSummaryData = response.body.data;
+            this.wagonRebate('canvas',this.findScoreSummaryData.totalRedScore,this.findScoreSummaryData.useRedScore,this.findScoreSummaryData.notUseRedScore);
+          }else{
+            
+          }   
+        }).then((error)=> this.error = error)
+      },
+      findScoreDetail: function(pageIndex){
+        this.$http.get('/api/findScoreDetail',{params:{ sessionToken: this.sessionToken, pageIndex: this.pageIndex}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            // this.findScoreDetailData = response.body.data.detailList;
+            for(var i = 0; i < response.body.data.detailList.length; i++){
+              this.findScoreDetailData.push(response.body.data.detailList[i])
+            }
+            this.pageIndex = response.body.data.paging.pageIndex;
+            this.totalPage = response.body.data.paging.totalPage;
+          }else{
+            
+          }   
+        }).then((error)=> this.error = error)
+      },
+      menu: function() {
+        this.scroll = document.body.scrollTop;
+        if(window.screen.height + this.scroll > document.body.offsetHeight){
+          this.pageIndex++
+          if(this.totalPage > this.pageIndex){
+            this.findScoreDetail(this.pageIndex);
+          }
+        }
+      }
+  },
+  mounted() {
+    // 返佣总览环状图
+      this.findScoreSummary();
+
+      this.findScoreDetail();
+
+      window.addEventListener('scroll', this.menu)
+  }
+};
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .integralUseDetailed
+    margin-top: 0.1rem
+    padding: 0.12rem
+    background-color: #FFF
+    li
+      position: relative
+      width: 100%
+      height: 0.65rem
+      overflow: hidden
+      line-height: 0.65rem
+      &::after
+        position: absolute
+        right: 0
+        bottom: 0
+        display: block
+        content: ''
+        width: 100%
+        height: 0
+        border-bottom: 1px solid #ccc
+        transform: scaleY(0.5)
+      &:nth-child(1)
+        height: 0.5rem
+        line-height: 0.5rem
+        span
+          color: #999999
+          font-size: 0.12rem!important
+          padding: 0!important
+          line-height: 0.5rem!important
+      span
+        float: left
+        width: 33.33%
+        height: 100%
+        text-align: center
+        color: #ff6000
+        font-size: 0.14rem
+        font-size: 0.15rem
+        &:nth-child(1)
+          font-size: 0.14rem
+          line-height: 0.2rem
+          color: #999999
+          padding: 0.125rem
+          i
+            font-style: normal
+  .integralNum
+    position: relative
+    height: 0.58rem
+    overflow: hidden
+    &::after
+      position: absolute
+      right: 0
+      top: 0
+      display: block
+      content: ''
+      width: 100%
+      height: 0
+      border-bottom: 1px solid #ccc
+      transform: scaleY(0.5)
+    .item
+      position: relative
+      float: left
+      width: 50%
+      height: 0.58rem
+      padding: 0.09rem 0
+      &::after
+        position: absolute
+        right: 0
+        top: 0
+        display: block
+        content: ''
+        height: 100%
+        border-right: 1px solid #ccc
+        transform: scaleX(0.5)
+      span
+        display: block
+        font-size: 0.14rem
+        line-height: 0.2rem
+        text-align: center
+        color: #999999
+        &:nth-child(1)
+          color: #ff8037
+  .seniorfranchiseDate
+    float: right
+    i
+      font-style: normal;
+      color: #999;
+  #laydate_box
+      right: 10px!important
+      left: auto!important
+  // 返佣总览
+  .overview-rebate
+    width: 100%
+    height: 2rem
+    position: relative
+    background-color: #FFF
+    overflow: hidden
+    .canvas
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translateX(-50%) translateY(-50%) scale(0.5)
+  // 返佣汇总详情
+  .rebate-details
+    p
+      position: relative
+      width: 100%
+      height: 0.5rem
+      span
+        position: relative
+        float: left
+        width: 33.33%
+        height: 100%
+        text-align: center
+        line-height: 0.5rem
+        color: #666666
+        font-size: 0.12rem
+        &::after
+          position: absolute
+          right: 0
+          top: 0
+          display: block
+          content: ''
+          width: 0
+          height: 100%
+          border-right: 1px solid #ccc
+          transform: scaleX(0.9) scaleY(0.5)
+        &:nth-child(3n)::after
+          display: none
+      &::after
+        position: absolute
+        right: 0
+        bottom: 0
+        display: block
+        content: ''
+        width: 100%
+        height: 0
+        border-bottom: 1px solid #ccc
+        transform: scaleX(0.9) scaleY(0.5)
+      &:nth-last-child(1)::after
+        display: none
+</style>

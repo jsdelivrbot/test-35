@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>手续费返佣</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+
+  <div class="rebate">
+      <div class="rebate-header" id="mDete"><!-- 2017年01月 --></div>
+      <div class="rebate-list" id="container">
+        <ul class="rebate-box width33" id="rebateList">
+          <!-- <li>
+            <div class="inner">
+              <div class="item">
+                <p>周一</p>
+                <p>01-13</p>
+              </div>
+              <div class="item">周大富</div>
+              <div class="item">100000</div>
+            </div>
+          </li>
+          <li>
+            <div class="inner">
+              <div class="item">
+                <p>周一</p>
+                <p>01-13</p>
+              </div>
+              <div class="item">周大富</div>
+              <div class="item">100000</div>
+            </div>
+          </li>
+          <li>
+            <div class="inner">
+              <div class="item">
+                <p>周一</p>
+                <p>01-13</p>
+              </div>
+              <div class="item">周大富</div>
+              <div class="item">100000</div>
+            </div>
+          </li> -->
+        </ul>
+      </div>
+  </div>
+
+  <p class="tips" id="tips">&nbsp;</p>
+
+  <script src="js/jquery-1.8.3.min.js"></script>
+  <script src="js/mo.js"></script>
+  <script src="js/jquery.cookie.js"></script>
+  <script src="js/common.js"></script>
+  <script type="text/javascript">
+    $(function(){
+      var session_token = $.cookie('session_token');
+      var url=decodeURI(location.href);
+      var month=url.split("?")[1]; 
+      app.ajaxHelper.submitRequest({
+          url: '/api/findPoundageRebateDetail',
+          data: {
+              session_token: session_token,
+              month: month
+          },
+          success: function (data) {
+              var state = data.result;
+              var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+              if (state == "success") {
+                $(".loader_cover_box").css("display","none");
+                $("#mDete").html(month);
+                  function detailedListHtml(date,week,name,rebateAmount) {
+                    var html = '<li><div class="inner"><div class="item"><p>'+week+'</p><p>'+date+'</p></div><div class="item">'+name+'</div><div class="item">'+rebateAmount+'</div></div></li>';
+
+                    return html;
+                  }
+                  $(data.data.rebateList).each(function(i){
+                    var listHtml = detailedListHtml(this.date,this.week,this.name,this.rebateAmount);
+                    $('#rebateList').append(listHtml);
+                  })
+                  if(data.data.rebateList == ''){
+                    $("#container").html(emptyHtml)
+                  }
+              } else if (state > "error") {
+                  $('#container').html(emptyHtml)
+              } else if (state < "noSession") {
+                  $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+                  window.location.href = "login.html";
+              }
+          }
+      })
+    });
+  </script>
+</body>
+</html>

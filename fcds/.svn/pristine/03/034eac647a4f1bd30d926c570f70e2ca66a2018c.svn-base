@@ -1,0 +1,500 @@
+<template>
+  <div v-title="'子账户管理'">
+    <div class="accoutManagement">
+      <ul>
+        <li><span>姓名：</span><input class='tel' type="text" placeholder="请输入姓名" v-model='name'></li>
+        <li><span>密码：</span><input class='tel' type="tel" placeholder="请输入密码" v-model='password'></li>
+        <li>
+          <span>角色：</span>
+          <label><input name="roleId" v-model="roleId" type="radio" value="ROLE_PLACING" />配售员</label> 
+          <label><input name="roleId" v-model="roleId" type="radio" value="ROLE_BUSINESS" />业务员</label>
+        </li>
+      </ul>
+      <div class="determine-box">
+        <div class="determine" @click="determine">提 交</div>
+      </div>
+    </div>
+
+    <div class="rolelist">
+      <div class="rolelistTap">
+        <span v-bind:class='{active:activeStateO}' @click="activeO">配售员列表</span>
+        <span v-bind:class='{active:activeStateE}' @click="activeE">业务员列表</span>
+      </div>
+      <div class="rolelistTip">
+        <span>姓名</span>
+        <span>账号</span>
+        <span>操作</span>
+      </div>
+
+      <ul class="rolelists" v-show="roleStateO">
+        <li v-for="(item, index) in getChildAccountMessageDatePlacingList">
+          <span>{{item.accountName}}</span>
+          <span>{{item.accountNo}}</span>
+          <span>
+            <i @click="modifyCoverName(item.accountNo)"><img src="../../../assets/34.png" alt=""></i>
+            <i @click="modifyCoverPassword(item.accountNo)"><img src="../../../assets/1414.png" alt=""></i>
+            <i @click="modifyCoverDelete(item.accountNo)"><img src="../../../assets/4134.png" alt=""></i>
+          </span>
+        </li>
+        <v-empty v-show="emptySta1"></v-empty>
+      </ul>
+
+      <ul class="rolelists" v-show="roleStateE">
+        <li v-for="(item, index) in getChildAccountMessageDateBusinessList">
+          <span>{{item.accountName}}</span>
+          <span>{{item.accountNo}}</span>
+          <span>
+            <i @click="modifyCoverName(item.accountNo)"><img src="../../../assets/34.png" alt=""></i>
+            <i @click="modifyCoverPassword(item.accountNo)"><img src="../../../assets/1414.png" alt=""></i>
+            <i @click="modifyCoverDelete(item.accountNo)"><img src="../../../assets/4134.png" alt=""></i>
+          </span>
+        </li>
+        <v-empty v-show="emptySta2"></v-empty>
+      </ul>
+    </div>
+
+    <div class="stage-cover" v-show="coverShow"></div>
+
+    <div class="modifyCover" v-show="coverShow">
+      <!--  修改名字 -->
+      <div class="modifyCoverInner" v-show="modifyName">
+        <ul>
+          <li><span>姓名：</span><input type="text" placeholder="请输入修改的姓名" v-model="accountName"></li>
+        </ul>
+        <div class="determine determineName" @click="determineName">确认修改</div>
+      </div>
+      <!--  修改密码 -->
+      <div class="modifyCoverInner" v-show="modifyPassword">
+        <ul>
+          <li><span>密码：</span><input type="text" placeholder="请输入密码" v-model="loginPassword"></li>
+          <li><span>确认密码：</span><input type="text" placeholder="请再次输入密码" v-model="checkLoginPassword"></li>
+        </ul>
+        <div class="determine determinePassword" @click="determinePassword">确认修改</div>
+      </div>
+
+      <!--  删除 -->
+      <div class="modifyCoverInner" v-show="modifyDelete">
+        <p>是否确认删除子账号{{accountNo}}</p>
+        <div class="determine determineDelete" @click="determineDelete">确认删除</div>
+      </div>
+
+      <span class="close" @click="close"><img src="../../../assets/close_03.png"></span>
+    </div>
+
+    <!-- tip -->
+    <p class="tips" v-show="create"><span>{{tipText}}</span></p>
+
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+
+  export default{
+    components:{
+      'v-empty': empty
+    },
+    data() {
+     return{
+        name: null,
+        password: null,
+        roleId: 'ROLE_PLACING',
+        roleStateO: true,
+        roleStateE: false,
+        activeStateO: true,
+        activeStateE: false,
+        sessionToken: localStorage.getItem("sessionToken"),
+        getChildAccountMessageDate: {},
+        coverShow: false,
+        accountNo: null,
+        accountName: null,
+        modifyName: false,//修改名字窗口
+        modifyPassword: false, //修改密码窗口
+        loginPassword: null, //修改密码
+        checkLoginPassword: null, //确认密码
+        modifyDelete: false, //删除窗口
+        create: false,
+        tipText: null,
+        getChildAccountMessageDatePlacingList: [],
+        getChildAccountMessageDateBusinessList: [],
+        emptySta1: false,
+        emptySta2: false
+      }
+    },
+    methods: {
+      determine: function(){
+        this.createChildAccount(this.name, this.password, this.roleId);
+      },
+      activeO: function(){
+        this.activeStateO = true;
+        this.activeStateE = false;
+        this.roleStateO = true;
+        this.roleStateE = false;
+      },
+      activeE: function(){
+        this.activeStateO = false;
+        this.activeStateE = true;
+        this.roleStateO = false;
+        this.roleStateE = true;
+      },
+      createChildAccount: function(childUserName, childUserPassword, roleId){
+        if(this.name != null && this.name != '' && this.password != null && this.password != ''){
+          this.$http.get('/api/createChildAccount?',{params:{ sessionToken: this.sessionToken, childUserName: childUserName, childUserPassword: childUserPassword, roleId: roleId}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.name = null;
+              this.password = null;
+              this.getChildAccountMessage();
+              this.tipText = '创建子账户成功！'
+              this.tip();
+            }else{
+              this.tipText = '创建子账户失败！'
+              this.create = true;
+              this.tip();
+            }
+          }).then((error)=> this.error = error)
+        }else{
+          this.tipText = '请输入完整信息！'
+          this.tip();
+        }
+      },
+      getChildAccountMessage: function(){
+        this.$http.get('/api/getChildAccountMessage?',{params:{ sessionToken: this.sessionToken }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.getChildAccountMessageDate = response.body.data;
+            var a = [];
+            for(var i=response.body.data.placingList.length-1; i >= 0; i--){
+              a.push(response.body.data.placingList[i]);
+            }
+            this.getChildAccountMessageDatePlacingList = a;
+
+            var b = [];
+            for(var i=response.body.data.businessList.length-1; i >= 0; i--){
+              b.push(response.body.data.businessList[i]);
+            }
+            this.getChildAccountMessageDateBusinessList = b;
+            if(response.body.data.placingList == '' || response.body.data.placingList == null){
+              this.emptySta1 = true;
+            }else{
+              this.emptySta1 = false;
+            }
+            if(response.body.data.businessList == '' || response.body.data.businessList == null){
+              this.emptySta2 = true;
+            }else{
+              this.emptySta2 = false;
+            }
+          }else{
+            this.tipText = '获取数据失败！'
+            this.tip();
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      editChildAccount: function(sessionToken, accountNo, accountName){
+        this.$http.get('/api/editChildAccount?',{params:{ sessionToken: sessionToken, accountNo: accountNo, accountName: accountName }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.getChildAccountMessage();
+            this.coverShow = false;
+            this.tipText = '成功!'
+            this.tip();
+          }else{
+            this.tipText = '失败!'
+            this.tip();
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      editChildAccountPassword: function(sessionToken,accountNo,loginPassword,checkLoginPassword){
+        this.$http.get('/api/editChildAccountPassword?',{params:{ sessionToken: sessionToken, accountNo: accountNo, loginPassword: loginPassword, checkLoginPassword: checkLoginPassword }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.tipText = '成功!'
+            this.tip();
+            this.coverShow = false;
+          }else{
+            this.tipText = '失败!'
+            this.tip();
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      removeChildAccount: function(sessionToken,accountNo){
+        this.$http.get('/api/removeChildAccount?',{params:{ sessionToken: sessionToken, accountNo: accountNo}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.getChildAccountMessage();
+            this.coverShow = false;
+            this.tipText = '成功!'
+            this.tip();
+          }else{
+            this.tipText = '失败!'
+            this.tip();
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      close: function(){
+        this.coverShow = false;
+      },
+      modifyCoverName: function(accountNo){
+        this.coverShow = true;
+        this.accountNo = accountNo;
+        this.modifyName = true;
+        this.modifyPassword = false;
+        this.modifyDelete = false;
+        this.accountName = null
+      },
+      modifyCoverPassword: function(accountNo){
+        this.coverShow = true;
+        this.accountNo = accountNo;
+        this.modifyName = false;
+        this.modifyPassword = true;
+        this.modifyDelete = false;
+        this.loginPassword = null;
+        this.checkLoginPassword = null;
+      },
+      modifyCoverDelete: function(accountNo){
+        this.coverShow = true;
+        this.accountNo = accountNo;
+        this.modifyName = false;
+        this.modifyPassword = false;
+        this.modifyDelete = true;
+      },
+      determineName: function(){ 
+        if(this.accountName != '' && this.accountName != null){
+          this.editChildAccount(this.sessionToken, this.accountNo, this.accountName);
+        }else{
+          this.tipText = '请输入修改的姓名!'
+          this.tip();
+        }
+      },
+      determinePassword: function(){
+        if(this.loginPassword != '' && this.loginPassword != null && this.checkLoginPassword != '' && this.checkLoginPassword != null){
+          this.editChildAccountPassword(this.sessionToken, this.accountNo, this.loginPassword, this.checkLoginPassword);
+        }else{
+          this.tipText = '请输入完整信息!'
+          this.tip();
+        }
+      },
+      determineDelete: function(){
+        this.removeChildAccount(this.sessionToken, this.accountNo);
+      },
+      tip: function(){
+        this.create = true;
+        var this_ = this;
+        clearTimeout(t)
+        var t = setTimeout(function (){
+            this_.create = false;
+        }, 3000);
+      }
+    },
+    mounted(){
+      this.getChildAccountMessage();
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .tips
+    position: fixed
+    top: 25%
+    left: 50%
+    transform: translateX(-50%) translateY(-50%)
+    z-index: 100000003
+    span
+      display: block
+      background-color: rgba(0,0,0,0.6)
+      min-width: 2rem
+      padding: 0.08rem 0.1rem
+      border-radius: 0.2rem
+      color: #fff
+      text-align: center
+      font-size: 0.15rem
+  .modifyCover
+    position: fixed
+    top: 50%
+    left: 50%
+    width: 2.9rem
+    height: 1.88rem
+    background-color: #fff
+    z-index: 100000002
+    transform: translateX(-50%) translateY(-50%)
+    border-radius: 3px
+    box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.4)
+    .modifyCoverInner
+      padding: 0.3rem 0.35rem
+      p
+        line-height: 0.4rem
+      .determine
+        margin: 0.2rem auto
+        width: 2rem
+        height: 0.35rem
+        background-color: #ff6000
+        border-radius: 0.2rem
+        text-align: center
+        color: #fff
+        font-size: 0.14rem
+        line-height: 0.35rem
+      li
+        position: relative
+        height: 0.26rem
+        line-height: 0.26rem
+        margin-top: 0.1rem
+        border-bottom: 1px solid #ff6000
+        padding-left: 0.75rem
+        span
+          position: absolute
+          top: 0
+          left: 0
+          font-size: 0.14rem
+          color: #333333
+        input
+          outline: none
+          font-size: 0.14rem
+    .close
+      position: absolute
+      top: -0.08rem
+      right: -0.08rem
+      width: 0.28rem
+      height: 0.28rem
+      img
+        display: block
+        width: 100%
+        height: 100%
+  .rolelist
+    margin-top: 0.1rem
+    background-color: #FFF
+    .rolelists
+      overflow: hidden
+      li
+        position: relative
+        width: 100%
+        height: 0.65rem
+        overflow: hidden
+        &::after
+          position: absolute
+          bottom: 0
+          left: 0
+          content: ''
+          display: block
+          width: 100%
+          border-top: 1px solid #ccc
+          transform: scaleY(0.5) scaleX(0.9)
+        span
+          float: left
+          width: 33.33%
+          text-align: center
+          line-height: 0.65rem
+          font-size: 0.14rem
+          i
+            display: inline-block
+            width: 0.2rem
+            height: 0.21rem
+            vertical-align: middle
+            margin: 0 0.05rem
+            img
+              display: block
+              width: 100%
+              height: 100%
+    .rolelistTip
+      position: relative
+      overflow: hidden
+      width: 100%
+      height: 0.48rem
+      color: #999999
+      &::after
+        position: absolute
+        bottom: 0
+        left: 0
+        content: ''
+        display: block
+        width: 100%
+        border-top: 1px solid #ccc
+        transform: scaleY(0.5) scaleX(0.9)
+      span
+        float: left
+        width: 33.33%
+        line-height: 0.48rem
+        text-align: center
+    .rolelistTap
+      width: 100%
+      height:0.48rem
+      border-bottom: 1px solid #ccc
+      padding: 0 0.12rem
+      span
+        position: relative
+        float: left
+        line-height: 0.48rem
+        text-align: center
+        padding: 0 0.2rem
+        font-size: 0.15rem
+        border-bottom: 1px solid transparent
+        &:nth-child(1)::after
+          position: absolute
+          top: 0
+          right: 0
+          content: ''
+          display: block
+          height: 100%
+          border-right: 1px solid #ccc
+          transform: scaleY(0.5)
+        &.active
+          border-bottom: 1px solid #ff6000
+          &::after
+            background-color: transparent!important
+  .accoutManagement
+    background-color: #FFF
+    width: 100%
+    padding: 0.3rem
+    li
+      position: relative
+      width: 100%
+      height: 0.3rem
+      margin-top: 0.2rem
+      line-height: 0.3rem
+      padding: 0 0 0 0.85rem
+      font-size: 0.15rem
+      input[type='tel'],input[type='text']
+        width: 100%
+        outline: none
+      label
+        margin-right: 0.3rem
+        input[type='radio']
+          outline: none
+          width: 0.15rem
+          height: 0.15rem
+          vertical-align: middle
+          margin-top: -0.04rem
+          margin-right:0.05rem 
+          -webkit-appearance: none
+          background: url(../../../assets/13123_03.png) 0 0 no-repeat
+          background-size: 100% 100%
+        input[type='radio']:checked
+          background: url(../../../assets/rada_03.png) 0 0 no-repeat
+          background-size: 100% 100%
+      &::after
+        position: absolute
+        bottom: 0
+        left: 0
+        display: block
+        content: ''
+        width: 100%
+        border-bottom: 1px solid #ff6000
+        transform: scaleY(0.5)
+      &:nth-child(3)::after
+        display: none
+      span
+        position: absolute
+        top: 0
+        left: 0
+        line-height: 0.3rem
+        font-size: 0.15rem
+    .determine
+      height: 0.42rem
+      width: 2.26rem
+      background-color: #ff6000
+      margin: 0.3rem auto 0 auto
+      border-radius: 0.3rem
+      text-align: center
+      color: #fff
+      font-size: 0.15rem
+      line-height: 0.42rem
+</style>

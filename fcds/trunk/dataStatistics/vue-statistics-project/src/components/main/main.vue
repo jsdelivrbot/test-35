@@ -1,0 +1,111 @@
+<template>
+  <div id="main">
+    <div class="tap">
+      <ul class="border-top-1px">
+        <li>
+          <router-link :to="{ path: '/main/capital'}" >
+            <span class="capital"></span>
+            <i>资金</i>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/main/transaction">
+            <span class="transaction"></span>
+            <i>交易</i>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/main/broker">
+            <span class="broker"></span>
+            <i>经纪商</i>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/main/dealer">
+            <span class="dealer"></span>
+            <i>交易商</i>
+          </router-link>
+        </li>
+      </ul>
+    </div>
+    <router-view></router-view>
+    <div style="height:1rem"></div>
+  </div>
+</template>
+
+<script>
+
+  export default{
+    created() {
+	   
+    },
+    mounted(){
+      
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  @import '../../common/stylus/mixin'
+  .tap
+    position: fixed
+    left: 50%
+    bottom: 0
+    width: 100%
+    max-width: 640px
+    height: 0.58rem
+    transform: translateX(-50%)
+    -webkit-transform: translateX(-50%)
+    background-color: #fff
+    z-index: 100000000
+    ul
+      display: flex
+      width: 100%
+      border-top-1px(#ccc)
+      li
+        display: inline-block
+        flex: 1
+        height: 0.58rem
+        a
+          position: relative
+          display: block
+          height: 0.58rem
+          font-size: 0.12rem
+          text-align: center
+          line-height: 0.95rem
+          &.active
+            i
+              color: #ff6600
+            span
+              &.capital
+                background-image: url(../../assets/capital_ico_atc.png)
+              &.transaction
+                background-image: url(../../assets/transaction_ico_atc.png)
+              &.broker
+                background-image: url(../../assets/broker_ico_atc.png)
+              &.dealer
+                background-image: url(../../assets/dealer_ico_atc.png)
+          i
+            display: block
+            font-style: normal
+          span
+            position: absolute
+            top: 0.08rem
+            left: 50%
+            display: block
+            transform: translateX(-50%)
+            width: 0.28rem
+            height: 0.28rem
+            background: center center no-repeat
+            -webkit-background-size: 100%
+            background-size: 100%
+            &.capital
+              background-image: url(../../assets/capital_ico.png)
+            &.transaction
+              background-image: url(../../assets/transaction_ico.png)
+            &.broker
+              background-image: url(../../assets/broker_ico.png)
+            &.dealer
+              background-image: url(../../assets/dealer_ico.png)
+
+</style>

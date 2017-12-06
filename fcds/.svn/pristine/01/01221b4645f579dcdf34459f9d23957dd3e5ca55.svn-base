@@ -1,0 +1,514 @@
+<template>
+  <div v-title="'提货详情'">
+    <v-back v-show="backSta">
+      <div slot="title" class="Vtitle">提货详情</div>
+    </v-back>
+
+     <div  class="gang" v-bind:class="{'class-b': isB}"></div>
+
+    <div class="section">
+        <div class="hd">
+          <div class="hd-inner">
+              <span class="hd-title">提货达成比例</span>
+              <span style="float: right"><router-link style="color: #54b9ff" to="/takeCoodsProportion">达成比例详情</router-link></span>
+          </div>
+        </div>
+        <div class="content">
+          <div id="takeCoodsProportion" style="width:100%;height:2rem;"></div>
+        </div>
+    </div>
+
+    <div class="vipsearch">
+      <div class="rolelistTap" style="position: relative; overflow: hidden">
+        <span class="vipsearch-title">提货详情</span>
+        <span style="float: right; color:#54b9ff; line-height: 0.48rem" @click="allshowPickup">查看全部</span>
+        <span class="dete-control" style="margin-right: 0.2rem; margin-top:0.11rem"></span>
+        <span id="demo1" class="curdates" style="min-height: 0.5rem; margin-right: 0.8rem">{{curdate}}</span>
+      </div>
+    </div>
+
+    <!-- <div class="searchBackD" v-bind:class="{'class-b': isB}"></div> -->
+
+   <!--  <router-link to="/takeCoodsProportion">
+      <div class="takeCoodsProportion">
+        <span>提货达成比例：</span>
+        <span><b><i v-bind:style="{ width: pickupReachRate }"></i></b></span>
+        <span>{{pickupReachRate}}</span>
+      </div>
+    </router-link> -->
+
+    <div class="vipBox">
+      <div class="tradingList takeGoodDetailsList" style="margin-top: 0">
+        <ul>
+          <li v-for="item in showPickupData">
+            
+              <span>{{item.fdate}}</span>
+              <span>{{toolHelper.formatNum(Math.round(item.closeTotalPrice))}}</span>
+            <router-link :to="{ path: '/takeGoodsDetails', query:{date: item.fdate } }"></router-link>
+          </li>
+        </ul>
+      </div>
+      <v-empty v-show="emptySta"></v-empty>
+    </div>
+    <v-load v-show="loadSta"></v-load>
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+import 'common/js/datePicker.js';
+import load from 'components/load/load';
+import search from 'components/search/search';
+import back from 'components/back/back';
+import echarts from 'common/js/echarts.min.js';
+
+  export default{
+    components:{
+      'v-empty': empty,
+      'v-load': load,
+      'search': search,
+      'v-back': back
+    },
+    data() {
+     return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        emptySta: true,
+        curdate: "",
+        showPickupData: {},
+        loadSta: false,
+        backSta: false,
+        isB: false,
+        totalPage: null,
+        pageIndex: null,
+        pickupReachRate: "0%"
+      }
+    },
+    methods: {
+      pie: function(el, v1, v2){
+
+        let pie = echarts.init(document.getElementById(el));
+        let option_pie = {
+          tooltip : {
+              trigger: 'item',
+              formatter: function(p,params){
+                var aaa = params.split('_');
+                var color = ['#999999', '#ff6000'];
+          return '<span style="display:inline-block;width:10px;height:10px;background-color:'+color[p.dataIndex]+';border-radius: 50%;margin:0 5px;"></span>' + p.name + '</br><span style="padding: 0 20px">' + p.percent + '%</span>';
+        },
+              // position:[3,3]
+          },
+          color:['#999999', '#ff6000'],
+            series : [
+                {
+                  name: "提货比例",
+                    type: 'pie',
+                    radius : '65%',
+                    center: ['50%', '55%'],
+                    data:[
+                        {value:v1, name:'未提货比例'},
+                        {value:v2, name:'提货达成比例'},
+                    ],
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        },
+                        normal:{
+                           label:{
+                               show:true,
+                               formatter: '{b}\n\n{d}%'
+                               // formatter: function(p,params){
+                               //    return p.name + '\n' + formatNum(p.value) + '万';
+                               // }
+                           },
+                           labelLine:{show:true}
+                        }
+                    }
+                }
+            ]
+        };
+
+      pie.setOption(option_pie);
+      function formatNum(strNum) {
+      if (strNum.length <= 3) {
+      return strNum;
+      }
+      if (!/^(\+|-)?(\d+)(\.\d+)?$/.test(strNum)) {
+      return strNum;
+      }
+      var a = RegExp.$1, b = RegExp.$2, c = RegExp.$3;
+      var re = new RegExp();
+      re.compile("(\\d)(\\d{3})(,|$)");
+      while (re.test(b)) {
+      b = b.replace(re, "$1,$2$3");
+      }
+      return a + "" + b + "" + c;
+      }
+
+      },
+      search: function (val) {
+        this.userParam = val;
+        this.bigInMoney();
+      },
+      changesKey: function(accountNo){
+        this.userParam = null;
+        this.bigInMoney();
+      },
+      showPickup: function(){
+        this.loadSta = true;
+        this.$http.get('/api/showPickupData?',{params:{ sessionToken: this.sessionToken, fdate: this.curdate }}).then((response) => { 
+          if(response.body.result == ERR_OK){
+            this.loadSta = false
+            this.totalPage = response.body.data.paging.totalPage;
+            this.pageIndex = response.body.data.paging.pageIndex;
+            this.showPickupData = response.body.data.pickupDataList;
+            this.pickupReachRate = response.body.data.pickupReachRate;
+
+            if(this.pickupReachRate != ""){
+              
+              if(this.pickupReachRate > 1){
+                var v2 = 1;
+                var v1 = 0;
+              }else if(this.pickupReachRate < 0){
+                var v2 = 0;
+                var v1 = 1;
+              }else{
+                var v2 = this.pickupReachRate;
+                var v1 = 1 - v2;
+              }
+     
+            }else{
+              var v2 = 0;
+              var v1 = 1;
+            }
+
+            this.pie('takeCoodsProportion', v1, v2);
+
+            if(this.curdate == null || this.curdate == '' ){
+              this.curdate = response.body.data.showDate;
+            }
+
+            if(this.showPickupData == ''){
+              this.emptySta = true;
+            }else{
+              this.emptySta = false;
+            }
+
+            this.nextshowPickup();
+
+          }else{
+            this.tipText = '数据获取失败，请稍后再试！';
+            this.tip();
+            this.loadSta = false;
+          }
+        }).then((error)=> this.error = error)
+      },
+      nextshowPickup: function(){
+        var _this = this;
+        let sw = true;
+        let g_pageIndex;
+        window.addEventListener('scroll',function(){  
+            // console.log(document.documentElement.clientHeight+'-----------'+window.innerHeight); // 可视区域高度  
+            // console.log(document.body.scrollTop); // 滚动高度  
+            // console.log(document.body.offsetHeight); // 文档高度  
+            // 判断是否滚动到底部 
+            if(document.body.scrollTop + window.innerHeight >= document.body.offsetHeight) {  
+                // console.log(sw);
+                // 如果开关打开则加载数据 
+
+                _this.pageIndex++;
+                if(sw==true){  
+                    // 将开关关闭  
+                    sw = false;
+                    let asda = _this.pageIndex;
+                    if(_this.totalPage > _this.pageIndex){
+                      _this.down = true;
+                      _this.$http.get('/api/showPickupData',{params:{ sessionToken: _this.sessionToken, fdate: _this.curdate, pageIndex: _this.pageIndex }}).then((response) => { 
+                        if(response.body.result == ERR_OK){ 
+                          for (var i = 0; i < response.body.data.pickupDataList.length; i++) {
+                            _this.showPickupData.push(response.body.data.pickupDataList[i])
+                          }
+                          _this.pageIndex = asda;
+                          _this.down = false;
+                          sw = true ;
+                        }else{}   
+                      }).then((error)=> _this.error = error)
+                    } 
+                }  
+            }
+        })
+      },
+      allshowPickup: function(){
+        this.curdate = null;
+        this.showPickup();
+      },
+      tip: function(){
+        this.create = true;
+        var this_ = this;
+        clearTimeout(t)
+        var t = setTimeout(function (){
+            this_.create = false;
+        }, 3000);
+      }
+    },
+    mounted(){
+      var nowdate = this.toolHelper.getNowFormatDate();
+      this.isB = this.toolHelper.isWeiXin();
+      this.backSta = this.toolHelper.isWeiXin();
+
+      this.showPickup();
+
+      var _this = this;
+      $("body").addClass('dash');
+        var calendar = new datePicker();
+      calendar.init({
+        'trigger': '#demo1', /*按钮选择器，用于触发弹出插件*/
+        'type': 'date',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+        'minDate':'2016-10-1',/*最小日期*/
+        'maxDate':nowdate,/*最大日期*/
+        'onSubmit':function(){/*确认时触发事件*/
+          var theSelectData=calendar.value;
+          _this.curdate = calendar.value;
+          _this.showPickup();
+        },
+        'onClose':function(){/*取消时触发事件*/
+        }
+      });
+
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus"> 
+  .gang
+    height: 0
+    &.class-b
+      height: 0.4rem
+  .takeCoodsProportion
+    background-color: #FFF 
+    height: 0.5rem
+    margin-top: 0.1rem
+    display: flex
+    display: -webkit-flex
+    padding: 0 0.12rem
+    span
+      line-height: 0.5rem
+      font-weight: 500
+      &:nth-child(1)
+        flex: 1.5
+      &:nth-child(2)
+        flex: 2.5
+        width: 50%
+        flex-shrink: 0
+        text-align: center
+      &:nth-child(3)
+        flex: 1
+        color: #ff6000
+      b
+        display: inline-block
+        width: 96%
+        height: 0.1rem
+        background-color: #e3e3e3
+        border-radius: 0.05rem
+        margin-top: 0.2rem
+        overflow: hidden
+        transition: all 0.5s ease 0s;
+        i
+          text-align: left
+          display: block
+          height: 100%
+          background-color: #ff6000
+          transition: all 0.5s ease 0s;
+  .vipsearch-title
+    line-height: 0.48rem
+    font-size: 0.15rem
+    font-weight: bold
+  .tradingList
+    position: relative
+    background-color: #FFF
+    margin-top: 0.1rem
+    &.takeGoodDetailsList
+      // margin-top: -0.01rem
+      ul li 
+        position: relative
+        overflow: hidden
+        span:nth-child(1)
+          line-height: 0.65rem
+          margin-top: 0
+          color: #999999
+        span:nth-child(2)
+          color: #ff6000
+          font-weight: bold
+        a
+          position: absolute
+          top: 0
+          left: 0
+          width: 100%
+          height: 100%
+    ul
+      padding: 0 0.12rem
+      li
+        position: relative
+        display: flex
+        height: 0.65rem
+        &::after
+          content: ''
+          display: block
+          width: 100%
+          position: absolute
+          height: 1px
+          background-color: #ccc
+          bottom: 0
+          left: 0
+          transform: scaleY(0.5)
+        span
+          flex: 1
+          line-height: 0.65rem
+          text-align: center
+          font-size: 0.13rem
+          color: #999
+          i
+            font-style: normal
+            display: block
+          b
+            display: block
+          &.nameOrNum
+            line-height: 0.2rem
+            margin-top: 0.12rem
+    &::after
+      content: ''
+      display: block
+      width: 100%
+      position: absolute
+      height: 1px
+      background-color: #ccc
+      bottom: 0
+      left: 0
+      transform: scaleY(0.5)
+    &::before
+      content: ''
+      display: block
+      width: 100%
+      position: absolute
+      height: 1px
+      background-color: #ccc
+      top: 0
+      left: 0
+      transform: scaleY(0.5)
+    .tradingHead
+      height: 0.5rem
+      line-height: 0.5rem
+      padding: 0 0.12rem
+      .inner
+        position: relative
+        display: flex
+        span
+          flex: 1
+          text-align: center
+          font-size: 0.14rem
+          color: #999
+        &::after
+          content: ''
+          display: block
+          width: 100%
+          position: absolute
+          height: 1px
+          background-color: #ccc
+          bottom: 0
+          left: 0
+          transform: scaleY(0.5)
+  .viplist
+    overflow: hidden
+    padding: 0.2rem 0
+    li
+      width: 50%
+      float: left
+      text-align: center
+      font-size: 0.13rem
+      line-height: 0.18rem
+      margin: 0.06rem 0
+      color: #999999
+      p
+        b
+          color: #ff6000
+      p:nth-child(2)
+        font-size: 0.14rem
+  .viptime
+    // min-height: 1.88rem!important
+    height: auto!important
+  #demo1
+    position: absolute
+    right: 0
+    padding-right: 0.44rem
+  .vipBox
+    .vipItem
+      margin-top: 0.1rem
+      background-color: #FFF
+      .hd
+        width: 100%
+        height: 0.5rem
+        height: 0.5rem
+        padding: 0 0.12rem
+        .hd-inner
+          position: relative
+          width: 100%
+          height: 0.5rem
+          overflow: hidden
+          .r
+            float: right
+            font-size: 0.13rem
+            line-height: 0.5rem
+            color: #54b9ff
+          .l
+            float: left
+            margin-top: 0.11rem
+            .name
+              font-size: 0.15rem
+              i
+                font-style: normal
+                color: #ff6600
+                font-size: 0.13rem
+                margin-left: 0.05rem
+            .no
+              font-size: 0.13rem
+              color: #999999
+              margin-top: 0.03rem
+      .bd
+        position: relative
+        overflow: hidden
+        width: 100%
+        padding: 0.12rem
+        &::after
+          position: absolute
+          left: 0
+          top: 0
+          content: ''
+          width: 100%
+          border-bottom: 1px solid #ccc
+          transform: scaleY(0.5) scaleX(0.94)
+        span
+          float: left
+          width: 50%
+          font-size: 0.13rem
+          color: #999999
+          line-height: 0.3rem
+      .md
+        padding: 0.12rem
+        position: relative
+        &::after
+          position: absolute
+          left: 0
+          top: 0
+          content: ''
+          width: 100%
+          border-bottom: 1px dashed #ccc
+          transform: scaleY(0.5) scaleX(0.94)
+        span
+          float: left
+          width: 50%
+          font-size: 0.13rem
+          color: #999999
+          line-height: 0.3rem
+</style>

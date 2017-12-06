@@ -1,0 +1,384 @@
+<template>
+  <div v-title="'活跃客户'">
+    <div class="vipsearch">
+      <div class="rolelistTap">
+
+        <search style="float: left"
+                v-on:search="search" 
+                v-on:changes="changesKey" 
+                placeholder="请输入交易商账号或姓名">    
+        </search>
+        
+        <span class="dete-control"></span>
+        <span id="demo1" class="curdates">{{curdate}}</span>
+      </div>
+    </div>
+
+    <div style="height: 0.48rem"></div>
+    
+    <div class="vipBox">
+      <div class="custimerList">
+
+        <div class="item" v-for="item in activeClientData">
+          <div class="custmerHead">
+            <div class="inner">
+              <h2><span class="name">{{item.name}}</span><span class="num">（{{item.tradeUserNo}}）</span></h2>
+            </div>
+          </div>
+          <ul>
+            <li>入金：{{item.inMoney}}元</li>
+            <li>交易额：{{item.count}}元</li>
+            <li>出金：{{item.outMoney}}元</li>
+            <li>挂单量：{{item.cancell}}笔</li>
+            <li>手机号码：{{item.phone}}</li>
+          </ul>
+        </div>
+
+        <div class="dropload-down" v-show="down">
+          <div class="dropload-load"><span class="loading"></span>加载中...</div>
+        </div>
+
+      </div>
+      <v-empty v-show="emptySta"></v-empty>
+    </div>
+    <v-load v-show="loadSta"></v-load>
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+import 'common/js/datePicker.js';
+import load from 'components/load/load';
+import search from 'components/search/search';
+
+  export default{
+    components:{
+      'v-empty': empty,
+      'v-load': load,
+      'search': search
+    },
+    data() {
+     return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        emptySta: false,
+        curdate: '',
+        activeClientData: [],
+        load: true,
+        userParam: null,
+        down: false,
+        scroll: '',
+        totalPage: null,
+        pageIndex: null,
+        loadSta: false
+      }
+    },
+    methods: {
+      search: function (val) {
+        this.userParam = val;
+        this.activeClient();
+      },
+      changesKey: function(accountNo){
+        this.userParam = null;
+        this.activeClient();
+      },
+      activeClient: function(){
+        this.loadSta = true;
+        this.$http.get('/api/activeClient?',{params:{ sessionToken: this.sessionToken, date: this.curdate, userParam: this.userParam }}).then((response) => { 
+          if(response.body.result == ERR_OK){
+            this.loadSta = false
+            this.activeClientData = response.body.data.Alllist;
+            this.totalPage = response.body.data.paging.totalPage;
+            this.pageIndex = response.body.data.paging.pageIndex;
+
+            if(this.curdate == null || this.curdate == '' ){
+              this.curdate = response.body.data.showDate;
+            }
+
+            if(this.activeClientData == ''){
+              this.emptySta = true;
+            }else{
+              this.emptySta = false;
+            }
+
+          }
+        }).then((error)=> this.error = error)
+      }
+    },
+    mounted(){
+      this.activeClient();
+      var _this = this;
+      $("body").addClass('dash');
+        var calendar = new datePicker();
+      calendar.init({
+        'trigger': '#demo1', /*按钮选择器，用于触发弹出插件*/
+        'type': 'date',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+        'minDate':'1900-1-1',/*最小日期*/
+        'maxDate':'2100-12-31',/*最大日期*/
+        'onSubmit':function(){/*确认时触发事件*/
+          var theSelectData=calendar.value;
+          _this.curdate = calendar.value;
+          _this.activeClient();
+        },
+        'onClose':function(){/*取消时触发事件*/
+        }
+      });
+
+      let sw = true;
+      let g_pageIndex;
+      window.addEventListener('scroll',function(){  
+          // console.log(document.documentElement.clientHeight+'-----------'+window.innerHeight); // 可视区域高度  
+          // console.log(document.body.scrollTop); // 滚动高度  
+          // console.log(document.body.offsetHeight); // 文档高度  
+          // 判断是否滚动到底部  
+          if(document.body.scrollTop + window.innerHeight >= document.body.offsetHeight) {  
+              // console.log(sw);
+              // 如果开关打开则加载数据 
+              _this.pageIndex++;
+              if(sw==true){  
+                  // 将开关关闭  
+                  sw = false;
+                  let asda = _this.pageIndex;
+                  if(_this.totalPage > _this.pageIndex){
+                    _this.down = true;
+                    _this.$http.get('/api/activeClient',{params:{ sessionToken: _this.sessionToken, date: _this.curdate, pageIndex: _this.pageIndex, userParam: _this.userParam }}).then((response) => { 
+                      if(response.body.result == ERR_OK){ 
+                        for (var i = 0; i < response.body.data.Alllist.length; i++) {
+                          _this.activeClientData.push(response.body.data.Alllist[i])
+                        }
+                        _this.pageIndex = asda;
+                        _this.down = false;
+                        sw = true ;
+                      }else{}   
+                    }).then((error)=> _this.error = error)
+                  } 
+              }  
+          }
+      })
+
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .custimerList
+    .item
+      position: relative
+      background-color: #FFF
+      margin-top: 0.1rem
+      &::after
+        content: ''
+        display: block
+        width: 100%
+        position: absolute
+        height: 1px
+        background-color: #ccc
+        bottom: 0
+        left: 0
+        transform: scaleY(0.5)
+      &::before
+        content: ''
+        display: block
+        width: 100%
+        position: absolute
+        height: 1px
+        background-color: #ccc
+        top: 0
+        left: 0
+        transform: scaleY(0.5)
+      ul
+        padding: 0.12rem
+        overflow: hidden
+        li
+          float: left
+          width: 50%
+          font-size: 0.13rem
+          line-height: 0.3rem
+          color: #999
+    .custmerHead
+      height: 0.6rem
+      padding: 0 0.12rem
+      .inner
+        position: relative
+        height: 0.6rem
+        line-height: 0.6rem
+        .name
+          font-size: 0.18rem
+        .num
+          font-size: 0.13rem
+          color: #999
+        &::after
+          content: ''
+          display: block
+          width: 100%
+          position: absolute
+          height: 1px
+          background-color: #ccc
+          bottom: 0
+          left: 0
+          transform: scaleY(0.5)
+  .viplist
+    overflow: hidden
+    padding: 0.2rem 0
+    li
+      width: 50%
+      float: left
+      text-align: center
+      font-size: 0.13rem
+      line-height: 0.18rem
+      margin: 0.06rem 0
+      color: #999999
+      p
+        b
+          color: #ff6000
+      p:nth-child(2)
+        font-size: 0.14rem
+  .viptime
+    // min-height: 1.88rem!important
+    height: auto!important
+  #demo1
+    position: absolute
+    right: 0
+    padding-right: 0.44rem
+  .vipBox
+    .vipItem
+      margin-top: 0.1rem
+      background-color: #FFF
+      .hd
+        width: 100%
+        height: 0.5rem
+        height: 0.5rem
+        padding: 0 0.12rem
+        .hd-inner
+          position: relative
+          width: 100%
+          height: 0.5rem
+          overflow: hidden
+          .r
+            float: right
+            font-size: 0.13rem
+            line-height: 0.5rem
+            color: #54b9ff
+          .l
+            float: left
+            margin-top: 0.11rem
+            .name
+              font-size: 0.15rem
+              i
+                font-style: normal
+                color: #ff6600
+                font-size: 0.13rem
+                margin-left: 0.05rem
+            .no
+              font-size: 0.13rem
+              color: #999999
+              margin-top: 0.03rem
+      .bd
+        position: relative
+        overflow: hidden
+        width: 100%
+        padding: 0.12rem
+        &::after
+          position: absolute
+          left: 0
+          top: 0
+          content: ''
+          width: 100%
+          border-bottom: 1px solid #ccc
+          transform: scaleY(0.5) scaleX(0.94)
+        span
+          float: left
+          width: 50%
+          font-size: 0.13rem
+          color: #999999
+          line-height: 0.3rem
+      .md
+        padding: 0.12rem
+        position: relative
+        &::after
+          position: absolute
+          left: 0
+          top: 0
+          content: ''
+          width: 100%
+          border-bottom: 1px dashed #ccc
+          transform: scaleY(0.5) scaleX(0.94)
+        span
+          float: left
+          width: 50%
+          font-size: 0.13rem
+          color: #999999
+          line-height: 0.3rem
+  .vipsearch
+    background-color: #FFF
+    .rolelistTap
+      position: relative
+      width: 100%
+      max-width: 640px
+      height:0.48rem
+      padding: 0 0.12rem
+      position: fixed
+      top: 0
+      left: 50%
+      transform: translateX(-50%)
+      background-color: #fff
+      z-index: 1
+      &::before
+        content: ''
+        display: block
+        width: 100%
+        position: absolute
+        height: 1px
+        background-color: #ccc
+        bottom: 0
+        left: 0
+        transform:scaleY(0.5)
+      .dete-control
+        position: relative
+        float: right 
+        display: block
+        width: 0.22rem
+        height: 0.22rem
+        background: url(../../../../assets/date_03.png) 0 0 no-repeat
+        background-size: 100%
+        -webkit-background-size: 100%
+        margin-top: 0.1rem
+      .curdates
+        float: right
+        color: #999999
+        font-size: 0.12rem
+        padding-right: 0.1rem
+        line-height: 0.48rem
+      .search-left
+        float: left
+        .search
+          position: relative
+          height: 0.35rem
+          width: 0.3rem
+          border-radius: 0.2rem
+          border: 1px solid #ff6000
+          margin-top: 0.06rem
+          background-color: #f3f3f3
+          overflow: hidden
+          padding: 0 0.36rem 0 0.04rem
+          transition: all 1s ease 0s
+          &.animation
+            width: 1.75rem
+            transition: all 1s ease 0s
+          input
+            width: 100%
+            height: 100%
+            background-color: transparent
+            border: none
+            outline: none
+            text-align: center
+          i
+            position: absolute
+            top: 0.015rem
+            right: 0.02rem
+            width: 0.3rem
+            height: 0.3rem
+            img
+              width: 100%
+              height: 100%
+</style>

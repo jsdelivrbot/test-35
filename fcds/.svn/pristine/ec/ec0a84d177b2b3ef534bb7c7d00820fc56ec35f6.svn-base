@@ -1,0 +1,92 @@
+<template>
+  <div id="submitted">
+    <div class="item">
+      <p class="user_ifon">
+        <i class="user_name" placingid="e8942c271ea44ed6bb38">李辉</i><i class="user_adderss">广东省广州二市番禺一区</i>
+      </p>
+      <p>
+        <span class="user_account">帐号：<i>4422020103</i></span><span class="user_num">数量（块）：<i>10</i></span>
+      </p>
+      <p>
+        <span>日期：2017-02-24</span><span>金额（元）：350.0</span>
+      </p>
+      <p>
+        <span>状态：配售成功</span><span>备注：配售成功</span>
+      </p>
+    </div>
+
+    <div class="item">
+      <p class="user_ifon">
+        <i class="user_name" placingid="e8942c271ea44ed6bb38">李辉</i><i class="user_adderss">广东省广州二市番禺一区</i>
+      </p>
+      <p>
+        <span class="user_account">帐号：<i>4422020103</i></span><span class="user_num">数量（块）：<i>10</i></span>
+      </p>
+      <p>
+        <span>日期：2017-02-24</span><span>金额（元）：350.0</span>
+      </p>
+      <p>
+        <span>状态：配售成功</span><span>备注：配售成功</span>
+      </p>
+    </div>
+
+    <div class="item">
+      <p class="user_ifon">
+        <i class="user_name" placingid="e8942c271ea44ed6bb38">李辉</i><i class="user_adderss">广东省广州二市番禺一区</i>
+      </p>
+      <p>
+        <span class="user_account">帐号：<i>4422020103</i></span><span class="user_num">数量（块）：<i>10</i></span>
+      </p>
+      <p>
+        <span>日期：2017-02-24</span><span>金额（元）：350.0</span>
+      </p>
+      <p>
+        <span>状态：配售成功</span><span>备注：配售成功</span>
+      </p>
+    </div>
+  </div>
+</template>
+
+<script>
+
+  export default{
+    created() {
+     
+    },
+    mounted(){
+      
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  #submitted
+    .item
+      margin-top: 0.1rem
+      padding: 0.1rem
+      width: 100%
+      height: 1.38rem
+      background-color: #fff
+      p
+        font-size: 0.14rem
+        &.user_ifon
+          position: relative
+          margin-bottom: 0.1rem
+          .user_name
+            color: #333
+            font-style: normal
+            font-size: 0.2rem
+          .user_adderss
+            padding-left: 0.12rem
+            color: #666
+            font-style: normal
+            font-size: 0.12rem
+        span
+          display: inline-block
+          width: 50%
+          color: #666
+          font-size: 0.14rem
+          line-height: 0.3rem
+          i
+            font-style: normal
+</style>

@@ -1,0 +1,104 @@
+<template>
+  <div id="package" v-title="'商品包详情'">
+      <v-back v-show="backSta">
+        <div slot="title" class="Vtitle">商品包详情</div>
+      </v-back>
+      <div class="backD" v-bind:class="{'class-b': isB}"></div>
+      <div class="section">
+          <div class="hd">
+            <div class="hd-inner">
+                <span class="hd-title">商品包详情明细</span>
+            </div>
+          </div>
+          <div class="content">
+            <div class="details-list">
+              <ul>
+                <li v-for="item in packageData">
+                  <router-link :to="{ path: '/packageDetails', query:{date: item.rebateCycle } }">
+                    <span>{{item.rebateCycle}}</span>
+                    <span>{{item.rebateAmountSum}}</span>
+                  </router-link>
+                </li>
+                <v-empty v-show="emptySta"></v-empty>
+              </ul>
+            </div>
+          </div>
+      </div>
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+import back from 'components/back/back';
+
+  export default{
+    components:{
+      'v-empty': empty,
+      'v-back': back
+    },
+    data(){
+      return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        rebateTypeId: 'ASSETPACKAGE_REBATE',
+        packageData: [],
+        emptySta: false,
+        backSta: false,
+        isB: false
+      }
+    },
+    created() {
+     
+    },
+    methods: {
+      package: function(){
+        this.$http.get('/api/findTotalRebateDetail',{params:{ sessionToken: this.sessionToken, rebateTypeId: this.rebateTypeId}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.packageData = response.body.data.rebateList;
+            if(response.body.data.rebateList == '' || response.body.data.rebateList == null){
+              this.emptySta = true;
+            }else{
+              this.emptySta = false;
+            }
+          }else{
+            
+          }   
+        }).then((error)=> this.error = error)
+      }
+    },
+    mounted(){
+      this.isB = this.toolHelper.isWeiXin();
+      this.backSta = this.toolHelper.isWeiXin();
+      this.package();
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  #package
+    .details-list
+      padding: 0 0.12rem
+      li
+        position: relative
+        width: 100%
+        height: 0.65rem
+        overflow: hidden
+        &::after
+         display: block
+         position: absolute
+         bottom: 0
+         left: 0
+         content: ''
+         width: 100%
+         border-bottom: 1px solid #ccc
+         transform: scaleY(0.5) 
+        span
+          float: left
+          width: 50%
+          line-height: 0.65rem
+          text-align: center
+          font-size: 0.14rem
+          &:nth-child(2)
+            color: #ff6000
+            font-family: "黑体"!important
+</style>

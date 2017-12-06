@@ -1,0 +1,676 @@
+<template>
+    <div v-title="'出售明细'">
+        <div class="detailedType">
+          <ul>
+            <li @click="noCommit">
+              <span v-bind:class="{active:noCommitListSta}">未提交</span>
+            </li>
+            <li @click="commit">
+              <span v-bind:class="{active:commitListSta}">已提交</span>
+            </li>
+            <li @click="success">
+              <span v-bind:class="{active:successListSta}">配售成功</span>
+            </li>
+            <li @click="fail">
+              <span v-bind:class="{active:failListSta}">配售失败</span>
+            </li>
+          </ul>
+        </div>
+        <div style="height: 0.6rem"></div>
+        <div class="dataList">
+          <!-- 未提交 -->
+          <div class="noCommitList" v-show="noCommitSta">
+            <div class="item" v-for="item in noCommitListData">
+              <p class="user_ifon">
+                <i class="user_name">{{item.tradeUserName}}</i><i class="user_adderss">{{item.brokerUserName}}</i><b v-show="placingS" class="modify" @click="modify(item.tradeUserName, item.tradeUserNo,item.placingQuantity, item.productId, item.placingId)"></b><b v-show="placingS" class="delete" @click="deleted(item.placingId)" :style="{backgroundImage: 'url(' + img + ')'}"></b>
+              </p>
+              <p>
+                <span class="user_account">账号：<i>{{item.tradeUserNo}}</i></span><span class="user_num">数量（块）：<i>{{item.placingQuantity}}</i></span>
+              </p>
+              <p>
+                <span>创建日期：{{item.createDate}}</span><span>金额（元）：{{item.money}}</span>
+              </p>
+              <p>
+                <!-- <span>配售日期：{{item.lastUpdateDate}}</span> --><span>状态：{{item.status}}</span><span>备注：{{item.comments}}</span>
+              </p>
+              <p>
+                </span><span v-if="test(item.placingAgent)">配售员：{{item.placingAgent}}</span></span>
+              </p>
+            </div>
+            <v-empty v-show="emptySta1"></v-empty>
+          </div>
+
+          <!-- 已经提交 -->
+          <div class="commitList" v-show="commitSta">
+            <div class="item" v-for="item in commitListData">
+              <p class="user_ifon">
+                <i class="user_name">{{item.tradeUserName}}</i><i class="user_adderss">{{item.brokerUserName}}</i>
+              </p>
+              <p>
+                <span class="user_account">账号：<i>{{item.tradeUserNo}}</i></span><span class="user_num">数量（块）：<i>{{item.placingQuantity}}</i></span>
+              </p>
+              <p>
+                <span>创建日期：{{item.createDate}}</span><span>金额（元）：{{item.money}}</span>
+              </p>
+              <p>
+                <span>配售日期：{{item.lastUpdateDate}}</span><span>状态：{{item.status}}</span>
+              </p>
+              <p>
+                <span>备注：{{item.comments}}</span><span v-if="test(item.placingAgent)">配售员：{{item.placingAgent}}</span></span>
+              </p>
+            </div>
+            <v-empty v-show="emptySta2"></v-empty>
+          </div>
+
+          <!-- 配售成功 -->
+          <div class="successList" v-show="successSta">
+            <div class="item" v-for="item in successListData">
+              <p class="user_ifon">
+                <i class="user_name">{{item.tradeUserName}}</i><i class="user_adderss">{{item.brokerUserName}}</i>
+              </p>
+              <p>
+                <span class="user_account">账号：<i>{{item.tradeUserNo}}</i></span><span class="user_num">数量（块）：<i>{{item.placingQuantity}}</i></span>
+              </p>
+              <p>
+                <span>创建日期：{{item.createDate}}</span><span>金额（元）：{{item.money}}</span>
+              </p>
+              <p>
+                <span>配售日期：{{item.lastUpdateDate}}</span><span>状态：{{item.status}}</span>
+              </p>
+              <p>
+                <span>备注：{{item.comments}}</span></span><span v-if="test(item.placingAgent)">配售员：{{item.placingAgent}}</span></span>
+              </p>
+            </div>
+            <v-empty v-show="emptySta3"></v-empty>
+          </div>
+
+          <!-- 配售失败 -->
+          <div class="failList" v-show="failSta">
+            <div class="item" v-for="item in failListData">
+              <p class="user_ifon">
+                <i class="user_name">{{item.tradeUserName}}</i><i class="user_adderss">{{item.brokerUserName}}</i>
+              </p>
+              <p>
+                <span class="user_account">账号：<i>{{item.tradeUserNo}}</i></span><span class="user_num">数量（块）：<i>{{item.placingQuantity}}</i></span>
+              </p>
+              <p>
+                <span>创建日期：{{item.createDate}}</span><span>金额（元）：{{item.money}}</span>
+              </p>
+              <p>
+                <span>配售日期：{{item.lastUpdateDate}}</span><span>状态：{{item.status}}</span>
+              </p>
+              <p>
+                <span>备注：{{item.comments}}</span><span v-if="test(item.placingAgent)">配售员：{{item.placingAgent}}</span></span>
+              </p>
+            </div>
+            <v-empty v-show="emptySta4"></v-empty>
+          </div>
+        </div>
+        <div style="height: 1rem"></div>
+        <div class="search-box">
+          <div class="search-left">
+            <div class="search" v-bind:class="{ animation: animationState}">
+              <input type="text" placeholder="请输入交易商账号或姓名" v-model="tradeUser" @keyup="change">
+              <i @click="animation"><img src="../../../../assets/search.png" alt=""></i>
+            </div>
+          </div>
+          <div class="search-right">
+            <span @click="submitPlacing" v-bind:class="{ hui: sta}" v-show="placingS">提交全部</span>
+          </div>
+        </div>
+
+        <div class="goHome" @click="gohome" v-show="placing"><img src="../../../../assets/gohome.png" alt=""></div>
+
+        <div class="stage-cover" v-show="coverShow"></div>
+
+        <div class="modifyCovers" v-show="coverShow">
+          <!-- 修改 -->
+          <div class="modifyCoverInner" v-show="modifysta">
+            <ul>
+              <li><span>交易商姓名：{{curtradeUserName}}</span></li>
+              <li><span>交易商账号：{{curtradeUserNo}}</span></li>
+              <li><span>配售数量：{{curplacingQuantity}}块</span></li>
+              <li><span>修改数量：</span><input type="text" placeholder="请输入数量" v-model='user_num'></li>
+            </ul>
+            <div class="determine" @click="modifyNum">确认修改</div>
+          </div>
+          <!-- 删除 -->
+          <div class="modifyCoverInner" v-show="modifyDe">
+             <div class="determine determineDelete" @click="modifyde">删除</div>
+          </div>
+          <!-- 关闭 -->
+          <span class="close" @click="close"><img src="../../../../assets/close_03.png"></span>
+        </div>
+
+        <p class="tips" v-show="create"><span>{{tipText}}</span></p>
+    </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+
+const ERR_OK = 'success';
+
+ export default{
+    components:{
+      'v-empty': empty
+    },
+    data() {
+      return{
+        noCommitListSta: true,
+        commitListSta: false,
+        successListSta: false,
+        failListSta: false,
+        noCommitSta: true,
+        commitSta: false,
+        successSta: false,
+        failSta: false,
+        animationState: true,
+        tradeUser: null, //请输入经纪商账号或姓名
+        sessionToken: localStorage.getItem("sessionToken"),
+        productId: null,
+        sta: true,
+        router: localStorage.getItem("sellroute"),
+        noCommitListData: [],
+        commitListData: [],
+        successListData: [],
+        failListData: [],
+        modifysta: false,
+        coverShow: false,
+        modifyDe: false,
+        curtradeUserName: null,
+        curtradeUserNo: null,
+        curplacingQuantity: null,
+        user_num: null,
+        type: null,
+        productId: null,
+        placingId: null,
+        emptySta1: false,
+        emptySta2: false,
+        emptySta3: false,
+        emptySta4: false,
+        placing: false,
+        placingS: false,
+        img: require('../../../../assets/modifyDe.png'),
+        tipText: null,
+        create: false
+      }
+    },
+    created() {
+       this.productId = this.$route.query.productId;
+    },
+    methods: {
+      deleted: function(placingId){
+        this.coverShow = true;
+        this.modifysta = false;
+        this.modifyDe = true;
+        this.placingId = placingId;
+        this.type = 'delete';
+      },
+      deletePlacing: function(placingId,type,sessionToken){
+        this.$http.get('/api/updatePlacing?',{params:{placingId: placingId,type: type,sessionToken: sessionToken}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.tipText = '已删除';
+            this.tip();
+            this.findPlacingList('');
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      modifyde: function(){
+        this.coverShow = false;
+        this.modifysta = false;
+        this.modifyDe = false;
+        this.deletePlacing(this.placingId, this.type, this.sessionToken);
+      },
+      modifyNum: function(){
+        this.coverShow = false;
+        this.modifysta = false;
+        this.modifyDe = false;
+        this.updatePlacing(this.productId,this.placingId,this.curtradeUserNo,this.curtradeUserName,this.user_num,this.type,this.sessionToken);
+      },
+      updatePlacing: function(productId,placingId,tradeUserNo,tradeUserName,placingNum,type,sessionToken){
+        this.$http.get('/api/updatePlacing?',{params:{productId: productId, placingId: placingId, tradeUserNo: tradeUserNo,tradeUserName:tradeUserName,placingNum: placingNum,type: type,sessionToken: sessionToken}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.tipText = '修改成功';
+            this.tip();
+            this.findPlacingList('');
+          }else{
+            // this.$refs.timerbtn.stop();
+            this.tipText = response.body.message;
+            this.tip();
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      modify: function(tradeUserName,tradeUserNo,placingQuantity,productId,placingId){
+        this.user_num = null;
+        this.coverShow = true;
+        this.modifysta = true;
+        this.modifyDe = false;
+        this.curtradeUserName = tradeUserName;
+        this.curtradeUserNo = tradeUserNo;
+        this.curplacingQuantity = placingQuantity;
+        this.productId = productId;
+        this.placingId = placingId;
+        this.type = 'update';
+      },
+      close: function(){
+        this.coverShow = false;
+        this.modifysta = false;
+        this.modifyDe = false;
+      },
+      noCommit: function(){
+        this.noCommitListSta = true;
+        this.commitListSta = false;
+        this.successListSta = false;
+        this.failListSta = false;
+
+        this.noCommitSta = true;
+        this.commitSta = false;
+        this.successSta = false;
+        this.failSta = false;
+      },
+      commit: function(){
+        this.noCommitListSta = false;
+        this.commitListSta = true;
+        this.successListSta = false;
+        this.failListSta = false;
+
+        this.noCommitSta = false;
+        this.commitSta = true;
+        this.successSta = false;
+        this.failSta = false;
+      },
+      success: function(){
+        this.noCommitListSta = false;
+        this.commitListSta = false;
+        this.successListSta = true;
+        this.failListSta = false;
+
+        this.noCommitSta = false;
+        this.commitSta = false;
+        this.successSta = true;
+        this.failSta = false;
+      },
+      fail: function(){
+        this.noCommitListSta = false;
+        this.commitListSta = false;
+        this.successListSta = false;
+        this.failListSta = true;
+
+        this.noCommitSta = false;
+        this.commitSta = false;
+        this.successSta = false;
+        this.failSta = true;
+      },
+      test: function(placingAgent){
+        var result;
+        if(placingAgent == ''){
+          result = false
+        }else{
+          result = true
+        }
+        return result;
+      },
+      animation: function(){
+        
+        if(this.tradeUser == null || this.tradeUser == ''){
+          if (this.animationState) {
+            this.animationState = false
+          }else{
+            this.animationState = true
+          }
+        }else{
+          // alert(this.accountNo)
+          this.findPlacingList(this.tradeUser);
+          // this.$router.push({ path: '/emptydata' })
+        }
+      },
+      change: function(){
+        if(this.tradeUser == ''){
+          this.findPlacingList('');
+          // this.$router.push({ path: '/sellDetailed' })
+        }
+      },
+      findPlacingList: function(tradeUser){
+        this.$http.get('/api/findPlacingList',{params:{ sessionToken: this.sessionToken, productId: this.productId, tradeUser: tradeUser}}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+
+            this.noCommitListData = response.body.data.noCommitList;
+            this.commitListData = response.body.data.commitList;
+            this.successListData = response.body.data.successList;
+            this.failListData = response.body.data.failList;
+
+            if(this.noCommitListData == ''){
+              this.emptySta1 = true;
+            }else{
+              this.emptySta1 = false;
+            } 
+
+            if(this.commitListData == ''){
+              this.emptySta2 = true;
+            }else{
+              this.emptySta2 = false;
+            }
+
+            if(this.successListData == ''){
+              this.emptySta3 = true;
+            }else{
+              this.emptySta3 = false;
+            }
+
+            if(this.failListData == ''){
+              this.emptySta4 = true;
+            }else{
+              this.emptySta4 = false;
+            }
+
+            if(response.body.data.submitState == "N"){
+              this.sta = true;
+            }else{
+              this.sta = false;
+            }
+          }else{
+            this.tipText = response.body.message;
+            this.tip();
+          }   
+        }).then((error)=> this.error = error)
+      },
+      submitPlacing: function(){
+        if(!this.sta){
+          this.$http.get('/api/submitPlacing?',{params:{sessionToken: this.sessionToken, productId: this.productId}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.findPlacingList('');
+              this.tipText = "提交成功!";
+              this.tip();
+            }else{
+              this.tipText = response.body.message;
+              this.tip();
+            }
+
+          }).then((error)=> this.error = error)
+        }
+      },
+      gohome: function(){
+        this.$router.push({ path: '/main/home' });
+      },
+      getLoginAccountRole: function(){
+        this.$http.get('/api/getLoginAccountRole?',{params:{ sessionToken: this.sessionToken }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            if(response.body.data.role == 'ROLE_PLACING'){
+              this.placing = false;
+              this.placingS = false;
+            }else{
+              this.placing = true;
+              this.placingS = true;
+            }
+          }else{
+
+          }       
+        }).then((error)=> this.error = error)
+      },
+      tip: function(){
+        this.create = true;
+        var this_ = this;
+        clearTimeout(t)
+        var t = setTimeout(function (){
+            this_.create = false;
+        }, 1000);
+      }
+    },
+    mounted(){
+      // alert(this.$route.query.productId)
+      this.findPlacingList('');
+
+      localStorage.setItem('productId', this.$route.query.productId);
+
+      this.getLoginAccountRole();
+    }
+ };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+    .modifyCovers
+        position: fixed
+        top: 50%
+        left: 50%
+        width: 2.9rem
+        min-height: 1.88rem
+        background-color: #fff
+        z-index: 100000002
+        transform: translateX(-50%) translateY(-50%)
+        border-radius: 3px
+        box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.4)
+        .modifyCoverInner
+          padding: 0.25rem 0.45rem 0.2rem 0.35rem
+          .determine
+            margin: 0.25rem auto 0 auto
+            width: 1.35rem
+            height: 0.35rem
+            background-color: #ff6000
+            border-radius: 0.2rem
+            text-align: center
+            color: #fff
+            font-size: 0.14rem
+            line-height: 0.35rem
+          li
+            position: relative
+            height: 0.26rem
+            line-height: 0.26rem
+            margin-top: 0.15rem
+            padding-left: 0.75rem
+            &:nth-last-child(1)
+              border-bottom: 1px solid #ff6000
+            span
+              position: absolute
+              top: 0
+              left: 0
+              font-size: 0.14rem
+              color: #333333
+            input
+              outline: none
+              font-size: 0.14rem
+        .close
+          position: absolute
+          top: -0.08rem
+          right: -0.08rem
+          width: 0.28rem
+          height: 0.28rem
+          img
+            display: block
+            width: 100%
+            height: 100%
+    .dataList
+      .item
+        margin-top: 0.1rem
+        padding: 0.1rem
+        width: 100%
+        min-height: 1.38rem
+        background-color: #fff
+        p
+          font-size: 0.14rem
+          &.user_ifon
+            position: relative
+            margin-bottom: 0.1rem
+            .user_name
+              color: #333
+              font-style: normal
+              font-size: 0.2rem
+            .user_adderss
+              padding-left: 0.12rem
+              color: #666
+              font-style: normal
+              font-size: 0.12rem
+            .delete
+              display: block
+              position: absolute
+              top: 0
+              right: 0
+              color: #54b9ff
+              font-size: 0.13rem
+              font-weight: normal
+              cursor: pointer
+              width: 0.15rem
+              height: 0.15rem
+              background-size: 100%
+              -webkit-background-size: 100%
+            .modify
+              display: block
+              position: absolute
+              top: 0
+              right: 0.25rem
+              color: #54b9ff
+              font-size: 0.13rem
+              font-weight: normal
+              cursor: pointer
+              width: 0.15rem
+              height: 0.15rem
+              background: url(../../../../assets/modify_03.png) 0 0 no-repeat
+              background-size: 100%
+              -webkit-background-size: 100%
+          span
+            display: inline-block
+            width: 50%
+            color: #666
+            font-size: 0.14rem
+            line-height: 0.3rem
+            i
+              font-style: normal
+    .goHome
+      position: fixed
+      width: 0.55rem
+      height: 0.55rem
+      bottom: 0.6rem
+      right: 0
+      opacity: 0.8
+      img
+        width: 100%
+        height: 100%
+    .search-box
+      position: fixed
+      width: 100%
+      max-width: 640px
+      height: 0.58rem
+      background-color: #FFF
+      bottom: 0
+      padding: 0 0.12rem
+      &::after
+        position: absolute
+        top: 0
+        right: 0
+        display: block
+        content: ''
+        width: 100%
+        height: 1px
+        background-color: #ccc
+        transform: scaleY(0.5)
+        -webkit-transform: scaleY(0.5)
+      .search-right
+        float: right
+        span
+          display: block
+          width: 1.35rem
+          height: 0.35rem
+          background-color: #ff6000
+          color: #fff
+          line-height: 0.35rem
+          border-radius: 0.2rem
+          text-align: center
+          margin-top: 0.11rem
+          &.hui
+            background-color: #ccc
+      .search-left
+        float: left
+        .search
+          position: relative
+          height: 0.35rem
+          width: 0.3rem
+          border-radius: 0.2rem
+          border: 1px solid #ff6000
+          margin-top: 0.11rem
+          background-color: #f3f3f3
+          overflow: hidden
+          padding: 0 0.36rem 0 0.04rem
+          transition: all 1s ease 0s
+          &.animation
+            width: 1.75rem
+            transition: all 1s ease 0s
+          input
+            width: 100%
+            height: 100%
+            background-color: transparent
+            border: none
+            outline: none
+            text-align: center
+          i
+            position: absolute
+            top: 0.015rem
+            right: 0.02rem
+            width: 0.3rem
+            height: 0.3rem
+            img
+              width: 100%
+              height: 100%
+    .active
+      color: #ff6000
+      position: relative
+      &::after
+        position: absolute
+        bottom: 0
+        right: 0
+        display: block
+        content: ''
+        width: 100%
+        height: 2px
+        background-color: #ff6000
+        transform: scaleY(0.5)
+        -webkit-transform: scaleY(0.5)
+    .detailedType
+      position: fixed
+      left: 50%
+      top: 0
+      width: 100%
+      max-width: 640px
+      height: 0.5rem
+      transform: translateX(-50%)
+      -webkit-transform: translateX(-50%)
+      background-color: #fff
+      z-index: 1 
+      &::after
+        position: absolute
+        bottom: 0
+        right: 0
+        display: block
+        content: ''
+        width: 100%
+        height: 1px
+        background-color: #ccc
+        transform: scaleY(0.5)
+        -webkit-transform: scaleY(0.5)
+      li
+        position: relative
+        float: left
+        width: 25%
+        text-align: center
+        height: 0.5rem
+        line-height: 0.5rem
+        &:nth-last-child(1)::after
+          display: none
+        &::after
+          position: absolute
+          bottom: 0
+          right: 0
+          display: block
+          content: ''
+          width: 1px
+          height: 100%
+          background-color: #ccc
+          transform: scaleX(0.5) scaleY(0.5)
+          -webkit-transform: scaleX(0.5) scaleY(0.5)
+        span
+          display: inline-block
+</style>

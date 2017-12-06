@@ -1,0 +1,136 @@
+<template>
+	<div>
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border_1px">
+		      <span class="hd-title">经纪商汇总</span>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content overview">
+		      <ul>
+		        <li>高级经纪商：<span>182</span></li>
+		        <li>一级经纪商：<span>864</span></li>
+		        <li>加盟费收入：<span>6,133,208.00</span></li>
+		        <li>佣金支出：<span>1,133,208.00</span></li>
+		      </ul>
+		    </div>
+		  </div>
+		</div>
+
+		<div style="height:0.1rem"></div>
+
+		<div class="section">
+		  <div class="hd">
+		    <div class="hd-inner border_1px">
+		      <span class="hd-title">近7日出入金趋势</span>
+		      <!-- <div class="legend">
+		        <span>入金</span>
+		        <span>出金</span>
+		      </div> -->
+		      <span class="dete-control column-control teshu" @click="showDetelist"></span>
+		      <div class="stage-box column-dete teshu" v-show="detailShow">
+		        <div class="stage-inner">
+		          <ul id="monthList">
+		            <li v-for="(item, index) in ringTpye">{{ringTpye[index]}}</li>
+		          </ul>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		  <div class="bd">
+		    <div class="content chart-column">
+		      <div id="main-transverse-column" style="width:100%;height:400px;"></div>
+		    </div>
+		  </div>
+		</div>
+		<div class="stage-cover" v-show="detailShow" @click="hideDetelist"></div>
+	</div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+
+ export default{
+ 	data() {
+ 		return {
+ 			detailShow: false,
+            ringTpye: ['交易金','交易额','开户量','招商量','红积分','手续费','持仓量','签约量','盈亏额']
+ 		};
+ 	},
+ 	methods: {
+ 		showDetelist: function() {
+ 			this.detailShow = true;
+ 		},
+ 		hideDetelist: function(){
+ 			this.detailShow = false
+ 		}
+ 	},
+    mounted() {
+        let transverse_column = echarts.init(document.getElementById('main-transverse-column'));
+        let transverse_column_option = {
+                 tooltip: {
+                     trigger: 'axis',
+                     axisPointer: {
+                         type: 'shadow'
+                     }
+                 },
+                 legend: {
+                     data: ['2011年', '2012年']
+                 },
+                 grid: {
+                     left: '3%',
+                     right: '6%',
+                     bottom: '3%',
+                     top: '3%',
+                     containLabel: true
+                 },
+                 xAxis: {
+                     type: 'value',
+                     boundaryGap: [0, 0.01]
+                 },
+                 yAxis: {
+                     type: 'category',
+                     data: ['张大大','张大大','张大大','张大大','张大大','张大大','张大大','张大大','张大大','张大大大']
+                 },
+                 series: [
+                     {
+                         name: '2011年',
+                         type: 'bar',
+                         data: [400, 433, 444, 500, 522, 544, 600, 644, 700, 744],
+                         itemStyle: {
+                             normal: {
+                                 color: new echarts.graphic.LinearGradient(
+                                      1, 0, 0, 0,
+                                      [
+                                          {offset: 0, color: '#ff7417'},
+                                          {offset: 0.5, color: '#ff9a56'},
+                                          {offset: 1, color: '#ffb584'}
+                                      ]
+                                  ),
+                                 barBorderRadius:[0, 5, 5, 0],
+                                 label: {
+                                         show: true,
+                                         position: 'right',
+                                         formatter: "{c}"
+                                     }
+                             }
+                           },
+                           barWidth: 20
+                     }
+                 ]
+             };
+
+	    transverse_column.setOption(transverse_column_option);
+    }
+ };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+    .stage-box
+        &.teshu
+            height: 3.3rem!important
+    .dete-control
+        &.teshu
+            background-image: url(../../assets/type.png)!important
+</style>

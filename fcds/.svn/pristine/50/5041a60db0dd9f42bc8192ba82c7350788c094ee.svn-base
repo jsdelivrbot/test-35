@@ -1,0 +1,436 @@
+<template>
+    <div>
+        <!-- 商品选择 -->
+        <div class="layer border_1px" @click="layerControl">
+          <span class="left" id='defaultProductId' style="font-weight:500">{{isCurrent.productNo}} {{isCurrent.productName}}</span>
+          <span class="right">选择商品 ></span>
+        </div>
+
+        <div style="height:0.6rem"></div>
+
+        <div class="section">
+          <div class="bd">
+            <div class="content overview">
+              <ul>
+                <li>商品名称：<span>{{findProductData.productName}}</span></li>
+                <li>商品发售总量：<span>{{findProductData.saleAmount}}个</span></li>
+                <li>商品编号：<span>{{findProductData.productNo}}</span></li>
+                <li>挂牌时间：<span>{{findProductData.listingDate}}</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!--出售商品 -->
+        <div class="section">
+          <div class="hd">
+            <div class="hd-inner border-bottom-1px">
+              <span class="hd-title">出售商品</span>
+              <span class="hd-analysis">
+                <router-link :to="{path:'/sellDetailed',query:{ productId: productId}}">
+                  <i>出售明细></i>
+                </router-link>
+              </span>
+            </div>
+          </div>
+          <div class="content">
+              <div class="pacjage-statistics">
+                <div class="statistics-hd">
+                  <div class="statistics-hd-inner">
+                    <span>已配数量：<b>{{findAssetPlacingTotalData.usePlacingTotal}}</b> 块</span>
+                    <span>未配数量：<b>{{findAssetPlacingTotalData.noPlacingTotal}}</b> 块</span>
+                  </div>
+                </div>
+                <div class="statistics-hd width25">
+                  <div class="statistics-hd-inner">
+                    <span>
+                      <b>{{findAssetPlacingTotalData.commitTotal}}</b>
+                      <i>已提交</i>
+                    </span>
+                    <span>
+                      <b>{{findAssetPlacingTotalData.noCommitTotal}}</b>
+                      <i>未提交</i>
+                    </span>
+                    <span>
+                      <b>{{findAssetPlacingTotalData.successTotal}}</b>
+                      <i>出售成功</i>
+                    </span>
+                    <span>
+                      <b>{{findAssetPlacingTotalData.errorTotal}}</b>
+                      <i>出售失败</i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="sell-info">
+                <ul>
+                  <li>
+                    <span>交易商账号：</span>
+                    <input type="tel" placeholder='请填写配售人员账号' v-model='tradeUserNo'>
+                  </li>
+                  <li>
+                    <span>交易商姓名：</span>
+                    <input type="text" placeholder='请填写配售人员姓名' v-model='tradeUserName'>
+                  </li>
+                  <li>
+                    <span>配售数量：</span>
+                    <input type="tel" placeholder="请填写配售数量" v-model='placingNum'>
+                  </li>
+                </ul>
+                <div class="submit-box">
+                  <div class="submit" @click="submitPlacing">确认</div>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <div class="plogout" v-show="placing"><img src="../../../assets/loas_02.png" alt=""><span class="plogoutbtn" @click="logout"><img src="../../../assets/loD.png" alt=""></span></div>
+
+        <!-- <div style="height:0.1rem"></div> -->
+
+        <div class="stage-cover" v-show="coverShow" @click="coverEvent"></div>
+
+        <div class="layerlist" v-show="layerlist">
+          <div class="list_box">
+            <div class="list_item">
+              <ul class="list_ul">
+                <li class="border-bottom-1px" v-for="(item, index) in findProductListData" @click="changeProduct(item)">
+                  <a href="javascript:;">
+                    <span class="list_id">{{item.productNo}}</span> <span class="list_name">{{item.productName}}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div class="control" @click="layerControlClose">
+              <a href="javascript:;">取消</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="susTip" v-show="susTipHide"><img src="../../../assets/suss_03.png" alt=""></div>
+
+        <p class="tips" v-show="create"><span>{{tipText}}</span></p>
+    </div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+import 'common/js/jquery-1.8.3.min.js';
+import 'common/js/laydate.dev.js';
+import load from 'components/load/load';
+
+const ERR_OK = 'success';
+
+ export default{
+    components:{
+      'v-load': load
+    },
+    data() {
+      return {
+        coverShow: false,
+        layerlist: false,
+        findProductListData: {}, //商品列表
+        isCurrent: {}, //选择商品（默认当期）
+        productId: null,
+        findProductData: {}, //商品详情
+        findAssetPlacingTotalData: {}, //商品配售合计
+        tradeUserNo: '',
+        tradeUserName: '',
+        placingNum: '',
+        sessionToken: localStorage.getItem("sessionToken"),
+        susTipHide: false,
+        tipText: null,
+        create: false,
+        placing: false
+      };
+    },
+    created() {
+      
+    },
+    methods: {
+        coverEvent: function() {
+          this.coverShow = false;
+          this.layerlist = false;
+        },
+        changeProduct: function(item) {
+          this.layerlist = false;
+          this.coverShow = false;
+          this.isCurrent = item;
+          this.productId = this.isCurrent.productId;
+          this.findProduct(this.productId);
+          this.findAssetPlacingTotal(this.productId);
+        },
+        layerControl: function() {
+          this.coverShow = true;
+          this.layerlist = true;
+        },
+        layerControlClose: function(){
+          this.coverShow = false;
+          this.layerlist = false;
+        },
+        findProductList: function(){
+          this.$http.get('/api/findProductList',{params:{ sessionToken: this.sessionToken}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.findProductListData = response.body.data.productList;
+              for(var i = 0;  i < this.findProductListData.length; i++){
+                if(this.findProductListData[i].isCurrent == 'Y'){
+                  this.isCurrent = this.findProductListData[i];
+                  this.productId = this.findProductListData[i].productId;
+                  this.findProduct(this.productId);
+                  this.findAssetPlacingTotal(this.productId);
+                }
+              }
+            }else{
+              
+            }   
+          }).then((error)=> this.error = error)
+        },
+        findProduct: function(productId){
+          this.$http.get('/api/findProduct',{params:{ sessionToken: this.sessionToken, productId: productId}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.findProductData = response.body.data;
+            }else{
+              
+            }   
+          }).then((error)=> this.error = error)
+        },
+        findAssetPlacingTotal: function(productId){
+          this.$http.get('/api/findAssetPlacingTotal',{params:{ sessionToken: this.sessionToken, productId: productId}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              this.findAssetPlacingTotalData = response.body.data;
+            }else{
+              
+            }   
+          }).then((error)=> this.error = error)
+        },
+        applyPlacing: function(productId,tradeUserNo,tradeUserName,placingNum){
+          this.$http.get('/api/applyPlacing',{params:{ sessionToken: this.sessionToken, productId: productId, tradeUserNo: tradeUserNo, tradeUserName:tradeUserName, placingNum: placingNum}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+
+              this.tradeUserNo = null;
+              this.tradeUserName = null;
+              this.placingNum = null;
+              
+              this.susTipHide = true;
+              var this_ = this;
+              clearTimeout(t)
+              var t = setTimeout(function (){
+                  this_.susTipHide = false;
+              }, 1000);
+
+            }else{
+              this.tipText = response.body.message;
+              this.tip();
+            }   
+          }).then((error)=> this.error = error)
+        },
+        submitPlacing: function(){
+          if(this.tradeUserNo != '' && this.tradeUserName != '' && this.placingNum != ''){
+            this.applyPlacing(this.productId,this.tradeUserNo,this.tradeUserName,this.placingNum);
+            this.findAssetPlacingTotal(this.productId);
+          }else{
+            this.tipText = "请输入完整的信息!";
+            this.tip();
+          }
+        },
+        tip: function(){
+          this.create = true;
+          var this_ = this;
+          clearTimeout(t)
+          var t = setTimeout(function (){
+              this_.create = false;
+          }, 1000);
+        },
+        logout: function(){
+          this.$http.get('/api/exitLogin?',{params:{ sessionToken: this.sessionToken }}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              localStorage.clear();
+              this.$router.push({ path: '/login' });
+            }else{
+
+            }
+            
+          }).then((error)=> this.error = error)
+        },
+        getLoginAccountRole: function(sessionToken){
+          this.$http.get('/api/getLoginAccountRole',{params:{ sessionToken: this.sessionToken}}).then((response) => { 
+            if(response.body.result == ERR_OK){ 
+              if(response.body.data.role == 'ROLE_PLACING'){
+                this.placing = true
+              }else{
+                this.placing = false
+              }
+            }else{
+              $("#tip").html('<span class="tip_text">'+response.body.message+'</span>')
+            }
+          }).then((error)=> this.error = error)
+        }
+    },
+    mounted() {
+        this.findProductList();
+
+        this.getLoginAccountRole();
+    }
+ };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .susTip
+    position: fixed
+    top: 40%
+    left: 50%
+    width: 1.24rem
+    height: 1.24rem
+    margin: -0.62rem -0.62rem
+    z-index: 1
+    img
+      width: 100%
+      height: 100%
+  .layer
+    height: 0.5rem
+    background-color: #fff
+    font-size: 0.15rem
+    padding: 0 0.12rem
+    .right
+      float: right
+      height: 0.5rem
+      line-height: 0.5rem
+      font-size: 0.13rem
+      color: #54b9ff
+    .left
+      float: left
+      height: 0.5rem
+      line-height: 0.5rem
+  .layerlist
+    position: fixed
+    bottom: 0
+    left: 50%
+    font-size: 0.15rem
+    width: 100%
+    max-width: 640px
+    transform: translateX(-50%)
+    -webkit-transform: translateX(-50%)
+    z-index: 1000000000
+    .control
+      width: 94%
+      height: 0.48rem
+      margin: 0.1rem 3%
+      border-radius: 0.05rem
+      text-align: center
+      line-height: 0.48rem
+      background-color: #fff
+      a
+        color: #666666
+    .list_item
+      width: 94%
+      margin: 0.1rem 3%
+      border-radius: 0.05rem
+      background-color: #fff
+      padding: 0 0.2rem
+      li
+        position: relative
+        width: 100%
+        height: 0.5rem
+        text-align: center
+        line-height: 0.5rem
+        &::after
+          position: absolute
+          bottom: 0
+          left: 0
+          display: block
+          content: ''
+          width: 100%
+          height: 1px
+          background-color: #ccc
+          transform: scaleY(0.5)
+          -webkit-transform: scaleY(0.5)
+        &:nth-last-child(1)::after
+          display: none
+  .hd-analysis
+    float: right
+    i
+      font-style: normal
+      font-size: 0.12rem
+      color: #54b9ff
+  .pacjage-statistics
+    overflow: hidden
+    .statistics-hd
+      overflow: hidden
+      height: 0.54rem
+      padding: 0 0.12rem
+      &.width25
+        margin-top: 0.17rem
+        span
+          width: 25%
+          b
+            display: block
+            line-height: 0.2rem
+          i
+            display: block
+            line-height: 0.2rem
+            font-style: normal
+            font-size: 0.12rem
+      .statistics-hd-inner
+        position: relative
+        width: 100%
+        height: 100%
+        &::after
+          position: absolute
+          bottom: 0
+          left: 0
+          display: block
+          content: ''
+          width: 100%
+          height: 1px
+          background-color: #ccc
+          transform: scaleY(0.5)
+          -webkit-transform: scaleY(0.5)
+      span
+        float: left
+        width: 50%
+        height: 100%
+        text-align: center
+        line-height: 0.54rem
+        b
+          color: #ff6000
+          font-size: 0.18rem
+  .sell-info
+    padding: 0.15rem 0.4rem
+    li
+      position: relative
+      height: 0.4rem
+      line-height: 0.4rem
+      margin-top: 0.15rem
+      padding-left: 1rem
+      text-align: center
+      input
+        width: 100%
+        outline: none
+      span
+        position: absolute
+        top: 0
+        left: 0
+        font-size: 0.14rem
+        color: #333
+      &::after
+        position: absolute
+        bottom: 0
+        left: 0
+        display: block
+        content: ''
+        width: 100%
+        height: 1px
+        background-color: #ff6000
+        transform: scaleY(0.5)
+        -webkit-transform: scaleY(0.5)
+    .submit
+      width: 100%
+      height: 0.42rem
+      margin: 0.3rem auto
+      background-color: #ff6000
+      border-radius: 0.3rem
+      text-align: center
+      color: #fff
+      line-height: 0.42rem
+      font-size: 0.15rem      
+</style>

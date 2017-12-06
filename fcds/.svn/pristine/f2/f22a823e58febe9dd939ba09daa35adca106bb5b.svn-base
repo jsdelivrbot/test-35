@@ -1,0 +1,239 @@
+<template>
+  <div>
+    
+    <div class="brokerInfo">
+      <div class="e-code" id="qrcode"><!-- <img src="../../../assets/e-code_03.png" alt=""> --></div>
+      <div class="info">
+        <p>我的推荐码：<b>{{showReferralInfoData.referralCode}}</b></p>
+        <p>推荐总人数：<b>{{showReferralInfoData.referralNum}}</b></p>
+        <p>经纪商总人数：<b>{{showReferralInfoData.referralToBrokerNum}}</b></p>
+      </div>
+    </div>
+
+    <div class="recommendBrokerlist">
+      <div class="rolelistTap">
+        <span>历史修改记录</span>
+        <div class="search-left">
+          <div class="search" v-bind:class="{ animation: animationState}">
+            <input type="text" placeholder="请输入经纪商账号或姓名" v-model="accountNo" @keyup="change">
+            <i @click="animation"><img src="../../../assets/search.png" alt=""></i>
+          </div>
+        </div>
+      </div>
+      <div class="list-box">
+        <div class="item" v-for="(item, index) in getReferralHistoryListData">
+          <div class="hd"><p>{{item.name}}（{{item.tradeUserNo}}）</p></div>
+          <div class="bd">
+            <span>联系电话：{{item.phone}}</span>
+            <span>更新时间：{{item.lastModifiedDate}}</span>
+            <span>业务员：{{item.salesman}}</span>
+            <span>状态：{{item.signStatusId}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+
+// import 'common/js/jquery-1.8.3.min.js';
+const ERR_OK = 'success';
+
+  export default{
+    data() {
+     return{
+        animationState: true,
+        accountNo: null,
+        session_token: localStorage.getItem("sessionToken"),
+        showReferralInfoData: {},//推荐经纪商
+        getReferralHistoryListData: {}//推荐经纪商历史
+      }
+    },
+    methods: {
+      animation: function(){
+        
+        if(this.accountNo == null || this.accountNo == ''){
+          if(this.animationState){
+            this.animationState = false
+          }else{
+            this.animationState = true
+          }
+        }else{
+          this.getReferralHistoryList(this.accountNo);
+        }
+      },
+      showReferralInfo: function(){
+        this.$http.get('/api/showReferralInfo?',{params:{ sessionToken: this.session_token }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.showReferralInfoData = response.body.data;
+          }else{
+            // this.$refs.timerbtn.stop();
+            alert(response.body.message)
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      getReferralHistoryList: function(brokerUser){
+        this.$http.get('/api/getReferralHistoryList?',{params:{ sessionToken: this.session_token, brokerUser: brokerUser }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.getReferralHistoryListData = response.body.data.brokerList;
+          }else{
+            // this.$refs.timerbtn.stop();
+            alert(response.body.message)
+          }
+          
+        }).then((error)=> this.error = error)
+      },
+      change: function(){
+        if(this.accountNo == ''){
+          this.getReferralHistoryList('');
+        }
+      },
+      qrcode: function(){
+        jQuery('#qrcode').qrcode({
+            render  : "canvas",//也可以替换为table
+            width   : $("#qrcode").width(),
+            height  : $("#qrcode").height(),
+            text    : this.toUtf8('http://192.168.3.102:8081/#/recommendInfo')
+        });
+      },
+      toUtf8: function(str){
+        var out, i, len, c;    
+            out = "";    
+            len = str.length;    
+            for(i = 0; i < len; i++) {    
+                c = str.charCodeAt(i);    
+                if ((c >= 0x0001) && (c <= 0x007F)) {    
+                    out += str.charAt(i);    
+                } else if (c > 0x07FF) {    
+                    out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));    
+                    out += String.fromCharCode(0x80 | ((c >>  6) & 0x3F));    
+                    out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));    
+                } else {    
+                    out += String.fromCharCode(0xC0 | ((c >>  6) & 0x1F));    
+                    out += String.fromCharCode(0x80 | ((c >>  0) & 0x3F));    
+                }    
+            }    
+            return out;
+      }
+    },
+    mounted(){
+      this.showReferralInfo();
+      this.getReferralHistoryList('');
+
+      this.$nextTick(function () {
+          require ('common/js/jquery-1.8.3.min.js');
+          require ('common/js/jquery.qrcode.min.js');
+          this.qrcode();
+      })
+
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .brokerInfo
+    position: relative
+    width: 100%
+    height: 1.36rem
+    background-color: #FFF
+    padding: 0 0 0 1.36rem
+    .info
+      padding: 0.2rem 0.3rem
+      p
+        font-size: 0.14rem
+        line-height: 0.33rem
+        color: #999999
+        b
+          color: #ff6000
+          font-size: 0.17rem
+    .e-code
+      position: absolute
+      top: 0.15rem
+      left: 0.3rem
+      width: 1.06rem
+      height: 1.06rem
+      img
+        display: block
+        width: 100%
+        height: 100%
+  .recommendBrokerlist
+    margin-top: 0.1rem
+    background-color: #FFF
+    .list-box
+      overflow: hidden
+      .item
+        position: relative
+        padding: 0.18rem 0.12rem
+        &::after
+          position: absolute
+          bottom: 0
+          right: 0
+          display: block
+          content: ''
+          width: 100%
+          height: 1px
+          background-color: #ccc
+          transform: scaleY(0.5)
+          -webkit-transform: scaleY(0.5)
+        .hd
+          font-size: 0.15rem
+          margin-bottom: 0.1rem
+        .bd
+          width: 100%
+          overflow: hidden
+          span
+            float: left
+            width: 50%
+            height: 0.3rem
+            line-height: 0.3rem
+            font-size: 0.13rem
+            color: #999999
+    .rolelistTap
+      width: 100%
+      height:0.48rem
+      border-bottom: 1px solid #ccc
+      padding: 0 0.12rem
+      overflow: hidden
+      .search-left
+        float: right
+        .search
+          position: relative
+          height: 0.35rem
+          width: 0.3rem
+          border-radius: 0.2rem
+          border: 1px solid #ff6000
+          margin-top: 0.06rem
+          background-color: #f3f3f3
+          overflow: hidden
+          padding: 0 0.36rem 0 0.04rem
+          transition: all 1s ease 0s
+          &.animation
+            width: 1.75rem
+            transition: all 1s ease 0s
+          input
+            width: 100%
+            height: 100%
+            background-color: transparent
+            border: none
+            outline: none
+            text-align: center
+          i
+            position: absolute
+            top: 0.015rem
+            right: 0.02rem
+            width: 0.3rem
+            height: 0.3rem
+            img
+              width: 100%
+              height: 100%
+      span
+        position: relative
+        float: left
+        line-height: 0.48rem
+        text-align: center
+        font-size: 0.15rem
+        border-bottom: 1px solid transparent
+        font-weight: bold
+</style>

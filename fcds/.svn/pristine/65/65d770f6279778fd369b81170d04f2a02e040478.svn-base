@@ -1,0 +1,156 @@
+
+if(!$.cookie('session_token')){
+	window.location.href="login.html";
+}else{
+	
+}
+
+
+// 获取url参数
+function GetQueryString(name){
+    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+    var r = window.location.search.substr(1).match(reg);
+    if(r!=null)return  unescape(r[2]); return null;
+}
+// alert(GetQueryString("pid"));
+
+var canvas = document.getElementById("myCanvas"); 
+var ctx = canvas.getContext("2d"); 
+function cal (x,y,r,n,color,text,text_1) {
+   var i =1;
+   var th = n*2*Math.PI/360;
+   // var text_1 = '';
+   point = "("+(x+r*Math.sin(th*i))+","+(y-r*Math.cos(th*i))+")";
+   // document.getElementsByTagName('p')[0].innerHTML = point;
+   var a = (x+r*Math.sin(th*i));
+   var b = (y-r*Math.cos(th*i));
+   ctx.font = "24px 微软雅黑";
+   if(a >= x && b > y){
+      ctx.strokeStyle= color;
+      ctx.lineWidth=2;
+      ctx.lineCap='square';
+      ctx.beginPath();
+      ctx.moveTo(a+0,b+0);
+      ctx.lineTo(a+20,b+20);
+      ctx.lineTo(a+180,b+20);
+      ctx.stroke();
+      ctx.closePath();
+
+      ctx.beginPath();
+      ctx.textAlign = 'right';
+      ctx.fillStyle = "#333";
+      ctx.fillText(text, a+180, b+15);
+      ctx.fillStyle = "#333";
+      ctx.fillText(text_1, a+180, b+50);
+   }else if(a < x && b >= y){
+      ctx.strokeStyle= color;
+      ctx.lineWidth=2;
+      ctx.lineCap='square';
+      ctx.beginPath();
+      ctx.moveTo(a-0,b+0);
+      ctx.lineTo(a-20,b+20);
+      ctx.lineTo(a-180,b+20);
+      ctx.stroke();
+      ctx.closePath();
+
+      ctx.beginPath();
+      ctx.textAlign = 'left';
+      ctx.fillStyle = "#333";
+      ctx.fillText(text, a-180, b+15);
+      ctx.fillStyle = "#333";
+      ctx.fillText(text_1, a-180, b+50);
+   }else if(a < x && b < y){
+      ctx.strokeStyle= color;
+      ctx.lineWidth=2;
+      ctx.lineCap='square';
+      ctx.beginPath();
+      ctx.moveTo(a-0,b-0);
+      ctx.lineTo(a-20,b-20);
+      ctx.lineTo(a-180,b-20);
+      ctx.stroke();
+      ctx.closePath();
+
+      ctx.beginPath();
+      ctx.textAlign = 'left';
+      ctx.fillStyle = "#333";
+      ctx.fillText(text, a-180, b-25);
+      ctx.fillStyle = "#333";
+      ctx.fillText(text_1, a-180, b+10);
+   }else if(a > x && b < y){
+      ctx.strokeStyle= color;
+      ctx.lineWidth=2;
+      ctx.lineCap='square';
+      ctx.beginPath();
+      ctx.moveTo(a+0,b-0);
+      ctx.lineTo(a+20,b-20);
+      ctx.lineTo(a+180,b-20);
+      ctx.stroke();
+      ctx.closePath();
+
+      ctx.beginPath();
+      ctx.textAlign = 'right';
+      ctx.fillStyle = "#333";
+      ctx.fillText(text, a+180, b-25);
+      ctx.fillStyle = "#333";
+      ctx.fillText(text_1, a+180, b+10);
+   }
+    ctx.textAlign = 'left';
+    ctx.fillStyle = "#EEEEFF";
+    ctx.strokeStyle = "blue";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.fillStyle = "#ff954b";
+    ctx.fillRect(50,400,30,30);
+    ctx.fillStyle = "#333";
+    ctx.fillText("手续费返佣", 90, 423);
+    ctx.beginPath();
+    ctx.fillStyle = "#e1e97a";
+    ctx.fillRect(400,400,30,30);
+    ctx.fillStyle = "#333";
+    ctx.fillText("资产包返佣", 440, 423);
+    ctx.beginPath();
+    ctx.fillStyle = "#8bddf1";
+    ctx.fillRect(50,440,30,30);
+    ctx.fillStyle = "#333";
+    ctx.fillText("加盟费返佣", 90, 463);
+    ctx.beginPath();
+    ctx.fillStyle = "#009142";
+    ctx.fillRect(400,440,30,30);
+    ctx.fillStyle = "#333";
+    ctx.fillText("积分返佣", 440, 463);
+}
+function yuanhuan(ctx,data,option){
+ var cood=option.cood;
+ var radius=option.radius;
+ var lastpos=pos=0;
+  for(var i=0;i<data.length;i++){
+   ctx.beginPath(); 
+   ctx.moveTo(cood.x,cood.y); 
+   ctx.fillStyle = data[i].bgcolor; 
+   pos=lastpos+Math.PI*2*data[i].value/100;
+   ctx.arc(cood.x,cood.y,radius,lastpos,pos,false); 
+   ctx.fill(); 
+   lastpos=pos;
+  }
+  ctx.beginPath(); 
+  ctx.fillStyle ="white"; 
+  radius*=0.7;
+  ctx.arc(cood.x,cood.y,radius,0,Math.PI*2 ,false); 
+  ctx.fill();
+ }
+ // function drawBeauty(beauty) {　　
+ //  var mycv = document.getElementById("myCanvas");　　
+ //  var myctx = mycv.getContext("2d");　　myctx.drawImage(beauty, 252, 135);　　
+ // }　　
+ // function load() {　　
+ //  var beauty = new Image();　　beauty.src = "images/brandlogo1.png";　　
+ //  if (beauty.complete) {　　drawBeauty(beauty);　　
+ //  } else {　　beauty.onload = function() {　　drawBeauty(beauty);　　
+ //    };　　beauty.onerror = function() {　　window.alert('加载失败，请重试');　　
+ //    };　　
+ //  };　　
+ // } //load
+ // 　　
+ // if (document.all) {　　window.attachEvent('onload', load);　　
+ // } else {　　window.addEventListener('load', load, false);　　
+ // }

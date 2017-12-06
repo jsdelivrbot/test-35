@@ -1,0 +1,77 @@
+<template>
+  <div id="submitted">
+    <div class="item" v-for="item in commitList">
+      <p class="user_ifon">
+        <i class="user_name">{{item.tradeUserName}}</i><i class="user_adderss">{{item.brokerUserName}}</i>
+      </p>
+      <p>
+        <span class="user_account">账号：<i>{{item.tradeUserNo}}</i></span><span class="user_num">数量（块）：<i>{{item.placingQuantity}}</i></span>
+      </p>
+      <p>
+        <span>日期：{{item.lastUpdateDate}}</span><span>金额（元）：{{item.money}}</span>
+      </p>
+      <p>
+        <span>状态：{{item.status}}</span><span>备注：{{item.comments}}</span>
+      </p>
+    </div>
+    <v-empty v-show="emptySta"></v-empty>
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+
+  export default{
+    components:{
+      'v-empty': empty
+    },
+    data(){
+      return{
+        commitList: {},
+        emptySta: false
+      }
+    },
+    created() {
+     this.commitList = this.$route.query.commitList;
+    },
+    mounted(){
+      if (this.commitList == null) {
+         this.emptySta = true
+       }else{
+         this.emptySta = false
+       }
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  #submitted
+    .item
+      margin-top: 0.1rem
+      padding: 0.1rem
+      width: 100%
+      height: 1.38rem
+      background-color: #fff
+      p
+        font-size: 0.14rem
+        &.user_ifon
+          position: relative
+          margin-bottom: 0.1rem
+          .user_name
+            color: #333
+            font-style: normal
+            font-size: 0.2rem
+          .user_adderss
+            padding-left: 0.12rem
+            color: #666
+            font-style: normal
+            font-size: 0.12rem
+        span
+          display: inline-block
+          width: 50%
+          color: #666
+          font-size: 0.14rem
+          line-height: 0.3rem
+          i
+            font-style: normal
+</style>

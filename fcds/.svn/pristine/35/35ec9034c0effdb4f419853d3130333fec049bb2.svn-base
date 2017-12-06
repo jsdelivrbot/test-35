@@ -1,0 +1,91 @@
+{
+  "_args": [
+    [
+      "calendar-plugin",
+      "/Users/juweitu/Documents/fcds/trunk/dataStatistics/vue-statistics-project"
+    ]
+  ],
+  "_from": "calendar-plugin@*",
+  "_id": "calendar-plugin@1.0.1",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/calendar-plugin",
+  "_nodeVersion": "6.10.0",
+  "_npmOperationalInternal": {
+    "host": "packages-18-east.internal.npmjs.com",
+    "tmp": "tmp/calendar-plugin-1.0.1.tgz_1490182723916_0.5329987651202828"
+  },
+  "_npmUser": {
+    "email": "919917215@qq.com",
+    "name": "reusjs"
+  },
+  "_npmVersion": "3.10.10",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "calendar-plugin",
+    "raw": "calendar-plugin",
+    "rawSpec": "",
+    "scope": null,
+    "spec": "*",
+    "type": "range"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/calendar-plugin/-/calendar-plugin-1.0.1.tgz",
+  "_shasum": "1c47f4c9c4d911e8c219ecca2c9fbf23a7e8f61a",
+  "_shrinkwrap": null,
+  "_spec": "calendar-plugin",
+  "_where": "/Users/juweitu/Documents/fcds/trunk/dataStatistics/vue-statistics-project",
+  "author": {
+    "email": "919917215@qq.com",
+    "name": "oyh"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "bugs": {
+    "url": "https://github.com/Reusjs/calendar-plugin/issues"
+  },
+  "dependencies": {},
+  "description": "A Vue.js project",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "shasum": "1c47f4c9c4d911e8c219ecca2c9fbf23a7e8f61a",
+    "tarball": "https://registry.npmjs.org/calendar-plugin/-/calendar-plugin-1.0.1.tgz"
+  },
+  "engines": {
+    "node": ">= 4.0.0",
+    "npm": ">= 3.0.0"
+  },
+  "homepage": "https://github.com/Reusjs/calendar-plugin",
+  "keywords": [
+    "Vue",
+    "calendar",
+    "es6",
+    "html",
+    "js",
+    "plugin"
+  ],
+  "maintainers": [
+    {
+      "name": "reusjs",
+      "email": "919917215@qq.com"
+    }
+  ],
+  "name": "calendar-plugin",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Reusjs/calendar-plugin.git"
+  },
+  "scripts": {
+    "build": "node build/build.js",
+    "dev": "node build/dev-server.js"
+  },
+  "version": "1.0.1"
+}

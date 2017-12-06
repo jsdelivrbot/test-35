@@ -1,0 +1,77 @@
+{
+  result: "success",
+  data: {
+    obj: [
+      {
+        postalAddressContactMechId: "10091",
+        contactName: "唐辰辰",
+        provinceGeoId: "CN-130000",
+        provinceGeoName: "河北省",
+        cityGeoId: "CN-130500",
+        cityGeoName: "邢台市",
+        countyGeoId: "CN-130522",
+        countyGeoName: "临城县",
+        address: "详细街道地址的",
+        postalCode: "542700",
+        mobile: "13566668888",
+        telephone: "13566668888",
+        defaultPartyContactMechPurpose: false
+      },
+      {
+        postalAddressContactMechId: "10090",
+        contactName: "cjcjc",
+        provinceGeoId: "CN-110000",
+        provinceGeoName: "北京",
+        cityGeoId: "CN-110100",
+        cityGeoName: "北京市",
+        countyGeoId: "CN-110101",
+        countyGeoName: "东城区",
+        address: "详细街道",
+        mobile: "14789564512",
+        telephone: "14789564512",
+        defaultPartyContactMechPurpose: false
+      },
+      {
+        postalAddressContactMechId: "10081",
+        contactName: "廖康娟",
+        provinceGeoId: "CN-130000",
+        provinceGeoName: "河北省",
+        cityGeoId: "CN-130500",
+        cityGeoName: "邢台市",
+        countyGeoId: "CN-130522",
+        countyGeoName: "临城县",
+        address: "木头女",
+        mobile: "18520365555",
+        telephone: "18520365555",
+        defaultPartyContactMechPurpose: false
+      },
+      {
+        postalAddressContactMechId: "10080",
+        contactName: "报表",
+        provinceGeoId: "CN-420000",
+        provinceGeoName: "湖北省",
+        cityGeoId: "CN-429005",
+        cityGeoName: "潜江市",
+        address: "地址值",
+        mobile: "13596324561",
+        telephone: "13596324561",
+        defaultPartyContactMechPurpose: false
+      },
+      {
+        postalAddressContactMechId: "10070",
+        contactName: "看看计划",
+        provinceGeoId: "CN-440000",
+        provinceGeoName: "广东省",
+        cityGeoId: "CN-440100",
+        cityGeoName: "广州市",
+        countyGeoId: "CN-440113",
+        countyGeoName: "番禺区",
+        address: "详细街道",
+        postalCode: "456123",
+        mobile: "13546124789",
+        telephone: "13546124789",
+        defaultPartyContactMechPurpose: false
+      }
+    ]
+  }
+}

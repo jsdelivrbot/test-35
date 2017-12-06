@@ -1,0 +1,40 @@
+{
+  "result": "success",
+  "data": {
+    "buyList": [
+      {
+        "id": 1000024,
+        "period": "24",
+        "lotteryTime": 1469382964000,
+        "title": "凡萨帝原汁机/机械...",
+        "num": 6,
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "buyNum": 1233441,
+        "winningNumber": 1233443,
+        "username": "4******e"
+      },
+      {
+        "id": 1000025,
+        "period": "25",
+        "lotteryTime": 1469482974000,
+        "title": "苹果6s",
+        "num": 2,
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "buyNum": 1235441,
+        "winningNumber": 1235441,
+        "username": "2******3"
+      },
+      {
+        "id": 1000026,
+        "period": "26",
+        "lotteryTime": 1479482974000,
+        "title": "禅意山房5mm两圈石榴",
+        "num": 2,
+        "minPic": "http://static.galileo.xiaojukeji.com/static/tms/seller_avatar_256px.jpg",
+        "buyNum": 1233441,
+        "winningNumber": 1233443,
+        "username": "3******c"
+      }
+    ]
+  }
+}

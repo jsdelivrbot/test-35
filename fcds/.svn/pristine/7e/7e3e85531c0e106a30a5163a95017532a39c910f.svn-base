@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>首页</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+
+  <div class="user_info_d" id="bestBroker"><!-- 市级运营中心 --></div>
+  <div style="height:0.3rem;"></div>
+
+
+
+  <div class="stage-cover"></div>
+
+  <div class="r-header" id="collecting1">
+    <p>
+      <span></span>
+      <b></b>
+    </p>
+  </div>
+  
+  <div class="box box2">
+    <canvas id="myCanvas1" width="700px" height="450px"></canvas>
+    <div class="tagging">
+      <ul id="tagging1">
+        <!-- <li><span>加盟费</span></li> -->
+      </ul>
+    </div>
+  </div>
+  <div style="height:0.1rem"></div>
+  <div class="r-header" id="collecting2">
+    <p>
+      <span></span>
+      <b></b>
+    </p>
+  </div>
+  <div class="box box2 teshu">
+    <div id="main" style="width:100%;height:200px;"></div>
+  </div>
+  <div style="height:0.1rem"></div>
+  <div class="r-header" id="collecting">
+    <p>
+      <span></span>
+      <i></i>
+    </p>
+    <div class="stage-box">
+      <div class="stage-inner">
+        <ul id="monthList">
+          <!-- <li>00001</li> -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="box box2">
+    <canvas id="myCanvas" width="700px" height="450px"></canvas>
+    <div class="tagging">
+      <ul id="tagging">
+        <!-- <li><span>加盟费</span></li> -->
+      </ul>
+    </div>
+  </div>
+
+  <div id="logout" onclick="window.location='logout.html'"><span>退出登录</span></div>
+
+  <p class="tips" id="tips">&nbsp;</p>
+
+  <script src="js/jquery-1.8.3.min.js"></script>
+  <script src="js/mo.js"></script>
+  <script src="js/jquery.cookie.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/echarts.min.js"></script>
+  <script type="text/javascript">
+    $(".loader_cover_box").css("display","block");
+    $(".r-header i").click(function(event) {
+      $(".stage-cover").css("display","block");
+      $(".stage-box").css("display","block");
+    });
+    $(".stage-cover").click(function(event) {
+      $(".stage-cover").css("display","none");
+      $(".stage-box").css("display","none");
+    });
+
+    var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+    var session_token = $.cookie('session_token');
+    var url=decodeURI(location.href);
+    var month=url.split("?")[1];
+    app.ajaxHelper.submitRequest({
+        url: '/api/findSummary',
+        data: {
+            session_token: session_token,
+            month: month
+        },
+        success: function (data) {
+             
+            if (data.result == "success") {
+                $(".loader_cover_box").css("display","none");
+                $("#bestBroker").html(data.data.role);
+                var monthListLength = data.data.monthList.length;
+                var curMonth = data.data.monthList[monthListLength-1];
+                $("#collecting1 p span").html("返佣总览");
+                $("#collecting2 p span").html("近7天返佣总情况");
+                $("#collecting1 p b").html(data.data.totalRebate.totalCycleRebate);
+                $("#collecting2 p b").html(data.data.sevenDayRebate.totalValue);
+                if(month){ 
+                  $("#collecting p span").html(month+"返佣汇总"); 
+                  curMonth = month;
+                }else{
+                  $("#collecting p span").html(data.data.monthList[monthListLength-1]+"返佣汇总");
+                }
+                
+                var cycleRebate = data.data.cycleRebate;
+                var totalRebate = data.data.totalRebate;
+                tu("myCanvas",cycleRebate);
+                tu("myCanvas1",totalRebate);
+
+              function detailedListHtml(poundageRebate,packageRebate,transBizFranchiseRebate,scoreRebate) {
+                var franchiseUrl = '\'franchise.html?'+curMonth+'\'';
+                var feeUrl = '\'fee.html?'+curMonth+'\'';
+                var integralUrl = '\'integral.html?'+curMonth+'\'';
+                var packageUrl = '\'package.html?'+curMonth+'\'';
+                var html = '<li><span onclick="window.location='+encodeURI(franchiseUrl)+'">加盟费</span></li><li><span onclick="window.location='+encodeURI(packageUrl)+'">商品包</span></li><li><span onclick="window.location='+encodeURI(feeUrl)+'">手续费</span></li><li><span onclick="window.location='+encodeURI(integralUrl)+'">积分</span></li>';
+                return html;
+              }
+
+              function detailedListHtml1(poundageRebate,packageRebate,transBizFranchiseRebate,scoreRebate) {
+                var html = '<li><span onclick="window.location=\'franchise.html?rebateTypeId=FRANCHISE_REBATE\'">加盟费</span></li><li><span onclick="window.location=\'package.html?rebateTypeId=ASSETPACKAGE_REBATE\'">商品包</span></li><li><span onclick="window.location=\'fee.html?rebateTypeId=POUNDAGE_REBATE\'">手续费</span></li><li><span onclick="window.location=\'integral.html?rebateTypeId=SCORE_REBATE\'">积分</span></li>';
+                return html;
+              }
+
+              $(cycleRebate).each(function(i){
+                var listHtml = detailedListHtml(this.poundageRebate,this.packageRebate,this.transBizFranchiseRebate,this.scoreRebate);
+                $('#tagging').append(listHtml);
+              })
+
+              $(totalRebate).each(function(i){
+                var listHtml = detailedListHtml1(this.poundageRebate,this.packageRebate,this.transBizFranchiseRebate,this.scoreRebate);
+                $('#tagging1').append(listHtml);
+              })
+
+              for(var i=(monthListLength-1);i >= 0; i--){
+                var thisUrl = '\'index.html?'+data.data.monthList[i]+'\'';
+                var thisMot = data.data.monthList[i];
+                  $('#monthList').append('<li data-url="'+thisMot+'" onclick="window.location='+encodeURI(thisUrl)+'">'+data.data.monthList[i]+'</li>');
+              }
+
+              var myChart = echarts.init(document.getElementById('main'));
+              app.title = '坐标轴刻度与标签对齐';
+              option = {
+                  color: ['#ff6600'],
+                  tooltip : {
+                      trigger: 'axis',
+                      axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                          type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                      }
+                  },
+                  grid: {
+                      left: '3%',
+                      right: '4%',
+                      bottom: '3%',
+                      containLabel: true
+                  },
+                  xAxis : [
+                      {
+                          type : 'category',
+                          data : data.data.sevenDayRebate.xAxisList,
+                          axisTick: {
+                              alignWithLabel: true
+                          },
+                          axisLabel :{  
+                              interval:0   
+                          } 
+                      }
+                  ],
+                  yAxis : [
+                      {
+                          type : 'value'
+                      }
+                  ],
+                  series : [
+                      {
+                          name:'直接访问',
+                          type:'bar',
+                          barWidth: '40%',
+                          data:data.data.sevenDayRebate.valueList
+                      }
+                  ]
+              };
+
+              myChart.setOption(option);
+
+            }else if(data.result == "noSession"){
+                window.location.href="login.html";
+            }else {
+                errors(emptyHtml);
+            }
+        }
+    });
+    
+    $(".stage-cover").on('touchmove', function(event) {
+        event.preventDefault();
+      })
+    
+    $(".loader_cover_box").on('touchmove', function(event) {
+      event.preventDefault();
+    });
+  </script>
+</body>
+</html>

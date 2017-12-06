@@ -1,0 +1,22 @@
+<template>
+  <div>
+    
+  </div>
+</template>
+
+<script>
+
+  export default{
+    created() {
+      // alert(localStorage.getItem("productId"))
+	   this.$router.push({ path: '/sellDetailed', query:{productId: localStorage.getItem("productId")} })
+    },
+    mounted(){
+      
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  
+</style>

@@ -1,0 +1,334 @@
+<template>
+	<div v-title="'个人中心'">
+		<div class="center-header" :style="{backgroundImage: 'url(' + img + ')'}">
+			<div class="inner">
+				<div class="name"><span>{{showPersonalCenterInfoData.tradeUserName}}（{{showPersonalCenterInfoData.brokerUserNo}}）</span></div>
+				<div class="region"><span>归属地：{{showPersonalCenterInfoData.brokerUserName}}</span></div>
+				<div class="populationStatistics" v-if="isPartner(showPersonalCenterInfoData.isPartner)">
+					<ul>
+						<li>
+							<img src="../../assets/V.png">
+						</li>
+						<li>
+							<p>{{showPersonalCenterInfoData.maxLevel}}</p>
+							<p>历史最高阶级</p>
+						</li>
+						<li>
+							<p>{{showPersonalCenterInfoData.level}}</p>
+							<p>当月阶级</p>
+						</li>
+					</ul>
+				</div>
+				<div class="populationStatistics" v-show="senior">
+					<ul>
+						<li>
+							<p>{{showPersonalCenterInfoData.brokerUserNum}}</p>
+							<p>经纪商总数</p>
+						</li>
+						<li>
+							<p>{{showPersonalCenterInfoData.tradeUserNum}}</p>
+							<p>交易商总数</p>
+						</li>
+						<li>
+							<p>{{showPersonalCenterInfoData.tradeUserSignNum}}</p>
+							<p>已签约总数</p>
+						</li>
+						<li>
+							<p>{{showPersonalCenterInfoData.diamondVIP}}</p>
+							<p>钻石VIP人数</p>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="operation">
+			<div class="item">
+				<span v-show="senior">
+					<router-link to="/recommendBroker">
+						<i><img src="../../assets/broker.png" alt=""></i>
+						<p>推荐经纪商</p>
+					</router-link>
+				</span>
+				<span v-show="senior">
+					<router-link to="/vip">
+						<i><img src="../../assets/zuanshi.png" alt=""></i>
+						<p>钻石 VIP</p>
+					</router-link>
+				</span>
+				<span v-show="senior">
+					<router-link to="/modifyPassword">
+						<i><img src="../../assets/password.png" alt=""></i>
+						<p>修改登录密码</p>
+					</router-link>
+				</span>
+				<div class="populationStatistics" v-show="ones">
+					<ul>
+						<li>
+							<p>{{showPersonalCenterInfoData.tradeUserNum}}</p>
+							<p>交易商总数</p>
+						</li>
+						<li>
+							<p>{{showPersonalCenterInfoData.tradeUserSignNum}}</p>
+							<p>已签约总数</p>
+						</li>
+						<li>
+							<p>{{showPersonalCenterInfoData.diamondVIP}}</p>
+							<p>钻石VIP人数</p>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="item">
+				<span v-show="senior">
+					<router-link to="/accountManagement">
+						<i><img src="../../assets/account.png" alt=""></i>
+						<p>子账号管理</p>
+					</router-link>
+				</span>
+				<span v-show="senior">
+					<router-link to="/modifyRegion">
+						<i><img src="../../assets/region.png" alt=""></i>
+						<p>申请修改交易商区域</p>
+					</router-link>
+				</span>
+				<span v-show="senior" @click="logout">
+					<i><img src="../../assets/logout.png" alt=""></i>
+					<p>退出登录</p>
+				</span>
+
+				<span v-show="ones">
+					<router-link to="/recommendBroker">
+						<i><img src="../../assets/broker.png" alt=""></i>
+						<p>推荐经纪商</p>
+					</router-link>
+				</span>
+				<span v-show="ones">
+					<router-link to="/vip">
+						<i><img src="../../assets/zuanshi.png" alt=""></i>
+						<p>钻石 VIP</p>
+					</router-link>
+				</span>
+				<span v-show="ones">
+					<router-link to="/modifyPassword">
+						<i><img src="../../assets/password.png" alt=""></i>
+						<p>修改登录密码</p>
+					</router-link>
+				</span>
+			</div>
+		</div>
+		<div class="logout" @click="logout" v-show="ones"><span>退出登录</span></div>
+	</div>
+</template>
+
+<script>
+
+const ERR_OK = 'success';
+
+ export default{
+ 	data(){
+ 		return {
+ 			session_token: localStorage.getItem("sessionToken"),
+ 			showPersonalCenterInfoData: {},//个人中心展示信息
+ 			img: require('../../assets/centerHeaderBg_02.jpg'),
+ 			ones: false,
+ 			senior: false
+ 		}
+ 	},
+ 	mounted(){
+ 		this.getLoginAccountRole();
+ 		this.showPersonalCenterInfo();
+ 	},
+ 	methods: {
+ 		isPartner: function(isPartner){
+ 			var result;
+ 			if(isPartner == "N"){
+ 			  result = false
+ 			}else{
+ 			  result = true
+ 			}
+ 			return result;
+ 		},
+ 		logout: function(){
+ 			this.$http.get('/api/exitLogin?',{params:{ sessionToken: this.session_token }}).then((response) => { 
+ 			  if(response.body.result == ERR_OK){ 
+ 			    localStorage.clear();
+ 			    this.$router.push({ path: '/login' });
+ 			  }else{
+
+ 			  }
+ 			  
+ 			}).then((error)=> this.error = error)
+ 		},
+ 		showPersonalCenterInfo: function(){
+ 			this.$http.get('/api/showPersonalCenterInfo?',{params:{ sessionToken: this.session_token }}).then((response) => { 
+ 			  if(response.body.result == ERR_OK){ 
+ 			    this.showPersonalCenterInfoData = response.body.data;
+ 			  }else{
+ 			    // this.$refs.timerbtn.stop();
+ 			    alert(response.body.message)
+ 			  }
+ 			  
+ 			}).then((error)=> this.error = error)
+ 		},
+ 		getLoginAccountRole: function(){
+ 			this.$http.get('/api/getLoginAccountRole?',{params:{ sessionToken: this.session_token }}).then((response) => { 
+ 			  if(response.body.result == ERR_OK){ 
+ 			    if(response.body.data.role == 'ROLE_TOP'){
+ 			    	this.senior = true;
+ 			    	this.ones = false;
+ 			    }else if(response.body.data.role == 'ROLE_FIRST'){
+ 			    	this.senior = false;
+ 			    	this.ones = true;
+ 			    }
+ 			  }else{
+ 			    // this.$refs.timerbtn.stop();
+ 			    alert(response.body.message)
+ 			  }
+ 			  
+ 			}).then((error)=> this.error = error)
+ 		}
+ 	}
+ };
+ 
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+	.center-header
+		width: 100%
+		height: 2.8rem
+		background: center bottom no-repeat
+		background-size: 100%
+		.inner
+			width: 100%
+			height: 100%
+			padding: 0.5rem 0.12rem 0 0.12rem
+			color: #fff
+			.name
+				font-size: 0.2rem
+				height: 0.28rem
+				line-height: 0.28rem
+				padding-left: 0.1rem
+			.region
+				
+				font-size: 0.14rem
+				height: 0.28rem
+				line-height: 0.28rem
+				padding-left: 0.1rem
+				span
+					display: inline-block
+					position: relative
+					height: 0.28rem
+					&::after
+						position: absolute
+						left: 0
+						bottom: 0
+						width: 100%
+						content: ''
+						-webkit-transform: scaleY(0.5)
+						transform: scaleY(0.5)
+						border-top: 2px solid #fff
+			.populationStatistics
+				overflow: hidden
+				height: 0.66rem
+				ul
+					width: 100%
+					
+					li
+						float: left
+						width: 25%
+						text-align: center
+						line-height: 0.22rem
+						padding-top: 0.15rem
+						p:nth-child(1)
+							font-size: 0.18rem
+							font-family: "HelveticaNeue"!important
+						p:nth-child(2)
+							font-size: 0.12rem
+						img
+							width: 0.65rem
+							height: 0.34rem
+							line-height: 0.6rem
+							margin-top: 0.05rem
+	.operation
+		width: 100%
+		height: 2.4rem
+		border-radius: 0.1rem 0.1rem 0 0;
+		background-color: #fff
+		margin-top: -0.1rem
+		color: #999999
+		.item
+			position: relative
+			width: 100%
+			height: 1.2rem
+			overflow:hidden
+			.populationStatistics
+				overflow: hidden
+				min-height: 0.66rem
+				padding: 0.2rem 0;
+				ul
+					width: 100%
+					
+					li
+						float: left
+						width: 33.33%
+						text-align: center
+						line-height: 0.26rem
+						padding-top: 0.15rem
+						p:nth-child(1)
+							font-size: 0.2rem
+							color: #ff6000
+						p:nth-child(2)
+							font-size: 0.14rem
+			&:nth-child(1)::after
+				position: absolute
+				left: 0
+				bottom: 0
+				width: 100%
+				content: ''
+				-webkit-transform: scaleY(0.5) scaleX(0.9)
+				transform: scaleY(0.5) scaleX(0.9)
+				border-top: 1px solid #ccc
+			span
+				float: left
+				display: inline-block
+				position: relative
+				width: 33.33%
+				height: 1.2rem
+				overflow: hidden
+				a
+					color: #999
+				p
+					text-align: center
+					font-size: 0.13rem
+					line-height: 1.6rem
+				i
+					display: block
+					position: absolute
+					top: 40%
+					left: 50%
+					margin: -0.17rem -0.17rem
+					width: 0.34rem
+					height: 0.34rem
+					img
+						width: 100%
+						height: 100%
+	.logout
+		width: 100%
+		height: 0.5rem
+		text-align: center
+		line-height: 0.5rem
+		background-color: #fff
+		margin-top: 0.1rem
+		font-size: 0.14rem 
+		span
+			color: #999999
+			&::before
+				display: inline-block
+				content: ''
+				width: 0.23rem
+				height: 0.24rem
+				background: url(../../assets/logout_03.png) center center no-repeat
+				background-size: 100% 100%
+				vertical-align: middle
+				margin-right: 0.15rem
+</style>

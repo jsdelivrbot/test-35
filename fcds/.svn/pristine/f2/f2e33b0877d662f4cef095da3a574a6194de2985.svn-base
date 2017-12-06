@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>首页</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+
+  <div class="user_info_d" id="bestBroker"><!-- 市级运营中心 --></div>
+  <div style="height:0.3rem;"></div>
+
+  <div class="r-header" id="collecting">
+    <p>
+      <span></span>
+      <i></i>
+    </p>
+    <div class="stage-box">
+      <div class="stage-inner">
+        <ul id="monthList">
+          <!-- <li>00001</li> -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage-cover"></div>
+
+  <div class="box box2">
+    <canvas id="myCanvas" width="700px" height="440px"></canvas>
+    <div class="tagging">
+      <ul id="tagging">
+        <!-- <li><span>加盟费</span></li> -->
+      </ul>
+    </div>
+  </div>
+
+  <div id="logout" onclick="window.location='logout.html'"><span>退出登录</span></div>
+
+  <p class="tips" id="tips">&nbsp;</p>
+
+  <script src="js/jquery-1.8.3.min.js"></script>
+  <script src="js/mo.js"></script>
+  <script src="js/jquery.cookie.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/highcharts.js"></script>
+  <script src="js/exporting.js"></script>
+  <script type="text/javascript">
+    $(".loader_cover_box").css("display","block");
+    $(".r-header i").click(function(event) {
+      $(".stage-cover").css("display","block");
+      $(".stage-box").css("display","block");
+    });
+    $(".stage-cover").click(function(event) {
+      $(".stage-cover").css("display","none");
+      $(".stage-box").css("display","none");
+    });
+
+    var session_token = $.cookie('session_token');
+    var url=decodeURI(location.href);
+    var month=url.split("?")[1];
+    app.ajaxHelper.submitRequest({
+        url: '/api/findSummary',
+        data: {
+            session_token: session_token,
+            month: month
+        },
+        success: function (data) {
+             
+            if (data.result == "success") {
+                $(".loader_cover_box").css("display","none");
+                $("#bestBroker").html(data.data.role);
+                var monthListLength = data.data.monthList.length;
+                var curMonth = data.data.monthList[monthListLength-1];
+                if(month){ 
+                  $("#collecting p span").html(month+"返佣汇总");
+                  curMonth = month;
+                }else{
+                  $("#collecting p span").html(data.data.monthList[monthListLength-1]+"返佣汇总");
+                }
+                
+                var a = parseFloat(data.data.cycleRebate.poundageRebateRatio);
+                var b = parseFloat(data.data.cycleRebate.packageRebateRatio);
+                var c = parseFloat(data.data.cycleRebate.transBizFranchiseRebateRatio);
+                var d = parseFloat(data.data.cycleRebate.scoreRebateRatio);
+
+                var allArry = [a,b,c,d];
+                proportion(allArry);
+
+                var y_data = [];
+
+                if(a==0&&b==0&&c==0&&d==0){
+                  y_data=[
+                    {bgcolor:'#ccc',value:100},
+                    {bgcolor:'#e1e97a',value:0},
+                    {bgcolor:'#8bddf1',value:0},
+                    {bgcolor:'#fe86b3',value:0}
+                  ];
+                  cal(350,220,150,(y_data[0].value/2/100)*360+90,'rgba(0,0,0,0)','暂无返佣','请继续加油！')
+                }else{
+                  y_data=[
+                    {bgcolor:'#ff954b',value:allArry[0]},
+                    {bgcolor:'#e1e97a',value:allArry[1]},
+                    {bgcolor:'#8bddf1',value:allArry[2]},
+                    {bgcolor:'#fe86b3',value:allArry[3]}
+                  ];
+                }
+
+                var aj = (y_data[0].value/2/100)*360+90;
+                var bj = ((y_data[0].value+(y_data[1].value/2))/100*360+90);
+                var cj = ((y_data[0].value+y_data[1].value+(y_data[2].value/2))/100*360+90);
+                var dj = ((y_data[0].value+y_data[1].value+y_data[2].value+(y_data[3].value/2))/100*360+90);
+
+                yuanhuan(ctx,y_data,{cood:{x:350,y:220},radius:160});
+                if(data.data.cycleRebate.poundageRebate>0){
+                  cal(350,220,170,aj,'#ff954b',data.data.cycleRebate.poundageRebate,'手续费返佣');
+                  cal1(350,220,160,aj,"images/3_03.png");
+                }
+                if(data.data.cycleRebate.packageRebate>0){
+                  cal(350,220,170,bj,'#e1e97a',data.data.cycleRebate.packageRebate,'资产包返佣');
+                  cal1(350,220,160,bj,"images/4_03.png");
+                }
+                if(data.data.cycleRebate.transBizFranchiseRebate>0){
+                  cal(350,220,170,cj,'#8bddf1',data.data.cycleRebate.transBizFranchiseRebate,'加盟费返佣');
+                  cal1(350,220,160,cj,"images/1_03.png");
+                }
+                if(data.data.cycleRebate.scoreRebate>0){
+                  cal(350,220,170,dj,'#f76864',data.data.cycleRebate.scoreRebate,'积分返佣');
+                  cal1(350,220,160,dj,"images/2_03.png");
+                }
+
+               load(252,135,"images/brandlogo1.png");
+
+              function detailedListHtml(poundageRebate,packageRebate,transBizFranchiseRebate,scoreRebate) {
+                var franchiseUrl = '\'franchise.html?'+curMonth+'\'';
+                var feeUrl = '\'fee.html?'+curMonth+'\'';
+                var integralUrl = '\'integral.html?'+curMonth+'\'';
+                var packageUrl = '\'package.html?'+curMonth+'\'';
+                var html = '<li><span onclick="window.location='+encodeURI(franchiseUrl)+'">加盟费</span></li><li><span onclick="window.location='+encodeURI(packageUrl)+'">商品包</span></li><li><span onclick="window.location='+encodeURI(feeUrl)+'">手续费</span></li><li><span onclick="window.location='+encodeURI(integralUrl)+'">积分</span></li>';
+
+                return html;
+              }
+
+              $(data.data.cycleRebate).each(function(i){
+                var listHtml = detailedListHtml(this.poundageRebate,this.packageRebate,this.transBizFranchiseRebate,this.scoreRebate);
+                $('#tagging').append(listHtml);
+              })
+
+              for(var i=(monthListLength-1);i >= 0; i--){
+                var thisUrl = '\'index.html?'+data.data.monthList[i]+'\'';
+                var thisMot = data.data.monthList[i];
+                  $('#monthList').append('<li data-url="'+thisMot+'" onclick="window.location='+encodeURI(thisUrl)+'">'+data.data.monthList[i]+'</li>');
+              }
+
+            }else if(data.result == "noSession"){
+                window.location.href="login.html";
+            }else {
+                errors(emptyHtml);
+            }
+        }
+    });
+    
+    $(".stage-cover").on('touchmove', function(event) {
+        event.preventDefault();
+      })
+    
+    $(".loader_cover_box").on('touchmove', function(event) {
+      event.preventDefault();
+    });
+  </script>
+</body>
+</html>

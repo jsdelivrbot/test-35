@@ -1,0 +1,62 @@
+<template>
+  <div id="franchiseDetails">
+      <div class="section">
+          <div class="hd">
+            <div class="hd-inner">
+                <span class="hd-title">积分{{date}}</span>
+            </div>
+          </div>
+          <div class="content">
+            <div class="details-list">
+              <ul>
+                <li>
+                  <span>
+                    <i>周 一</i>
+                    <i>01-03</i>
+                  </span>
+                  <span>周大富</span>
+                  <span>3015.24</span>
+                </li>
+                <li>
+                  <span>
+                    <i>周 一</i>
+                    <i>01-03</i>
+                  </span>
+                  <span>周大富</span>
+                  <span>3015.24</span>
+                </li>
+                <li>
+                  <span>
+                    <i>周 一</i>
+                    <i>01-03</i>
+                  </span>
+                  <span>周大富</span>
+                  <span>3015.24</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+      </div>
+  </div>
+</template>
+
+<script>
+
+  export default{
+    data(){
+      return{
+        date: this.$route.query.date
+      }
+    },
+    created() {
+
+    },
+    mounted(){
+      
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+
+</style>

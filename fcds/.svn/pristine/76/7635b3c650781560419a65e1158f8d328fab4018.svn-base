@@ -1,0 +1,463 @@
+<template>
+  <div v-title="'每日简报'">
+    
+    <div class="section">
+      <div class="hd">
+        <div class="hd-inner">
+          <span class="hd-title">每日简报</span>
+          <span class="dete-control"></span>
+          <span id="demo2" class="brfd">{{curdate1}}</span>
+        </div>
+      </div>
+      <div class="content">
+        <ul class="customerList">
+          <li>持仓市值：{{getDailyAndWorklyData.holdAmount}}</li>
+          <li>可用余额：{{getDailyAndWorklyData.enableMoney}}</li>
+          <li>出金：{{getDailyAndWorklyData.outMoney}}</li>
+          <li>入金：{{getDailyAndWorklyData.inMoney}}</li>
+          <li>买入：{{getDailyAndWorklyData.buyIn}}</li>
+          <li>卖出：{{getDailyAndWorklyData.sellOut}}</li>
+          <li>挂单未成交：{{getDailyAndWorklyData.tradeErrorCount}}</li>
+          <li>交易客户数：{{getDailyAndWorklyData.transactionUserCount}}</li>
+          <!-- <li>有效客户总数：{{getDailyAndWorklyData.CustomersNumCount}}</li> -->
+          <li>委卖数量：{{getDailyAndWorklyData.entrustSellAmountSum}}</li>
+        </ul>
+      </div>
+      <v-load v-show="load3"></v-load>
+    </div>
+
+    <div class="section">
+      <div class="hd">
+        <div class="hd-inner">
+          <span class="hd-title">客户分析<i class="help" @click="coverShowEven">?</i></span>
+          <span class="dete-control"></span>
+          <span id="demo1" class="brfd">{{curdate}}</span>
+        </div>
+      </div>
+      <div class="content">
+        <ul class="customerList">
+        	<li>活跃客户：<b>{{customerAnalysisData.activeUserCount}}</b></li>
+        	<li>交易客户：<b>{{customerAnalysisData.tradeUserCount}}</b></li>
+        	<li>大入金客户：<b>{{customerAnalysisData.bigInMoneyUserCount}}</b></li>
+        	<li>大出金客户：<b>{{customerAnalysisData.bigOutMoneyUserCount}}</b></li>
+        	<li>入场客户：<b>{{customerAnalysisData.inUserCount}}</b></li>
+        	<li>离场客户：<b>{{customerAnalysisData.outUserCount}}</b></li>
+        </ul>
+      </div>
+      <v-load v-show="load1"></v-load>
+    </div>
+
+
+    <div class="section">
+        <div class="sectionCover" style="display:none"></div>
+        <div class="content" style="padding:0;">
+          <div class="rebate-details">
+            <p>
+              <span>
+                <router-link to="/activeCustomer">
+                  活跃客户
+                </router-link>
+              </span> 
+              <span>
+                <router-link to="/tradingClient">    
+                  交易客户
+                </router-link>
+              </span>
+              <span>
+                <router-link to="/intoGoldCustomer">
+                  大入金客户
+                </router-link>
+              </span>
+            </p>
+            <p>
+              <span>
+                <router-link to="/outGoldCustomer">
+                  大出金客户
+                </router-link>
+              </span>
+              <span>
+                <router-link to="/admissionCustomer">
+                  入场客户
+                </router-link>
+              </span>
+              <span>
+                <router-link to="/leaveCustomer">
+                  离场客户
+                </router-link>
+              </span>
+            </p>
+          </div>
+        </div>
+    </div>
+
+    <div class="section">
+      <div class="hd">
+        <div class="hd-inner">
+            <span class="hd-title">近7日客户分析趋势</span>
+            <div class="legend">
+              <span>入场客户</span>
+              <span>离场客户</span>
+            </div>
+            <!-- <span class="dete-control" @click="pieRequest"></span> -->
+            <!-- <span class="curdate" id="J-xl-2"></span> -->
+        </div>
+      </div>
+      <div class="content">
+      	<div id="main-polyline" style="width:100%;height:200px;"></div>
+      </div>
+      <v-load v-show="load2"></v-load>
+    </div>
+    <!-- 背景遮罩 -->
+    <div class="stage-cover" v-show="coverShow" @click="coverHide"></div>
+    <div class="helpTextCover" v-show="coverShow">
+    <ul>
+      <li>活跃客户：当日登录过交易客户端的客户</li>
+      <li>交易客户：当日有成交记录的客户</li>
+      <li>大入金客户：当日入金超过五万元的客户</li>
+      <li>大出金客户：当日出金超过五万元的客户</li>
+      <li>入场客户：首次入金或者交易的客户</li>
+      <li>离场客户：有过交易且当日出金后总权益小于4000元</li>
+    </ul>
+      <span class="close" @click="coverHide"><img src="../../../assets/close_03.png"></span>
+    </div>
+  </div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+import 'common/js/jquery-1.8.3.min.js';
+import 'common/js/laydate.dev.js';
+import load from 'components/load/load';
+
+const ERR_OK = 'success';
+
+export default{
+  components:{
+    'v-load': load
+  },
+  data(){
+      return {
+          coverShow: false, //背景遮罩状态
+          onesf: false,
+          sessionToken: localStorage.getItem("sessionToken"),
+          findCycleRebateLineDataData: {},
+          motlistSta: false,
+          monthList: {},
+          curmonth: null,
+          senior: false,
+          date: null,
+          ones: false,
+          customerAnalysisData: {},
+          curdate: '',
+          customerAnalysisTrendData:{},
+          load1: true,
+          load2: true,
+          load3: true,
+          curdate1: '',
+          getDailyAndWorklyData: {}
+      }
+  },
+  created(){
+    // this.getLoginAccountRole();
+  },
+  methods:{
+    // 背景遮罩隐藏
+    coverHide: function(){
+      this.coverShow = false;
+      this.motlistSta = false;
+      this.onesf = false;
+    },
+    coverShowEven: function(){
+      this.coverShow = true;
+    },
+      // 2017年n月（上/下）返佣汇总(折线图)日期选择
+      pieRequest: function(){
+        var _this = this;
+        this.coverShow = true;
+        $("#laydate_box").css("display","block");
+        $("#laydate_table").css("display","block");
+          laydate({
+              elem: '#J-xl-2',
+              min: '2016-10-01', //设定最小日期
+              max: laydate.now(-1), //最大日期
+              choose: function(datas){ //选择日期完毕的回调
+                var date = datas;
+                date = date.replace(/-/g,'');
+                  // _this.getPieDete(date);
+                  // _this.findCycleRebateLineData(date);
+                  _this.coverShow = false
+              }
+
+          });
+      },
+      motlistcontrol: function(){
+        this.coverShow = true;
+        this.motlistSta = true;
+      },
+      curmot: function(month){
+        this.coverShow = false;
+        this.motlistSta = false;
+        this.date = month;
+        this.curmonth = month;
+      },
+      oneFranchise: function(){
+        this.coverShow = true;
+        this.onesf = true;
+      },
+      folding: function(el, v1, v2, v3){
+        let folding = echarts.init(document.getElementById(el));
+        let option_folding = {
+            tooltip : {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '2%',
+                right: '7%',
+                bottom: '3%',
+                top: '3%',
+                containLabel: true
+            },
+            xAxis : [
+                {
+                    type : 'category',
+                    boundaryGap : false,
+                    data : v1,
+                    axisLabel: {
+                       interval: 0
+                    },
+                    splitLine: {
+                        show: true,
+                      lineStyle:{
+                        color:"#e1e1e1",
+                        type:"solid"
+                      }
+                     }
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value'
+                }
+            ],
+            series : [
+                {
+                    name:'入场客户',
+                    type:'line',
+                    data:v2,
+                    itemStyle: {
+                      normal: {
+                        color:'#ff6701',
+                         // label: {
+                         //   show: true,
+                         //   position: 'top',
+                         //   formatter: "{c}"
+                         // }
+                      }
+                    }
+                },
+                {
+                    name:'离场客户',
+                    type:'line',
+                    data:v3,
+                    itemStyle: {
+                      normal: {
+                        color:'#54b9ff',
+                         // label: {
+                         //   show: true,
+                         //   position: 'top',
+                         //   formatter: "{c}"
+                         // }
+                      }
+                    }
+                }
+            ]
+        };
+        folding.setOption(option_folding);
+      },
+      customerAnalysis: function(){
+        this.load1 = true;
+      	this.customerAnalysisData = {};
+      	this.$http.get('/api/customerAnalysis?',{params:{ sessionToken: this.sessionToken, date: this.curdate }}).then((response) => { 
+      	  if(response.body.result == ERR_OK){ 
+            this.load1 = false;
+      	    this.customerAnalysisData = response.body.data;
+      	    if(this.curdate == '' || this.curdate == null){
+      	      this.curdate = this.customerAnalysisData.showDate;
+      	    }else{
+
+      	    }
+      	  }else{
+      	    
+      	  }  
+      	}).then((error)=> this.error = error)
+      },
+      customerAnalysisTrend: function(){
+        this.load2 = true;
+      	this.$http.get('/api/customerAnalysisTrend?',{params:{ sessionToken: this.sessionToken, date: this.curdate }}).then((response) => { 
+      	  if(response.body.result == ERR_OK){
+            this.load2 = false;
+      	    this.customerAnalysisTrendData = response.body.data;
+      	    this.folding('main-polyline', this.customerAnalysisTrendData.dateList, this.customerAnalysisTrendData.inUserCountList, this.customerAnalysisTrendData.outUserCountList);
+      	  }else{
+      	    
+      	  }  
+      	}).then((error)=> this.error = error)
+      },
+      getDailyAndWorkly: function(){
+        this.getDailyAndWorklyData = {};
+        this.load3 = true;
+        this.$http.get('/api/getDailyAndWorkly?',{params:{ sessionToken: this.sessionToken, date: this.curdate1 }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.load3 = false;
+
+            for(var key in response.body.data){  
+              try{ 
+
+                var value = eval("response.body.data['" +  key +"']");  
+                if(key == "showDate"){
+                  
+                }else{
+                  
+                  if(key == 'tradeErrorCount' || key == 'transactionUserCount' || key == 'entrustSellAmountSum'){
+                    response.body.data[key] = this.toolHelper.formatNum(value);
+                  }else{
+                    response.body.data[key] = this.toolHelper.fmoney(value,2);
+                  }
+                }
+                
+              }catch(e){}  
+            } 
+
+            this.getDailyAndWorklyData = response.body.data;
+
+            if(this.curdate1 == '' || this.curdate1 == null){
+              this.curdate1 = this.getDailyAndWorklyData.showDate;
+            }else{
+
+            }
+          }else{
+            // this.$refs.timerbtn.stop();
+            // alert(response.body.message)
+          }
+          
+        }).then((error)=> this.error = error)
+      }
+  },
+  mounted() {
+      $("body").removeClass('dash');
+      var calendar1 = new datePicker();
+      var calendar = new datePicker();
+      var _this = this;
+      calendar.init({
+        'trigger': '#demo1', /*按钮选择器，用于触发弹出插件*/
+        'type': 'date',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+        'minDate':'1900-1-1',/*最小日期*/
+        'maxDate':'2100-12-31',/*最大日期*/
+        'onSubmit':function(){/*确认时触发事件*/
+          _this.sectionCoverSta = true;
+          var theSelectData=calendar.value;
+          _this.curdate = calendar.value;
+          _this.customerAnalysis();
+          _this.customerAnalysisTrend();
+        },
+        'onClose':function(){/*取消时触发事件*/
+          // alert(1)
+        }
+      });
+
+      this.customerAnalysis();
+      this.customerAnalysisTrend();
+
+      
+      calendar1.init({
+        'trigger': '#demo2', /*按钮选择器，用于触发弹出插件*/
+        'type': 'date',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+        'minDate':'1900-1-1',/*最小日期*/
+        'maxDate':'2100-12-31',/*最大日期*/
+        'onSubmit':function(){/*确认时触发事件*/
+          _this.sectionCoverSta = true;
+          var theSelectData=calendar1.value;
+          _this.curdate1 = calendar1.value;
+          _this.getDailyAndWorkly()
+        },
+        'onClose':function(){/*取消时触发事件*/
+          // alert(2)
+        }
+      });
+
+      this.getDailyAndWorkly();
+
+  }
+};
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .helpTextCover
+    position: absolute
+    width: 2.9rem
+    top: 50%
+    left: 50%
+    transform: translateX(-50%) translateY(-50%)
+    -webkit-transform: translateX(-50%) translateY(-50%)
+    background-color: #FFF
+    border-radius: 0.05rem
+    box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.4)
+    padding: 0.2rem 0.1rem
+    z-index: 100000002
+    .close
+      position: absolute
+      top: -0.08rem
+      right: -0.08rem
+      width: 0.3rem
+      height: 0.3rem
+      img
+        width: 100%
+        height: 100%
+    li
+      font-size: 0.12rem
+      line-height: 0.35rem
+      color: #666
+  .help
+    display: inline-block
+    width: 0.16rem
+    height: 0.16rem
+    border: 1px solid #54b9ff
+    border-radius: 0.16rem
+    line-height: 0.16rem
+    text-align: center
+    font-style: normal
+    vertical-align: middle
+    color: #54b9ff
+    margin-left: 0.1rem
+    margin-bottom: 0.05rem
+  .sectionCover
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    z-index: 1
+	.customerList
+		overflow: hidden
+		padding: 0 0.12rem
+		li
+			float: left
+			width: 50%
+			line-height: 0.35rem
+			font-size: 0.13rem
+			b
+				color: #ff6000
+				font-weight: 600
+</style>

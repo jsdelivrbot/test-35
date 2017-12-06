@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>高级交易量</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+
+	<div class="detailed_header">
+		<div class="user_info_d" id="bestBroker"></div>
+		<div class="search_box l_top">
+			<div class="search_inner">
+				<div class="search s_date">
+					<div class="search_left"><input type="text" placeholder="开始时间" id="date_q"></div>
+				</div>
+				<span class="date_t">至</span>
+				<div class="search s_date d_r">
+					<div class="search_left"><input type="text" placeholder="截至时间" id="date_h"></div>
+				</div>
+			</div>
+		</div>
+		<div class="search_box">
+			<div class="search_inner">
+				<div class="search">
+					<div class="search_left"><input type="text" placeholder="请输入高级经纪商账号或名称" id="searchInfo"></div>
+				</div>
+				<div class="inner_left or" id="search"><a href="javascript:;">查 询</a></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="detailed_list" id="detailed_list">
+		<div class="list list_1 cur" id="levelList" >
+			<!-- <div class="item">
+				<b class="d_grade senior"></b>
+				<p class="user_ifon"><i class="user_name">王健林1</i><i class="user_adderss">广东省广州一市白云一区</i><b class="modify">修改</b></p>
+				<p><span class="user_account">经纪商账号：<i>4301</i></span><span class="user_num">结算账号：<i>4405020001</i></span></p>
+				<p><span>开号日期：2016-11-24</span><span>手机号码：18576854657</span></p>
+				<p><span>开户总量：13</span><span>签约总量：12</span></p>
+				<p><span>交易总量：98600</span></p>
+				<b class="level_one" onclick="window.location= 'transaction_detailed.html?startDate=2017-1-1&endDate=2017-1-12&brokerUserNo=123456'">每日交易量</b>
+			</div> -->
+			<!-- <div class="empty_data"><div class="empty"></div></div> -->
+		</div>
+
+	</div>
+	<div style="height:70px"></div>
+	<p class="tips" id="tips">&nbsp;</p>
+	<script src="js/jquery-1.8.3.min.js"></script>
+	<script src="js/mo.js"></script>
+	<script type="text/javascript" src="js/laydate.dev.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/common.js"></script>
+	<script type="text/javascript">
+
+		laydate({elem: '#date_q'});
+		laydate({elem: '#date_h'});
+
+		$(function() {    
+
+			$(".loader_cover_box").css("display","block");
+			var links = '<div class="Nav"><div class="navin"><ul><li onclick="window.location = \'index.html\'"><a href="#" class="homebox"><i class="home"></i>首页</a></li><li class="curr"><a href="#" class="cartbox" onclick="window.location= \'senior_trading.html\'"><i class="shopcart"></i>交易量</a></li><li ><a href="#" class="comdybox" onclick="window.location= \'broker.html\'"><i class="comdy"></i>交易商</a></li></ul></div></div>'
+			$("body").append(links);
+			var totalPage = 0;
+		    var page = 0;
+			// alert(GetQueryString("pic"))
+		    // 高级经纪律商交易量查询
+        	var session_token = $.cookie('session_token');
+			var pbrokerUserNo = GetQueryString("pic");
+			var startDateC = $("#date_q").val();
+    	    var endDateC = $("#date_h").val();
+	        app.ajaxHelper.submitRequest({
+	            url: '/api/listBrokerUserTransactionAdvance',
+	            data: {
+	                session_token: session_token,
+	                pbrokerUserNo: pbrokerUserNo,
+	                startDate: startDateC,
+	                endDate: endDateC
+	            },
+	            success: function (data) {
+	                var state = data.result;
+	                var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+	                if (state == "success") {
+	                	totalPage = data.data.paging.totalPage;
+                		$(".loader_cover_box").css("display","none");
+    	                function detailedListHtml(name,brokerUserName,brokerUserNo,tradingVolume,transCount,holdAmountCount,tradeUserNo) {
+
+    		                var html = '<div class="item"><b class="d_grade senior"></b><p class="user_ifon"><i class="user_name">'+name+'</i><i class="user_adderss">'+brokerUserName+'</i></p><p><span>交易量：'+transCount+'</span><span>交易额：'+tradingVolume+'</span></p><p><span>最近一日持仓量：'+holdAmountCount+'</span></p><b class="level_one vip" onclick="window.location= \'position.html?userNo='+tradeUserNo+'\'">查看持仓数据</b><b class="level_one" onclick="window.location= \'first_level_trading.html?startDate='+$("#date_q").val()+'&endDate='+$("#date_h").val()+'&brokerUserNo='+brokerUserNo+'\'">一级经纪商</b></div>';
+
+    		                return html;
+    	                }
+    	                $(data.data.brokerList).each(function(i){
+    	                	var listHtml = detailedListHtml(this.name,this.brokerUserName,this.brokerUserNo,this.tradingVolume,this.transCount,this.holdAmountCount,this.tradeUserNo);
+    	                	$('#levelList').append(listHtml);
+    	                })
+
+    	                $("#bestBroker").html(data.data.supervisorName);
+
+    	                $("#date_q").val(data.data.startDate);
+    	                $("#date_h").val(data.data.endDate);
+
+	                } else if (state == "error") {
+                        $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+	                    // $('#levelList').html(emptyHtml)
+	                } else if (state == "noSession") {
+	                    $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+	                    window.location.href = "login.html";
+	                }
+	            }
+	        })
+
+            // 收索请求
+            $(document).on('click' , '#search' , function(){
+
+            	$(".loader_cover_box").css("display","block");
+            	page = 0;
+    	        var session_token=$.cookie('session_token');
+    	        var pbrokerUserNo = GetQueryString("pic");
+    	        var startDate = $("#date_q").val();
+    	        var endDate = $("#date_h").val();
+    	        var brokerUserNo = $("#searchInfo").val();
+    	        var pageIndex = page;
+    	        app.ajaxHelper.submitRequest({
+    	            url: '/api/listBrokerUserTransactionAdvance',
+    	            data: {
+    	                session_token: session_token,
+    	                pbrokerUserNo: pbrokerUserNo,
+    	                startDate: startDate,
+    	                endDate: endDate,
+    	                brokerUserNo: brokerUserNo,
+    	                pageIndex: pageIndex
+    	            },
+    	            success: function (data) {
+    	                var state = data.result;
+    	                var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+    	                if (state == "success") {
+    	                	totalPage = data.data.paging.totalPage;
+    	                    var itemListHtml = '';
+		            		$(".loader_cover_box").css("display","none");
+
+                            function detailedListHtml(name,brokerUserName,brokerUserNo,tradingVolume,transCount,holdAmountCount,tradeUserNo) {
+
+                                var html = '<div class="item"><b class="d_grade senior"></b><p class="user_ifon"><i class="user_name">'+name+'</i><i class="user_adderss">'+brokerUserName+'</i></p><p><span>交易量：'+transCount+'</span><span>交易额：'+tradingVolume+'</span></p><p><span>最近一日持仓量：'+holdAmountCount+'</span></p><b class="level_one vip" onclick="window.location= \'position.html?userNo='+tradeUserNo+'\'">查看持仓数据</b><b class="level_one" onclick="window.location= \'first_level_trading.html?startDate='+$("#date_q").val()+'&endDate='+$("#date_h").val()+'&brokerUserNo='+brokerUserNo+'\'">一级经纪商</b></div>';
+
+                                return html;
+                            }
+
+			                $(data.data.brokerList).each(function(i){
+			                	var listHtml = detailedListHtml(this.name,this.brokerUserName,this.brokerUserNo,this.tradingVolume,this.transCount,this.holdAmountCount,this.tradeUserNo);
+			                	itemListHtml += listHtml;
+			                })
+
+			                if(data.data.brokerList == ''){
+			                    $('#levelList').html(emptyHtml);
+			                }else{
+			                	$('#levelList').html(itemListHtml);
+			                } 
+    	                } else if (state > "error") {
+    	                    
+    	                } else if (state < "noSession") {
+    	                    window.location.href = "login.html";
+    	                }
+    	            }
+    	        })
+            })
+	        
+            // 分页
+            $(window).scroll(function(){
+
+    			var wh=$("#detailed_list").height();
+    	        var s= wh - $(window).scrollTop() - $(window).height();
+    	        if(s < 10 ){
+    	        	page++;
+    	        	// alert(totalPage +"---"+page)
+    	        	if(totalPage > page){
+    	        		$(".loader_cover_box").css("display","block");
+                	    var session_token=$.cookie('session_token');
+                	    var pbrokerUserNo = GetQueryString("pic");
+                	    var startDate = $("#date_q").val();
+                	    var endDate = $("#date_h").val();
+                	    var brokerUserNo = $("#searchInfo").val();
+                	    var pageIndex = page;
+            	        app.ajaxHelper.submitRequest({
+            	            url: '/api/listBrokerUserTransactionAdvance',
+            	            data: {
+            	                session_token: session_token,
+            	                pbrokerUserNo: pbrokerUserNo,
+            	                startDate: startDate,
+            	                endDate: endDate,
+            	                brokerUserNo: brokerUserNo,
+            	                pageIndex: pageIndex
+            	            },
+            	            success: function (data) {
+            	                var state = data.result;
+            	                var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+            	                if (state == "success") {
+            	                	totalPage = data.data.paging.totalPage;
+                            		$(".loader_cover_box").css("display","none");
+                	                function detailedListHtml(name,brokerUserName,brokerUserNo,tradingVolume,transCount,holdAmountCount,tradeUserNo) {
+
+                                var html = '<div class="item"><b class="d_grade senior"></b><p class="user_ifon"><i class="user_name">'+name+'</i><i class="user_adderss">'+brokerUserName+'</i></p><p><span>交易量：'+transCount+'</span><span>交易额：'+tradingVolume+'</span></p><p><span>最近一日持仓量：'+holdAmountCount+'</span></p><b class="level_one vip" onclick="window.location= \'position.html?userNo='+tradeUserNo+'\'">查看持仓数据</b><b class="level_one" onclick="window.location= \'first_level_trading.html?startDate='+$("#date_q").val()+'&endDate='+$("#date_h").val()+'&brokerUserNo='+brokerUserNo+'\'">一级经纪商</b></div>';
+
+                                return html;
+                            }
+                	                $(data.data.brokerList).each(function(i){
+                	                	var listHtml = detailedListHtml(this.name,this.brokerUserName,this.brokerUserNo,this.tradingVolume,this.transCount,this.holdAmountCount,this.tradeUserNo);
+                	                	$('#levelList').append(listHtml);
+                	                })
+
+                	                $("#bestBroker").html(data.data.supervisorName);
+
+                	                $("#date_q").val(data.data.startDate);
+                	                $("#date_h").val(data.data.endDate);
+
+            	                } else if (state > "error") {
+            	                    $('#levelList').html(emptyHtml)
+            	                } else if (state < "noSession") {
+            	                    $("#tip").html('<span class="tip_text">' + data.message + '</span>');
+            	                    window.location.href = "login.html";
+            	                }
+            	            }
+            	        })
+
+    	        	}
+    		  		
+
+    	        }
+            });
+            
+	        $(".loader_cover_box").on('touchmove', function(event) {
+				event.preventDefault();
+			});
+		});   
+	</script>
+</body>
+</html>

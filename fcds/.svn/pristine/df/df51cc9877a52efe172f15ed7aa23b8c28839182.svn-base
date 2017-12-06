@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>一级考核排名</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+
+	<div class="search_box">
+		<div class="search_inner">
+			<div class="search width100">
+				<div class="search_left"><input type="text" placeholder="输入经纪商账号或姓名" id="searchInfo"></div>
+				<div class="search_right" id="search">搜索</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="filt">
+			<a href="javascript:;" class="filter_list">
+				<!--<span class="good_id">000004</span>
+				<span class="good_name">和田玉吉庆玉钱</span>
+				<span class="filt_good">选择商品</span>-->
+			</a>
+		</div>
+		<div class="layer">
+			<div class="list_box">
+				<div class="list_item">
+					<ul class="list_ul">
+						<!--<li>
+							<a href="javascript:;">
+								<span class="list_id">000004</span>
+								<span class="list_name">和田玉吉庆玉钱4</span>
+							</a>
+						</li>-->
+					</ul>
+				</div>
+				<div class="control">
+					<a href="javascript:;" class="control_btn">取消</a>
+				</div>
+			</div>
+		</div>
+	
+	<div class="detailed_list" id="detailed_list">
+		<div class="first_level_header border_1px">
+			<div class="items">一级经纪商</div>
+			<div class="items">排名</div>
+			<div class="items">已配售</div>
+			<div class="items">建议配额</div>
+		</div>
+		<ul class="first_level_ranking_list" id="first_level_ranking_list">
+			<!-- <li class="border_1px">
+				<div>
+					<p>张三</p>
+					<p>442202</p>
+				</div>
+				<div>1</div>
+				<div>56</div>
+				<div>200</div>
+			</li> -->
+		</ul>
+	</div>
+
+
+	<div style="height:70px"></div>
+	<p class="tips" id="tips">&nbsp;</p>
+	<script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {    
+
+			var $rankingBox = $('#first_level_ranking_list');
+			var $cover = $(".loader_cover_box");
+			$cover.css("display","block");
+			
+        	var param = new Object();
+        	param.session_token=$.cookie('session_token');
+			param.productId =GetQueryString("pid");
+			var currentShow = true;
+			var idTxt ='';
+			var nameTxt = '';
+
+			var links = '<div class="Nav"><div class="navin"><ul><li onclick="window.location = \'index.html?pid='+GetQueryString("pid")+'\'"><a href="#" class="homebox"><i class="home"></i>首页</a></li><li ><a href="#" class="cartbox" onclick="window.location= \'package.html?pid='+GetQueryString("pid")+'\'"><i class="shopcart"></i>商品包</a></li><li><a href="#" class="comdybox" onclick="window.location= \'detailed.html?pid='+GetQueryString("pid")+'\'"><i class="comdy"></i>出售明细</a></li></ul></div></div>'
+			$("body").append(links);
+
+		    // 交易商明细
+	        function getDealerDetail(){
+	        	$('.filter_list').html('');
+	        	$('.list_ul').html('');
+	        	$('#uncommittedList').html('');
+	        	var productIdInfo = JSON.stringify(param);
+	        	$.ajax({  
+		            type: "post",
+		            url: "/member-server-front/broker/queryFirstBrokerRanking",
+		            data:productIdInfo,
+		            dataType: "json",
+		            success: function(data) {
+	
+		            	var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+	
+		            	if(data.status < 0){
+		            		window.location.href="login.html";
+		            	}else{
+	
+		            		$cover.css("display","none");
+	
+			                function detailedListHtml(firstBrokerUserNo,firstBrokerUserName,ranking,useAmount,adviceAmount) {
+	
+				                var html = '<li class="border_1px"><div><p>'+firstBrokerUserName+'</p><p>'+firstBrokerUserNo+'</p></div><div>'+ranking+'</div><div>'+useAmount+'</div><div>'+adviceAmount+'</div></li>';
+	
+				                return html;
+			                }
+	
+			                if(data.data.rankingList == ''){
+			                	$rankingBox.html(emptyHtml);
+			                }else{
+				                $(data.data.rankingList).each(function(i){
+				                	var listHtml = detailedListHtml(this.firstBrokerUserNo,this.firstBrokerUserName,this.ranking,this.useAmount,this.adviceAmount);
+				                	
+				                	$rankingBox.append(listHtml);
+				                })
+			                }
+			                
+			                //选择商品
+							var filterList = $('.filter_list');
+							var listLayer = $('.layer');
+							var controlBtn = $('.control_btn');
+							var filterList = $('.filter_list');
+							var listBox = $('.list_box');
+							var listUl = $('.list_ul');
+							
+							function hideLayer(){
+								listLayer.hide();
+								listBox.animate({'bottom':'-2.8rem'},500);
+								$('body,html').css({'height':'100%','overflow':'auto'});
+							}
+							
+							function showLayer(){
+								listBox.animate({'bottom':'0'},500);
+								listLayer.show();
+								$('body,html').css({'height':'100%','overflow':'hidden'});
+							}
+							
+							var detailHtml = '';
+							$(data.data.productList).each(function(index,value){
+								detailHtml += '<li><a href="javascript:;"><span class="list_id" data-id="'+ this.productId +'">'+ this.productNo +'</span><span class="list_name">'+ this.productName +'</span></a></li>';
+								if( currentShow ){
+									if(this.productId == GetQueryString("pid")){
+										filterList.html('');
+										filterList.append( '<span class="good_id">'+ this.productNo +'</span><span class="good_name">'+ this.productName +'</span><span class="filt_good">选择商品</span>' );
+									}
+								}else{
+									filterList.html('');
+									filterList.append( '<span class="good_id">'+ idTxt +'</span><span class="good_name">'+ nameTxt +'</span><span class="filt_good">选择商品</span>' );
+								}
+							});
+							
+							listUl.append( detailHtml );
+							
+							filterList.click( showLayer );
+							controlBtn.click( hideLayer );
+							
+							listUl.find('li').click(function(){
+                                var productId = $(this).find('.list_id').attr('data-id');
+                                // location.href = "/first_level_ranking.html?pid="+productId;
+                                window.location = 'first_level_ranking.html?pid='+productId;
+							});
+	
+		            	}
+	
+		            },
+		            error: function(err) {
+		                alert(data.message);
+		            }     
+		        }); 
+	        }
+	        getDealerDetail();
+
+	        $(".layer").on("touchmove",function(){
+	        	event.preventDefault();
+	        })
+
+
+            // 收索请求
+            $(document).on('click' , '#search' , function(){
+
+            	$cover.css("display","block");
+            	
+            	var searchParam = new Object();
+            	searchParam.session_token=$.cookie('session_token');
+            	searchParam.productId=GetQueryString("pid");
+            	searchParam.brokerUser = $("#searchInfo").val();
+            	var searchInfo = JSON.stringify(searchParam);
+    	        $.ajax({  
+    	            type: "post",
+    	            url: "/member-server-front/broker/queryFirstBrokerRanking",
+    	            data:searchInfo,
+    	            dataType: "json",
+    	            success: function(data) {
+
+    	            	var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+
+    	            	if(data.status < 0){
+    	            		window.location.href="login.html";
+    	            	}else{
+
+    	            		$cover.css("display","none");
+
+    		            	var rankingListDate ='';
+    		              	
+			                function detailedListHtml(firstBrokerUserNo,firstBrokerUserName,ranking,useAmount,adviceAmount) {
+	
+				                var html = '<li class="border_1px"><div><p>'+firstBrokerUserName+'</p><p>'+firstBrokerUserNo+'</p></div><div>'+ranking+'</div><div>'+useAmount+'</div><div>'+adviceAmount+'</div></li>';
+	
+				                return html;
+			                }
+
+    		                $(data.data.rankingList).each(function(i){
+    		                	var listHtml = detailedListHtml(this.firstBrokerUserNo,this.firstBrokerUserName,this.ranking,this.useAmount,this.adviceAmount);
+    		                	rankingListDate += listHtml
+    		                })
+
+    		                if(data.data.rankingList == ''){
+		                     	$rankingBox.html(emptyHtml);
+    		                }else{
+    		                	$rankingBox.html(rankingListDate);
+    		                };	        
+
+    	            	}
+    	            },
+    	            error: function(err) {
+    	                alert(data.message);
+    	            }
+    	        }); 
+            })
+
+            $(".detailed_tap .new-rp-header span").click(function(){
+            	var indexNo = $(this).index();
+            	$(this).addClass("cur").siblings().removeClass("cur");
+            	$(".detailed_list .list").eq(indexNo).addClass("cur").siblings().removeClass("cur");
+            })
+	        
+		});   
+	</script>
+</body>
+</html>

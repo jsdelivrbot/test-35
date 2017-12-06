@@ -1,0 +1,195 @@
+<template>
+	<div>
+		<div class="center-header" :style="{backgroundImage: 'url(' + img + ')'}">
+			<div class="inner">
+				<div class="name"><span>廖家军（3614）</span></div>
+				<div class="region"><span>归属地：北京市市辖三区</span></div>
+				<div class="populationStatistics">
+					<ul>
+						<li>
+							<p>3546</p>
+							<p>交易商总数</p>
+						</li>
+						<li>
+							<p>362</p>
+							<p>已签约总数</p>
+						</li>
+						<li>
+							<p>54</p>
+							<p>钻石VIP人数</p>
+						</li>
+						<li>
+							<p>23</p>
+							<p>黄金VIP人数</p>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="operation">
+			<div class="item">
+				<span>
+					<i><img src="../../assets/broker.png" alt=""></i>
+					<p>交易商总数</p>
+				</span>
+				<span>
+					<i><img src="../../assets/region.png" alt=""></i>
+					<p>申请修改交易商区域</p>
+				</span>
+			</div>
+			<div class="item">
+				<span>
+					<i><img src="../../assets/account.png" alt=""></i>
+					<p>子账号管理</p>
+				</span>
+				<span>
+					<i><img src="../../assets/password.png" alt=""></i>
+					<p>修改登录密码</p>
+				</span>
+			</div>
+		</div>
+		<div class="logout" @click="logout"><span>退出登录</span></div>
+	</div>
+</template>
+
+<script>
+
+ export default{
+ 	data(){
+ 		return {
+ 			img: require('../../assets/centerHeaderBg_02.jpg')
+ 		}
+ 	},
+ 	methods: {
+ 		logout: function(){
+ 			localStorage.clear();
+ 			this.$router.push({ path: '/login' });
+ 		}
+ 	}
+ };
+ 
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+	.center-header
+		width: 100%
+		height: 2.8rem
+		background: center bottom no-repeat
+		background-size: 100%
+		.inner
+			width: 100%
+			height: 100%
+			padding: 0.5rem 0.12rem 0 0.12rem
+			color: #fff
+			.name
+				font-size: 0.2rem
+				height: 0.28rem
+				line-height: 0.28rem
+				padding-left: 0.1rem
+			.region
+				
+				font-size: 0.14rem
+				height: 0.28rem
+				line-height: 0.28rem
+				padding-left: 0.1rem
+				span
+					display: inline-block
+					position: relative
+					height: 0.28rem
+					&::after
+						position: absolute
+						left: 0
+						bottom: 0
+						width: 100%
+						content: ''
+						-webkit-transform: scaleY(0.5)
+						transform: scaleY(0.5)
+						border-top: 2px solid #fff
+			.populationStatistics
+				overflow: hidden
+				height: 0.66rem
+				ul
+					width: 100%
+					
+					li
+						float: left
+						width: 25%
+						text-align: center
+						line-height: 0.22rem
+						padding-top: 0.15rem
+						p:nth-child(1)
+							font-size: 0.2rem
+						p:nth-child(2)
+							font-size: 0.14rem
+	.operation
+		width: 100%
+		height: 2rem
+		border-radius: 0.1rem 0.1rem 0 0;
+		background-color: #fff
+		margin-top: -0.1rem
+		color: #999999
+		.item
+			position: relative
+			width: 100%
+			height: 1rem
+			overflow:hidden
+			&:nth-child(1)::after
+				position: absolute
+				left: 0
+				bottom: 0
+				width: 100%
+				content: ''
+				-webkit-transform: scaleY(0.5) scaleX(0.9)
+				transform: scaleY(0.5) scaleX(0.9)
+				border-top: 1px solid #ccc
+			span
+				float: left
+				display: inline-block
+				position: relative
+				width: 50%
+				height: 1rem
+				overflow: hidden
+				&:nth-child(1)::after
+					position: absolute
+					right: 0
+					bottom: 0
+					height: 100%
+					content: ''
+					-webkit-transform: scaleX(0.5) scaleY(0.5)
+					transform: scaleX(0.5) scaleY(0.5)
+					border-right: 1px solid #ccc
+				p
+					text-align: center
+					font-size: 0.14rem
+					line-height: 1.6rem
+				i
+					display: block
+					position: absolute
+					top: 40%
+					left: 50%
+					margin: -0.22rem -0.22rem
+					width: 0.44rem
+					height: 0.44rem
+					img
+						width: 100%
+						height: 100%
+	.logout
+		width: 100%
+		height: 0.5rem
+		text-align: center
+		line-height: 0.5rem
+		background-color: #fff
+		margin-top: 0.1rem
+		font-size: 0.14rem 
+		span
+			color: #999999
+			&::before
+				display: inline-block
+				content: ''
+				width: 0.23rem
+				height: 0.24rem
+				background: url(../../assets/logout_03.png) center center no-repeat
+				background-size: 100% 100%
+				vertical-align: middle
+				margin-right: 0.15rem
+</style>

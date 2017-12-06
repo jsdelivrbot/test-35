@@ -1,0 +1,217 @@
+<template>
+  <div>
+    <div class="vipsearch">
+      <div class="rolelistTap">
+        <span>钻石VIP列表</span>
+        <div class="search-left">
+          <div class="search" v-bind:class="{ animation: animationState}">
+            <input type="text" placeholder="请输入交易商账号或姓名" v-model="accountNo">
+            <i @click="animation"><img src="../../../assets/search.png" alt=""></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height: 0.48rem"></div>
+
+    <div class="vipBox">
+      <div class="vipItem">
+        <div class="hd">
+          <div class="hd-inner">
+            <div class="l">
+              <p class="name">王百万<i>VIP4</i></p>
+              <p class="no">4422030475</p>
+            </div>
+            <div class="r">抢购时间：2017-05-15</div>
+          </div>
+        </div>
+        <div class="bd">
+          <span>直接推荐人姓名：王千万</span>
+          <span>交易账号：4422020064</span>
+          <span>是否成为钻石VIP：是</span>
+          <span>抢购时间：2017-03-24</span>
+          <span>是否已返佣：是</span>
+          <span>返佣金额：4000</span>
+        </div>
+      </div>
+
+      <div class="vipItem">
+        <div class="hd">
+          <div class="hd-inner">
+            <div class="l">
+              <p class="name">王百万<i>VIP4</i></p>
+              <p class="no">4422030475</p>
+            </div>
+            <div class="r">抢购时间：2017-05-15</div>
+          </div>
+        </div>
+        <div class="bd">
+          <span>直接推荐人姓名：王千万</span>
+          <span>交易账号：4422020064</span>
+          <span>是否成为钻石VIP：是</span>
+          <span>抢购时间：2017-03-24</span>
+          <span>是否已返佣：是</span>
+          <span>返佣金额：4000</span>
+        </div>
+      </div>
+
+      <div class="vipItem">
+        <div class="hd">
+          <div class="hd-inner">
+            <div class="l">
+              <p class="name">王百万<i>VIP4</i></p>
+              <p class="no">4422030475</p>
+            </div>
+            <div class="r">抢购时间：2017-05-15</div>
+          </div>
+        </div>
+        <div class="bd">
+          <span>直接推荐人姓名：王千万</span>
+          <span>交易账号：4422020064</span>
+          <span>是否成为钻石VIP：是</span>
+          <span>抢购时间：2017-03-24</span>
+          <span>是否已返佣：是</span>
+          <span>返佣金额：4000</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+const ERR_OK = 'success';
+
+  export default{
+    data() {
+     return{
+        accountNo: null,
+        session_token: localStorage.getItem("sessionToken"),
+        animationState: true
+      }
+    },
+    methods: {
+      animation: function(){
+        
+        if(this.accountNo == null || this.accountNo == ''){
+          if(this.animationState){
+            this.animationState = false
+          }else{
+            this.animationState = true
+          }
+        }else{
+          alert(this.accountNo);
+        }
+      }
+    },
+    mounted(){
+      // this.getBelongMemberChangeList('');
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .vipBox
+    .vipItem
+      margin-top: 0.1rem
+      background-color: #FFF
+      .hd
+        width: 100%
+        height: 0.5rem
+        height: 0.5rem
+        padding: 0 0.12rem
+        .hd-inner
+          position: relative
+          width: 100%
+          height: 0.5rem
+          overflow: hidden
+          &::after
+            position: absolute
+            left: 0
+            bottom: 0
+            content: ''
+            width: 100%
+            border-bottom: 1px solid #ccc
+            transform: scaleY(0.5)
+          .r
+            float: right
+            font-size: 0.13rem
+            line-height: 0.5rem
+            color: #999999
+          .l
+            float: left
+            margin-top: 0.11rem
+            .name
+              font-size: 0.15rem
+              i
+                font-style: normal
+                color: #ff6600
+                font-size: 0.13rem
+            .no
+              font-size: 0.13rem
+              color: #999999
+              margin-top: 0.03rem
+      .bd
+        overflow: hidden
+        width: 100%
+        padding: 0.12rem
+        span
+          float: left
+          width: 50%
+          font-size: 0.13rem
+          color: #999999
+          line-height: 0.3rem
+  .vipsearch
+    background-color: #FFF
+    .rolelistTap
+      width: 100%
+      height:0.48rem
+      border-bottom: 1px solid #ccc
+      padding: 0 0.12rem
+      position: fixed
+      top: 0
+      left: 50%
+      transform: translateX(-50%)
+      background-color: #fff
+      z-index: 1
+      .search-left
+        float: right
+        .search
+          position: relative
+          height: 0.35rem
+          width: 0.3rem
+          border-radius: 0.2rem
+          border: 1px solid #ff6000
+          margin-top: 0.06rem
+          background-color: #f3f3f3
+          overflow: hidden
+          padding: 0 0.36rem 0 0.04rem
+          transition: all 1s ease 0s
+          &.animation
+            width: 1.75rem
+            transition: all 1s ease 0s
+          input
+            width: 100%
+            height: 100%
+            background-color: transparent
+            border: none
+            outline: none
+            text-align: center
+          i
+            position: absolute
+            top: 0.015rem
+            right: 0.02rem
+            width: 0.3rem
+            height: 0.3rem
+            img
+              width: 100%
+              height: 100%
+      span
+        position: relative
+        float: left
+        line-height: 0.48rem
+        text-align: center
+        font-size: 0.15rem
+        border-bottom: 1px solid transparent
+        font-weight: bold
+</style>

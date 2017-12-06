@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>商品包</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+	<!-- <div class="home_header">
+		<div class="h_user_info_box">
+			<div class="h_user_box">
+				<div class="h_user_bg"></div>
+				<div class="h_user_img" style="background-image: url(images/34.jpg);"></div>
+			</div>
+			<div class="h_user_info_d">
+				<div class="h_user_info_d_box" id="user_info"> -->
+					<!-- <P>马云</P>
+					<P>4301020001</P>
+					<P>团队总人数：86人</P>
+					<P>归属地：广东省广州一市</P>
+					<span class="grade"></span> -->
+<!-- 				</div>
+			</div>
+		</div>
+	</div> -->
+	<div class="filt">
+			<a href="javascript:;" class="filter_list">
+				<!--<span class="good_id">000004</span>
+				<span class="good_name">和田玉吉庆玉钱</span>
+				<span class="filt_good">选择商品</span>-->
+			</a>
+		</div>
+		<div class="layer">
+			<div class="list_box">
+				<div class="list_item">
+					<ul class="list_ul">
+						<!--<li>
+							<a href="javascript:;">
+								<span class="list_id">000004</span>
+								<span class="list_name">和田玉吉庆玉钱</span>
+							</a>
+						</li>-->
+					</ul>
+				</div>
+				<div class="control">
+					<a href="javascript:;" class="control_btn">取消</a>
+				</div>
+			</div>
+		</div>
+	<div class="package_detailed" id="packageDetailed">
+
+		<!-- <div class="home_package package">
+			<div class="home_package_header">
+				<span class="home_package_header_icon"><img src="images/icon_06.png" alt=""></span>
+				<p class="theme_title">第四期商品包团购</p>
+			</div>
+			<div class="home_package_num border_1px">
+				<p>已售总数<i>2340</i>（块）</p>
+				<p>未售总数<i>18</i>（块）</p>
+			</div>
+			<div class="home_fd" style="text-align: center;">
+				<span class="left teshu" id="placing">出售商品包</span>
+			</div>
+		</div>
+
+		 <div class="home_package package">
+			<div class="home_package_header">
+				<span class="home_package_header_icon"><img src="images/icon_06.png" alt=""></span>
+				<p class="theme_title">第四期商品包配额</p>
+			</div>
+			<div class="home_package_num border_1px">
+				<p>考核配额总数<i>2340</i>（块）</p>
+				<p>基础配额总数<i>18</i>（块）</p>
+			</div>
+		</div>
+
+		<div class="product">
+			<div class="product_img"><img src="images/ere_03.jpg" alt=""></div>
+			<p>商品名称：和田玉</p>
+			<p>商品编号：000004</p>
+			<p>商品总量：30000个</p>
+			<p>挂牌时间：2016-12-24</p>
+			<p>截止时间：2016-12-30</p>
+		</div> -->
+
+	</div> 
+	
+
+	<div class="cover">
+		<div class="placing_box">
+			<div class="hd">配售申请</div>
+			<div class="bd">
+				<p class="tip" id="tip">&nbsp;</p>
+				<p class="border">交易商账号：<input type="text" name="tradeNo" id="tradeNo" placeholder="请填写配售人员账号"></p>
+				<p class="border">交易商姓名：<input type="text" name="tradeName" id="tradeName" placeholder="请填写配售人员姓名"></p>
+				<p class="border">配售数量：<input type="tel" name="num" id="num" placeholder="请填写配售数量">块</p>
+			</div>
+			<div class="fd">
+				<span class="delete">取消</span>
+				<span class="submit" id="submit">确定</span>
+			</div>
+		</div>
+	</div>
+	<div style="height:70px"></div>
+	<script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/common.js"></script>
+	<script type="text/javascript">
+		$(function(){
+
+			$(".loader_cover_box").css("display","block");
+			
+			var session_token = new Object();
+			session_token.session_token=$.cookie('session_token');
+			var session = JSON.stringify(session_token);
+
+        	var param = new Object();
+        	param.session_token=$.cookie('session_token');
+			param.productId =GetQueryString("pid");
+			
+			var currentShow = true;
+			var idTxt ='';
+			var nameTxt = '';
+
+			var links = '<div class="Nav"><div class="navin"><ul><li><a href="#" class="homebox" onclick="window.location = \'index.html?pid='+GetQueryString("pid")+'\'"><i class="home"></i>首页</a></li><li class="curr" onclick="window.location= \'package.html?pid='+GetQueryString("pid")+'\'"><a href="#" class="cartbox"><i class="shopcart"></i>商品包</a></li><li onclick="window.location= \'detailed.html?pid='+GetQueryString("pid")+'\'"><a href="#" class="comdybox"><i class="comdy"></i>出售明细</a></li></ul></div></div>'
+			$("body").append(links);
+
+			// 交易商信息
+			 $.ajax({  
+			     type: "post",
+			     url: "/member-server-front/broker/queryBrokerUser",
+			     data:session,
+			     dataType: "json",
+			     success: function(data) {
+
+			     	if(data.status < 0){
+	   	    		window.location.href="login.html";
+	     	    	}else{
+
+		                 function userInfoHtml(name,accountNo,count,brokerUserName,level) {
+
+			                 var html = '<P>'+name+'</P><P>'+accountNo+'</P><P>团队总人数：'+count+'人</P><P>归属地：'+brokerUserName+'</P><span class="grade '+level+'"></span>';
+
+			                 return html;
+		                 }
+		                
+		                 $(data.data).each(function(i){
+		                 	var infoHtml = userInfoHtml(this.name,this.accountNo,this.count,this.brokerUserName,this.level);
+		                 	$('#user_info').append(infoHtml);
+		                   })
+		                
+	            	}
+
+
+			     },
+			     error: function(err) {
+			         alert(data.message);
+			     }     
+			 });
+
+			$(".cover").on("touchmove",function(){
+				event.preventDefault();
+			})
+
+			$(document).on("click","#placing",function(){
+				$(".cover").css("display","block")
+			})
+
+			$(".delete").click(function(){
+				$(".cover").css("display","none")
+			})
+
+			// 商品包详情请求
+			function getPackageDetail(){
+				$('.filter_list').html('');
+	        	$('.list_ul').html('');
+	        	$('#packageDetailed').html('');
+	        	var productIdInfo = JSON.stringify(param);
+				$.ajax({  
+				    type: "post",
+				    url: "/member-server-front/assetPackage/queryDetail",
+				    data:productIdInfo,   
+				    dataType: "json",
+				    success: function(data) {
+	
+				    	if(data.status < 0){
+				    		window.location.href="login.html";
+				    	}else{
+	
+				    		$(".loader_cover_box").css("display","none");
+	
+			                function packageDetailedHtml(allocationCount,notAllocationCount,productNo,productName,productCount,listingDate,examineEndDate,productId,speciallyCount,assessCount,placingEndDate) {
+	
+				                var html = '<div class="product"><div class="product_img"><img src="images/product/'+productNo+'.jpg" alt="加载中..."></div><p>商品名称：'+productName+'</p><p>商品编号：'+productNo+'</p><p>商品总量：'+productCount+'块</p><p>挂牌时间：'+listingDate+'</p></div>'+'<div class="home_package package"><div class="home_package_header"><span class="home_package_header_icon"><img src="images/387.png" alt=""></span><p class="theme_title">第'+parseInt(productNo)+'期商品包团购</p></div><div class="home_package_num border_1px"><p>已售总数<i>'+allocationCount+'</i>（块）</p><p>未售总数<i>'+notAllocationCount+'</i>（块）</p></div><div class="home_fd teshu"><span class="left teshu" id="placing">出售商品包</span></div></div>'+'<div class="home_package package"><div class="home_package_header"><span class="home_package_header_icon"><img src="images/14368.png" alt=""></span><p class="theme_title">第'+parseInt(productNo)+'期商品包考核配额</p></div><div class="home_package_num"><p>考核配额总数<i>'+assessCount+'</i>（块）</p><p>基础配额总数<i>'+speciallyCount+'</i>（块）</p></div></div>';
+	
+				                return html;
+			                }
+			                
+			                $(data.data).each(function(i){
+			                	var packageinfoHtml = packageDetailedHtml(this.allocationCount,this.notAllocationCount,this.productNo,this.productName,this.productCount,this.listingDate,this.examineEndDate,this.productId,this.speciallyCount,this.assessCount,this.placingEndDate);
+			                	$('#packageDetailed').append(packageinfoHtml);
+			                  })
+			                
+			                //选择商品
+							var filterList = $('.filter_list');
+							var listLayer = $('.layer');
+							var controlBtn = $('.control_btn');
+							var filterList = $('.filter_list');
+							var listBox = $('.list_box');
+							var listUl = $('.list_ul');
+							
+							function hideLayer(){
+								listLayer.hide();
+								listBox.animate({'bottom':'-2.8rem'},500);
+								$('body,html').css({'height':'100%','overflow':'auto'});
+							}
+							
+							function showLayer(){
+								listBox.animate({'bottom':'0'},500);
+								listLayer.show();
+								$('body,html').css({'height':'100%','overflow':'hidden'});
+							}
+							
+							var detailHtml = '';
+							$(data.data.productList).each(function(index,value){
+								detailHtml += '<li><a href="javascript:;"><span class="list_id" data-id="'+ this.productId +'">'+ this.productNo +'</span><span class="list_name">'+ this.productName +'</span></a></li>';
+								if( currentShow ){
+									if(this.productId == GetQueryString("pid")){
+										filterList.html('');
+										filterList.append( '<span class="good_id">'+ this.productNo +'</span><span class="good_name">'+ this.productName +'</span><span class="filt_good">选择商品</span>' );
+									}
+								}else{
+									filterList.html('');
+									filterList.append( '<span class="good_id">'+ idTxt +'</span><span class="good_name">'+ nameTxt +'</span><span class="filt_good">选择商品</span>' );
+								}
+							});
+							
+							listUl.append( detailHtml );
+							
+							filterList.click( showLayer );
+							controlBtn.click( hideLayer );
+							
+							listUl.find('li').click(function(){
+							    var productId = $(this).find('.list_id').attr('data-id');
+								location.href = "/package.html?pid="+productId;
+							});
+	
+				    	}   
+	
+				    },
+				    error: function(err) {
+				        alert(data.message);
+				    }     
+				});
+			}
+			getPackageDetail();
+
+			// 商品包团购请求
+			$(document).on("click",'#submit',function(){
+
+				$(".loader_cover_box").css("display","block");
+
+				var placingParam = new Object();
+				placingParam.productId=GetQueryString("pid");
+				placingParam.session_token=$.cookie('session_token');
+				placingParam.tradeNo = $("#tradeNo").val();
+				placingParam.tradeName= $("#tradeName").val();
+				placingParam.num= $("#num").val();
+				var placingApply = JSON.stringify(placingParam);
+
+				var valP = true;
+				$(".cover .placing_box input").each(function(){
+					if($(this).val() == ''){
+						valP = false;
+					}
+				})
+
+				if(valP == true){
+					$.ajax({  
+					    type: "post",
+					    url: "/member-server-front/assetPackage/placingApply",
+					    data:placingApply,
+					    dataType: "json",
+					    success: function(data) {
+					    	
+					    if(data.status < 0){
+				    		window.location.href="login.html";
+				    	}else{
+
+				    		if(data.status == 0){
+				    			$("#tip").html("配售申请成功！");
+				    			
+				    			timedMsg();
+				    			function timedMsg(){
+				    			 var t=setTimeout('$(".cover").css("display","none")',2000);
+				    			 var f=setTimeout('window.location.reload();',2500);
+				    			 var b=setTimeout('$(".loader_cover_box").css("display","none");',2000);
+				    			}
+				    		}else{
+				    			$("#tip").html(data.message);
+				    			$(".loader_cover_box").css("display","none");
+				    		}
+
+				    	}
+					    	
+					    },
+					    error: function(err) {
+					        alert(data.message);
+					    }     
+					});
+				}else{
+					$("#tip").html("交易商信息不完整，请填写正确信息！");
+					$(".loader_cover_box").css("display","none");
+				}
+			})
+		});	
+	</script>
+</body>
+</html>

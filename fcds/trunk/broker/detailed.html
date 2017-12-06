@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>商品包明细</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+	<div class="detailed_header">
+		
+	</div>
+
+	<div class="search_box">
+		<div class="search_inner">
+			<div class="search">
+				<div class="search_left"><input type="text" placeholder="输入交易商账号或姓名" id="searchInfo"></div>
+				<div class="search_right" id="search">搜索</div>
+			</div>
+			<div class="inner_left" id="inner_left"><a href="javascript:;">提交全部</a></div>
+		</div>
+	</div>
+
+	<div class="detailed_tap">
+		<div class="new-rp-header width33">
+			<span class="cur">未提交</span>
+			<span class="second">已提交</span>
+			<span class="second">出售成功</span>
+			<span class="">出售失败</span>
+		</div>
+	</div>
+
+	<div class="filt">
+			<a href="javascript:;" class="filter_list">
+				<!--<span class="good_id">000004</span>
+				<span class="good_name">和田玉吉庆玉钱</span>
+				<span class="filt_good">选择商品</span>-->
+			</a>
+		</div>
+		<div class="layer">
+			<div class="list_box">
+				<div class="list_item">
+					<ul class="list_ul">
+						<!--<li>
+							<a href="javascript:;">
+								<span class="list_id">000004</span>
+								<span class="list_name">和田玉吉庆玉钱4</span>
+							</a>
+						</li>-->
+					</ul>
+				</div>
+				<div class="control">
+					<a href="javascript:;" class="control_btn">取消</a>
+				</div>
+			</div>
+		</div>
+	
+	<div class="detailed_list" id="detailed_list">
+		
+		<div class="list list_1 cur" id="uncommittedList" >
+			  <!--<div class="item">
+				<p class="user_ifon"><i class="user_name">王健林1</i><i class="user_adderss">广东省广州一市白云一区</i><b class="modify">修改</b></p>
+				<p><span class="user_account">帐号：<i>40362300011</i></span><span class="user_num">数量（块）：<i>10</i></span></p>
+				<p><span>日期：2016-12-24</span><span>金额（元）：30000</span></p>
+				<p><span>状态：出售失败</span><span>备注：余额不足</span></p>
+			</div> -->
+		</div>
+		<div class="list list_2" id="commitList"></div>
+		<div class="list list_3" id="successList"></div>
+		<div class="list list_4" id="failList"></div>
+	</div>
+
+	<div class="cover">
+		<div class="placing_box">
+			<div class="hd">修改配售</div>
+			<div class="bd">
+				<p class="tip" id="tip">&nbsp;</p>
+				<p class="u_name">交易商姓名：王健林</p>
+				<p class="u_account">交易商账号：4422020001</p>
+				<p class="u_num">配售数量：10块</p>
+				<p class="border">修改数量：<input type="tel" placeholder="请修改配送数量" name="updateNum" id="updateNum"></p>
+			</div>
+			<div class="fd">
+				<span class="delete" id="delete">删除</span>
+				<span class="submit" id="submit">保存</span>
+			</div>
+			<span class="close" id="close">x</span>
+		</div>
+	</div>
+	<div style="height:70px"></div>
+	<p class="tips" id="tips">&nbsp;</p>
+	<script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {    
+
+			$(".loader_cover_box").css("display","block");
+			
+        	var param = new Object();
+        	param.session_token=$.cookie('session_token');
+			param.productId =GetQueryString("pid");
+			var currentShow = true;
+			var idTxt ='';
+			var nameTxt = '';
+
+			var links = '<div class="Nav"><div class="navin"><ul><li onclick="window.location = \'index.html?pid='+GetQueryString("pid")+'\'"><a href="#" class="homebox"><i class="home"></i>首页</a></li><li ><a href="#" class="cartbox" onclick="window.location= \'package.html?pid='+GetQueryString("pid")+'\'"><i class="shopcart"></i>商品包</a></li><li class="curr"><a href="#" class="comdybox" onclick="window.location= \'detailed.html?pid='+GetQueryString("pid")+'\'"><i class="comdy"></i>出售明细</a></li></ul></div></div>'
+			$("body").append(links);
+
+		    // 交易商明细
+	        function getDealerDetail(){
+	        	$('.filter_list').html('');
+	        	$('.list_ul').html('');
+	        	$('#uncommittedList').html('');
+	        	var productIdInfo = JSON.stringify(param);
+	        	$.ajax({  
+		            type: "post",
+		            url: "/member-server-front/assetPackage/placingList",
+		            data:productIdInfo,
+		            dataType: "json",
+		            success: function(data) {
+	
+		            	var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+	
+		            	if(data.status < 0){
+		            		window.location.href="login.html";
+		            	}else{
+	
+		            		$(".loader_cover_box").css("display","none");
+	
+			                function detailedListHtml(tradeUserName,tradeUserNo,brokerUserName,num,money,stateInfo,info,placingId,date,state) {
+			                	var statetip = "modify";
+			                	if(info == null){
+			                		info = '';
+			                	}else{
+			                		info = info;
+			                	}
+			                	if(state == "SUBMIT_PENDING" ){
+			                		statetip = "modify block";
+			                	}else{
+		            		    	statetip ="modify";
+		            		    }
+	
+				                var html = '<div class="item"><p class="user_ifon"><i class="user_name" placingId='+placingId+'>'+tradeUserName+'</i><i class="user_adderss">'+brokerUserName+'</i><b class="'+statetip+'">修改</b></p><p><span class="user_account">帐号：<i>'+tradeUserNo+'</i></span><span class="user_num">数量（块）：<i>'+num+'</i></span></p><p><span>日期：'+date+'</span><span>金额（元）：'+money+'</span></p><p><span>状态：'+stateInfo+'</span><span>备注：'+info+'</span></p></div>';
+	
+				                return html;
+			                }
+	
+			                if(data.data.commitList == ''){
+			                	$('#commitList').html(emptyHtml);
+			                }else{
+				                $(data.data.commitList).each(function(i){
+				                	var listHtml = detailedListHtml(this.tradeUserName,this.tradeUserNo,this.brokerUserName,this.num,this.money,this.stateInfo,this.info,this.placingId,this.date,this.state);
+				                	
+				                	$('#commitList').append(listHtml);
+				                })
+			                }
+	
+	
+			                if(data.data.uncommittedList == ''){
+			                	$('#uncommittedList').html(emptyHtml);
+	
+			                }else{
+				                $(data.data.uncommittedList).each(function(i){
+				                	var listHtml = detailedListHtml(this.tradeUserName,this.tradeUserNo,this.brokerUserName,this.num,this.money,this.stateInfo,this.info,this.placingId,this.date,this.state);
+				                	$('#uncommittedList').append(listHtml);
+				                })
+			           		}
+	
+	   		           		if(data.data.successList == ''){
+	   		                	$('#successList').html(emptyHtml);
+	   		                }else{
+	   			                $(data.data.successList).each(function(i){
+	   			                	var listHtml = detailedListHtml(this.tradeUserName,this.tradeUserNo,this.brokerUserName,this.num,this.money,this.stateInfo,this.info,this.placingId,this.date,this.state);
+	   			                	$('#successList').append(listHtml);
+	   			                })
+	   		            	}
+	
+			           		if(data.data.failList == ''){
+			                	$('#failList').html(emptyHtml);
+			                }else{
+				                $(data.data.failList).each(function(i){
+				                	var listHtml = detailedListHtml(this.tradeUserName,this.tradeUserNo,this.brokerUserName,this.num,this.money,this.stateInfo,this.info,this.placingId,this.date,this.state);
+				                	$('#failList').append(listHtml);
+				                })
+			            	}
+	
+			                if(data.data.submitState == "Y"){
+			                	$("#inner_left").attr("class","inner_left or")
+			                }else if(data.data.submitState == "N"){
+			                	$("#inner_left").attr("class","inner_left ga")
+			                }
+			                
+			                //选择商品
+							var filterList = $('.filter_list');
+							var listLayer = $('.layer');
+							var controlBtn = $('.control_btn');
+							var filterList = $('.filter_list');
+							var listBox = $('.list_box');
+							var listUl = $('.list_ul');
+							
+							function hideLayer(){
+								listLayer.hide();
+								listBox.animate({'bottom':'-2.8rem'},500);
+								$('body,html').css({'height':'100%','overflow':'auto'});
+							}
+							
+							function showLayer(){
+								listBox.animate({'bottom':'0'},500);
+								listLayer.show();
+								$('body,html').css({'height':'100%','overflow':'hidden'});
+							}
+							
+							var detailHtml = '';
+							$(data.data.productList).each(function(index,value){
+								detailHtml += '<li><a href="javascript:;"><span class="list_id" data-id="'+ this.productId +'">'+ this.productNo +'</span><span class="list_name">'+ this.productName +'</span></a></li>';
+								if( currentShow ){
+									if(this.productId == GetQueryString("pid")){
+										filterList.html('');
+										filterList.append( '<span class="good_id">'+ this.productNo +'</span><span class="good_name">'+ this.productName +'</span><span class="filt_good">选择商品</span>' );
+									}
+								}else{
+									filterList.html('');
+									filterList.append( '<span class="good_id">'+ idTxt +'</span><span class="good_name">'+ nameTxt +'</span><span class="filt_good">选择商品</span>' );
+								}
+							});
+							
+							listUl.append( detailHtml );
+							
+							filterList.click( showLayer );
+							controlBtn.click( hideLayer );
+							
+							listUl.find('li').click(function(){
+                                var productId = $(this).find('.list_id').attr('data-id');
+                                location.href = "/detailed.html?pid="+productId;
+							});
+	
+		            	}
+	
+		            },
+		            error: function(err) {
+		                alert(data.message);
+		            }     
+		        }); 
+	        }
+	        getDealerDetail();
+
+	        $(".cover").on("touchmove",function(){
+	        	event.preventDefault();
+	        })
+
+	        $("#close").click(function(){
+	        	$(".cover").css("display","none");
+	        })
+
+	        var u_placingId = 0 ;
+	        $(document).on('click' , '.modify' , function(){
+	        	var u_name = $(this).parent().parent().find(".user_name").html();
+	        	var u_account = $(this).parent().parent().find(".user_account i").html();
+	        	var u_num = $(this).parent().parent().find(".user_num i").html();
+	        	u_placingId = $(this).parent().parent().find(".user_name").attr("placingId");
+	        	u_productId = $(this).parent().parent().find(".user_name").attr("productId");
+	        	$(".cover .placing_box .u_name").html("交易商姓名："+u_name)
+	        	$(".cover .placing_box .u_account").html("交易商账号："+u_account)
+	        	$(".cover .placing_box .u_num").html("配售数量："+u_num)
+	        	$(".cover").css("display","block");
+	        })
+
+	        // 商品包配售修改请求
+	        $(document).on('click' , '#submit' , function(){
+
+	        	$(".loader_cover_box").css("display","block");
+
+	        	var modifyParam = new Object();
+	        	modifyParam.session_token=$.cookie('session_token');
+				modifyParam.placingId = u_placingId;
+				modifyParam.type = "update";
+				modifyParam.num= $("#updateNum").val();
+				var modifyInfo = JSON.stringify(modifyParam);
+	        	$.ajax({  
+	        	    type: "post",
+	        	    url: "/member-server-front/assetPackage/placingUpdate",
+	        	    data:modifyInfo,
+	        	    dataType: "json",
+	        	    success: function(data) {
+	        	    	
+	        	    	if(data.status < 0){
+	        	    		window.location.href="login.html";
+	        	    	}else{
+
+	        	    		if(data.status == 0){
+	        	    			$("#tip").html("修改成功!");
+	        	    			timedMsg();
+	        	    			function timedMsg(){
+	        	    			 var t=setTimeout('$(".cover").css("display","none")',2000);
+	        	    			 var b=setTimeout('$(".loader_cover_box").css("display","none");',2000);
+	        	    			 var f=setTimeout('window.location.reload();',2500);
+	        	    			}
+	        	    		}else{
+	        	    			$("#tip").html(data.message);
+	        	    			$(".loader_cover_box").css("display","none");
+
+	        	    		}
+
+	        	    	}
+	        	    	
+	        	    },
+	        	    error: function(err) {
+	        	        alert(data.message);
+	        	    }     
+	        	});
+	        })
+
+	        // 商品包配售删除请求
+            $(document).on('click' , '#delete' , function(){
+
+            	$(".loader_cover_box").css("display","block");
+
+            	var deleteParam = new Object();
+            	deleteParam.session_token=$.cookie('session_token');
+    			deleteParam.placingId = u_placingId;
+    			deleteParam.type = "delete";
+    			var deleteInfo = JSON.stringify(deleteParam);
+            	$.ajax({  
+            	    type: "post",
+            	    url: "/member-server-front/assetPackage/placingUpdate",
+            	    data:deleteInfo,
+            	    dataType: "json",
+            	    success: function(data) {
+            	    	
+            	    	if(data.status < 0){
+            	    		window.location.href="login.html";
+            	    	}else{
+            	    		if(data.status == 0){
+
+            	    			$("#tip").html("删除成功!");
+            	    			timedMsg();
+            	    			function timedMsg(){
+            	    			 var t=setTimeout('$(".cover").css("display","none")',2000);
+            	    			 var f=setTimeout('window.location.reload();',2500);
+            	    			 var t=setTimeout('$(".loader_cover_box").css("display","none");',2000);
+            	    			}
+            	    		}else{
+            	    			$(".loader_cover_box").css("display","none");
+            	    		}
+            	    	}
+            	    	
+            	    },
+            	    error: function(err) {
+            	        alert(data.message);
+            	    }     
+            	});
+            })
+
+            // 收索请求
+            $(document).on('click' , '#search' , function(){
+
+            	$(".loader_cover_box").css("display","block");
+            	
+            	var searchParam = new Object();
+            	searchParam.session_token=$.cookie('session_token');
+            	searchParam.productId=GetQueryString("pid");
+            	searchParam.tradeUser = $("#searchInfo").val();
+            	var searchInfo = JSON.stringify(searchParam);
+    	        $.ajax({  
+    	            type: "post",
+    	            url: "/member-server-front/assetPackage/placingList",
+    	            data:searchInfo,
+    	            dataType: "json",
+    	            success: function(data) {
+
+    	            	var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+
+    	            	if(data.status < 0){
+    	            		window.location.href="login.html";
+    	            	}else{
+
+    	            		$(".loader_cover_box").css("display","none");
+
+    		            	var commitListDate ='';
+    		            	var uncommittedListDate = '';
+    		            	var successListDate = '';
+    		            	var failListDate = '';
+
+    		                function detailedListHtml(tradeUserName,tradeUserNo,brokerUserName,num,money,stateInfo,info,placingId,date,state) {
+
+    		                	if(info == null){
+    		                		info = '';
+    		                	}else{
+    		                		info = info;
+    		                	}
+
+    		                	var statetip = "modify";
+    		                	if(state == "SUBMIT_PENDING" ){
+    		                		statetip = "modify block";
+    		                	}else{
+    	            		    	statetip ="modify";
+    	            		    }
+
+    			                var html = '<div class="item"><p class="user_ifon"><i class="user_name" placingId='+placingId+'>'+tradeUserName+'</i><i class="user_adderss">'+brokerUserName+'</i><b class="'+statetip+'">修改</b></p><p><span class="user_account">帐号：<i>'+tradeUserNo+'</i></span><span class="user_num">数量（块）：<i>'+num+'</i></span></p><p><span>日期：'+date+'</span><span>金额（元）：'+money+'</span></p><p><span>状态：'+stateInfo+'</span><span>备注：'+info+'</span></p></div>';
+
+    			                return html;
+    		                }
+
+    		                $(data.data.commitList).each(function(i){
+    		                	var listHtml = detailedListHtml(this.tradeUserName,this.tradeUserNo,this.brokerUserName,this.num,this.money,this.stateInfo,this.info,this.placingId,this.date,this.state);
+    		                	commitListDate += listHtml
+    		                })
+    		                $(data.data.uncommittedList).each(function(i){
+    		                	var listHtml = detailedListHtml(this.tradeUserName,this.tradeUserNo,this.brokerUserName,this.num,this.money,this.stateInfo,this.info,this.placingId,this.date,this.state);
+    		                	uncommittedListDate += listHtml
+    		                })
+    		                $(data.data.successList).each(function(i){
+    		                	var listHtml = detailedListHtml(this.tradeUserName,this.tradeUserNo,this.brokerUserName,this.num,this.money,this.stateInfo,this.info,this.placingId,this.date,this.state);
+    		                	successListDate += listHtml
+    		                })
+    		                $(data.data.failList).each(function(i){
+    		                	var listHtml = detailedListHtml(this.tradeUserName,this.tradeUserNo,this.brokerUserName,this.num,this.money,this.stateInfo,this.info,this.placingId,this.date,this.state);
+    		                	failListDate += listHtml
+    		                })
+
+    		                if(data.data.commitList == ''){
+		                     	$('#commitList').html(emptyHtml);
+    		                }else{
+    		                	$('#commitList').html(commitListDate);
+    		                };
+
+    		                if(data.data.uncommittedList == ''){
+		                     	$('#uncommittedList').html(emptyHtml);
+    		                }else{
+    		                	$('#uncommittedList').html(uncommittedListDate);
+    		                };
+
+    		                if(data.data.successList == ''){
+    		                     	$('#successList').html(emptyHtml);
+    		                }else{
+    		                	$('#successList').html(failListDate);
+    		                } 
+    		                
+    		                if(data.data.failList == ''){
+    		                     	$('#failList').html(emptyHtml);
+    		                }else{
+    		                	$('#failList').html(failListDate);
+    		                }      	        
+
+    	            	}
+    	            },
+    	            error: function(err) {
+    	                alert(data.message);
+    	            }
+    	        }); 
+            })
+
+            // 提交全部请求
+            $("#inner_left").click(function(){
+            	if($(this).hasClass("or")){
+            		
+            		$(".loader_cover_box").css("display","block");
+            		$('#tips').css("display","block");
+		        	var allParam = new Object();
+		        	allParam.session_token=$.cookie('session_token');
+					allParam.productId = GetQueryString("pid");
+					var allInfo = JSON.stringify(allParam);
+            		$.ajax({  
+            		    type: "post",
+            		    url: "/member-server-front/assetPackage/placingSubmit",
+            		    data:allInfo,
+            		    dataType: "json",
+            		    success: function(data) {
+            		    	if(data.status < 0){
+            		    		window.location.href="login.html";
+            		    	}else{
+            		    		$('#tips').html('<span class="tip_text">'+data.message+'</span>');
+            		    		$(".loader_cover_box").css("display","none");
+
+            		    		window.location.reload();
+            		    		var statetip ="modify";
+            		    		if(state == "SUBMIT_PENDING" ){
+            		    			statetip = "modify block";
+            		    		}else{
+            		    			statetip ="modify";
+            		    		}
+
+            		    		$(".detailed_list .item p.user_ifon .modify ").attr("class",statetip);
+            		    		
+
+            		    	}	    	
+            		    },
+            		    error: function(err) {
+            		        alert(data.message);
+            		        $(".loader_cover_box").css("display","none");
+            		    }     
+            		});
+            	}else if($(this).hasClass("ga")){
+
+            	}
+				
+            })
+
+            $(".detailed_tap .new-rp-header span").click(function(){
+            	var indexNo = $(this).index();
+            	$(this).addClass("cur").siblings().removeClass("cur");
+            	$(".detailed_list .list").eq(indexNo).addClass("cur").siblings().removeClass("cur");
+            })
+	        
+		});   
+	</script>
+</body>
+</html>

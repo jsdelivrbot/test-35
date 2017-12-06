@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>推荐信息填写</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<style>
+		@media only screen and (min-width: 320px){
+		    html {
+		        font-size: 85.33px !important;
+		    }
+		    .canvas{transform:translateX(-50%) translateY(-50%) scale(0.42)!important;}
+		}
+		@media only screen and (min-width: 360px){
+		    html {
+		        font-size: 96px !important;
+		    }
+		    .canvas{transform:translateX(-50%) translateY(-50%) scale(0.45)!important;}
+		}
+		@media only screen and (min-width: 375px){
+		    html {
+		        font-size: 100px !important;
+		    }
+		    .canvas{transform:translateX(-50%) translateY(-50%) scale(0.5)!important;}
+		}
+		@media only screen and (min-width: 384px){
+		    html {
+		        font-size: 102.4px !important;
+		    }
+		}
+		@media only screen and (min-width: 414px){
+		    html {
+		        font-size: 110.4px !important; 
+		    }
+		    .canvas{transform:translateX(-50%) translateY(-50%) scale(0.55)!important;}
+		}
+		@media only screen and (min-width: 480px){
+		    html {
+		        font-size: 128px !important; 
+		    }
+		}
+		@media only screen and (min-width: 540px){
+		    html {
+		        font-size: 144px !important; 
+		    }
+		}
+		@media only screen and (min-width: 640px){
+		    html {
+		        font-size: 100px !important; 
+		    }
+		    .canvas{transform:translateX(-50%) translateY(-50%) scale(0.5)!important;}
+		}
+		* {
+		    box-sizing: border-box;
+		    -webkit-tap-highlight-color: transparent;
+		    font-family: 'Avenir Next',Avenir,'Helvetica Neue',Helvetica,'Lantinghei SC','Hiragino Sans GB','Microsoft YaHei',"微软雅黑",STHeiti,'WenQuanYi Micro Hei',SimSun,sans-serif;
+		    padding: 0;
+		    margin: 0 auto;
+		    max-width: 640px;
+
+		}
+		body{
+			background-color: #efefef;
+		}
+		.modifyPassword {
+		    background-color: #fff;
+		    width: 100%;
+		    padding: 0.3rem;
+		}
+		.modifyPassword .determine {
+		    height: 0.42rem;
+		    width: 2.26rem;
+		    background-color: #ff6000;
+		    margin: 0.1rem auto 0 auto;
+		    border-radius: 0.3rem;
+		    text-align: center;
+		    color: #fff;
+		    font-size: 0.15rem;
+		    line-height: 0.42rem;
+		}
+		.modifyPassword li {
+		    position: relative;
+		    width: 100%;
+		    height: 0.3rem;
+		    margin-top: 0.2rem;
+		    line-height: 0.3rem;
+		    padding: 0 0 0 0.85rem;
+		    font-size: 0.15rem;
+		    list-style: none;
+		}
+		.modifyPassword li span {
+		    position: absolute;
+		    top: 0;
+		    left: 0;
+		    line-height: 0.3rem;
+		    font-size: 0.15rem;
+		}
+		.modifyPassword li input[type='text'] {
+		    width: 100%;
+		    outline: none;
+		    font-size: 0.15rem
+		}
+		.modifyPassword li::after {
+		    position: absolute;
+		    bottom: 0;
+		    left: 0;
+		    display: block;
+		    content: '';
+		    width: 100%;
+		    border-bottom: 1px solid #ff6000;
+		    transform: scaleY(0.5);
+		}
+		::-webkit-input-placeholder{
+		    color:#cbcbcb!important;
+		}
+		input{
+			border: none;
+		}
+		.recom p{
+			width: 100%;
+			height: 0.6rem;
+			line-height: 0.6rem;
+			font-size: 0.14rem
+			overflow: hidden;
+		}
+		.recom p span{
+			font-size: 0.14rem
+		}
+		.recom p .left{
+			float: left;
+		}
+		.recom p .right{
+			float: right;
+		}
+	</style>
+</head>
+<body>
+	<div class="modifyPassword">
+		<ul>
+			<li><span>姓名：</span><input type="text" placeholder="请输入姓名" class="name"></li>
+			<li><span>联系电话：</span><input type="text" placeholder="请输入电话号码" class="phone"></li>
+			<li><span>地址：</span><input type="text" placeholder="请输入地址" class="address"></li>
+		</ul>
+		<div class="recom"><p><span class="left"><!-- 推荐码：4362 --></span><span class="right"><!-- 推荐人：王百万 --></span></p></div>
+		<div class="determine-box">
+			<div class="determine">确 认</div>
+		</div>
+	</div>
+	<script src="js/jquery-1.8.3.min.js"></script>
+	<script src="js/mo.js"></script>
+	<script>
+		var referralCode = GetQueryString("referralCode");
+
+        app.ajaxHelper.submitRequest({
+            url: '/api/getReferralUserByReferralCode',
+            data: {
+                referralCode: referralCode
+            },
+            success: function (data) {
+                var state = data.result;
+                if (state == "success") {
+            		$(".left").html("推荐码："+data.data.referralCode);
+            		$(".right").html("推荐人："+data.data.referralUser);
+                } else if (state > "error") {
+                    // $('#itemList').html(emptyHtml)
+                } else if (state < "noSession") {
+                    // window.location.href = "login.html";
+                }
+            }
+        })
+
+        $(".determine").click(function(){
+        	var name = $(".name").val();
+			var phone = $(".phone").val();
+			var address = $(".address").val();
+        	if(name != '' && phone != '' && address != ''){
+        		app.ajaxHelper.submitRequest({
+        		    url: '/api/createReferralInfo',
+        		    data: {
+        		        referralCode: referralCode,
+        		        name: name,
+        		        phone: phone,
+        		        address: address
+        		    },
+        		    success: function (data) {
+        		        var state = data.result;
+        		        if (state == "success") {
+        		    		$(".name").val('');
+        		    		$(".phone").val('');
+        		    		$(".address").val('');
+        		    		alert("成功！")
+        		        } else if (state > "error") {
+        		            alert(data.message)
+        		        } else if (state < "noSession") {
+        		            // window.location.href = "login.html";
+        		        }
+        		    }
+        		})
+        	}else{
+        		alert("请填写完整的信息！")
+        	}
+        })
+
+        function GetQueryString(name){
+            var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if(r!=null)return  unescape(r[2]); return null;
+        }
+        // alert(GetQueryString("pid"));
+	</script>
+</body>
+</html>

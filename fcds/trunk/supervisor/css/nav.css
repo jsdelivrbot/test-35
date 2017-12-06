@@ -1,0 +1,33 @@
+/*@charset "utf-8";*/
+/*Nav*/
+.Nav{ max-width:640px;position:fixed; left:50%; right:0; bottom:0; width:100%; background-color:#313131;z-index: 1;transform: translateX(-50%);-webkit-transform: translateX(-50%);}
+.test{ position:relative}
+
+.Nav .navin{ height:60px;}
+.Nav .navin ul{ list-style:none; margin:0; padding:0;}
+.Nav .navin ul li{ float:left; width:33.33%;position:relative;}
+.Nav .navin ul li a{ display:block; margin:0 auto; text-align:center; text-decoration:none; font-size:12px; line-height:30px; color:#fff; padding-top:5px;position: relative;}
+.Nav .navin ul li .home,
+.Nav .navin ul li .comdy,
+.Nav .navin ul li .cart,
+.Nav .navin ul li .shopcart,
+.Nav .navin ul li .usercenter,
+.Nav .navin ul li.curr .home,
+.Nav .navin ul li.curr .comdy,
+.Nav .navin ul li.curr .cart,
+.Nav .navin ul li.curr .shopcart,
+.Nav .navin ul li.curr .usercenter{ background:url(../images/nav-ico.png) no-repeat left center; display:block; background-size:940%; width:30px; height:30px; font-size:0; line-height:0; margin:0 auto;}
+
+.Nav .navin ul li .home{ background-position:-73px -55px;}
+.Nav .navin ul li .comdy{ background-position:-122px -54px;}
+.Nav .navin ul li .cart{ background-position:-22px -45px;}
+.Nav .navin ul li .usercenter{ background-position:-98px  -45px;}
+.Nav .navin ul li .shopcart{background-position:-170px -56px;}
+
+.Nav .navin ul li.curr .home{ background-position:-72px -11px;}
+.Nav .navin ul li.curr .comdy{ background-position:-122px -10px;}
+.Nav .navin ul li.curr .cart{ background-position:-22px -8px;}
+.Nav .navin ul li.curr .shopcart{ background-position:-170px -11px;}
+.Nav .navin ul li.curr .usercenter{ background-position:-98px -8px;}
+.Nav .navin ul li.curr a{ color:#ff6000;}
+

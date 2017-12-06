@@ -1,0 +1,109 @@
+<template>
+  <div v-title="'每日简报'">
+    <div class="section">
+        <div class="hd">
+          <div class="hd-inner none">
+              <span class="hd-title">每日简报</span>
+              <span class="dete-control"></span>
+              <span id="demo1" class="brfd">{{curdate}}</span>
+          </div>
+        </div>
+    </div>
+    <ul class="brf">
+      <li>
+        <span>持仓市值：{{getDailyAndWorklyData.holdAmount}}</span>
+        <span>可用余额：{{getDailyAndWorklyData.enableMoney}}</span>
+        <span>出金：{{getDailyAndWorklyData.outMoney}}</span>
+        <span>入金：{{getDailyAndWorklyData.inMoney}}</span>
+        <span>买入：{{getDailyAndWorklyData.buy}}</span>
+        <span>卖出：{{getDailyAndWorklyData.sall}}</span>
+        <span>挂单未成交：{{getDailyAndWorklyData.unsetled}}</span>
+        <span>交易客户数：{{getDailyAndWorklyData.transactionUserCount}}</span>
+        <span>有效客户总数：{{getDailyAndWorklyData.CustomersNumCount}}</span>
+      </li>
+    </ul>
+    <v-load v-show="load"></v-load>
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+import load from 'components/load/load';
+
+  export default{
+    components:{
+      'v-empty': empty,
+      'v-load': load
+    },
+    data() {
+     return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        curdate: '',
+        getDailyAndWorklyData: {},
+        load: true
+      }
+    },
+    created(){
+      this.getDailyAndWorkly();
+    },
+    mounted(){
+      var calendar = new datePicker();
+      var _this = this;
+      calendar.init({
+        'trigger': '#demo1', /*按钮选择器，用于触发弹出插件*/
+        'type': 'date',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+        'minDate':'1900-1-1',/*最小日期*/
+        'maxDate':'2100-12-31',/*最大日期*/
+        'onSubmit':function(){/*确认时触发事件*/
+          var theSelectData=calendar.value;
+          _this.curdate = calendar.value;
+          _this.getDailyAndWorkly()
+        },
+        'onClose':function(){/*取消时触发事件*/
+        }
+      });
+    },
+    methods: {
+      getDailyAndWorkly: function(){
+        this.getDailyAndWorklyData = {};
+        this.load = true;
+        this.$http.get('/api/getDailyAndWorkly?',{params:{ sessionToken: this.sessionToken, date: this.curdate }}).then((response) => { 
+          if(response.body.result == ERR_OK){ 
+            this.load = false;
+            this.getDailyAndWorklyData = response.body.data;
+            if(this.curdate == '' || this.curdate == null){
+              this.curdate = this.getDailyAndWorklyData.showDate;
+            }else{
+
+            }
+          }else{
+            // this.$refs.timerbtn.stop();
+            // alert(response.body.message)
+          }
+          
+        }).then((error)=> this.error = error)
+      }
+    }
+  };
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .brfd
+    height: 0.47rem
+    color: #999
+  .section .hd .hd-inner.none::after
+    display: none
+  .brf
+    li
+      padding: 0.12rem
+      overflow: hidden
+      margin-top: 0.1rem
+      background-color: #FFF
+      span
+        float: left
+        width: 50%
+        line-height: 0.4rem
+        font-size: 0.12rem
+        color: #999999
+</style>

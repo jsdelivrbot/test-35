@@ -1,0 +1,258 @@
+<template>
+  <div v-title="'修改结算账号'">
+
+    <div class="SCommission_box msa">
+      <p>
+        <span>原结算账号：</span><input type="tel" v-model="tradeUserNo"  placeholder="请输入原结算账号" @keyup='changes'>
+      </p>
+      <p>
+        <span>原结算账号姓名：</span><b>{{name}}</b>
+      </p>
+      <p>
+        <span>原手机号码：</span><b>{{phone}}</b>
+      </p>
+      <p class="account">
+        <span>新结算账号：</span><input type="tel" placeholder="请输入新结算账号">
+      </p>
+      <p class="newname">
+        <span>新结算账号姓名：</span><b>{{phone}}</b>
+      </p>
+      <p class="newname">
+        <span>新手机号码：</span><b>{{phone}}</b>
+      </p>
+      <p class="yzm">
+        <span>验证码：</span><input type="tel" placeholder="请输入验证码" v-model="dynamicPassword"><timer-btn ref="timerbtn" class="btn btn-default" v-on:run="sendCodes" style="display: inline-block" v-show='verification'></timer-btn>
+      </p>
+      <div class="commissionSubmit">
+        <span>提交</span>
+      </div>
+    </div>
+
+    <div style="height: 0.1rem"></div>
+
+    <div class="section">
+      <div class="hd">
+        <div class="hd-inner">
+          <span class="hd-title">历史修改记录</span>
+        </div>
+      </div>
+      <div class="content">
+        <div class="msalist">
+          <ul>  
+            <li>
+              <span>原结算账号：4422440044</span>
+              <span>原结算账号姓名：特兰克斯</span>
+              <span>新结算账号：4422440022</span>
+              <span>新结算账号姓名：北界王</span>
+              <span>申请时间：2017-07-27</span>
+              <span>修改时间：2017-07-27</span>
+              <span>备注：修改成功</span>
+            </li>
+            <li>
+              <span>原结算账号：4422440044</span>
+              <span>原结算账号姓名：特兰克斯</span>
+              <span>新结算账号：4422440022</span>
+              <span>新结算账号姓名：北界王</span>
+              <span>申请时间：2017-07-27</span>
+              <span>修改时间：2017-07-27</span>
+              <span>备注：修改成功</span>
+            </li>
+            <li>
+              <span>原结算账号：4422440044</span>
+              <span>原结算账号姓名：特兰克斯</span>
+              <span>新结算账号：4422440022</span>
+              <span>新结算账号姓名：北界王</span>
+              <span>申请时间：2017-07-27</span>
+              <span>修改时间：2017-07-27</span>
+              <span>备注：修改成功</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <p class="tips" v-show="create"><span>{{tipText}}</span></p>
+
+  </div>
+</template>
+
+<script>
+import empty from 'components/empty/empty';
+const ERR_OK = 'success';
+import timerBtn from 'components/login/timerBtn/timerBtn';
+
+  export default{
+    data(){
+      return{
+        sessionToken: localStorage.getItem("sessionToken"),
+        tipText: null,
+        create: false,
+        coverShow: false,
+        tradeUserNo: '',
+        name: '交易商姓名',
+        phone: '交易商手机号码',
+        amount: null,
+        goodsNo: '000004',
+        verification: true,
+        dynamicPassword: null
+      }
+    },
+    components: {
+      'timer-btn': timerBtn
+    },
+    methods: {
+      changes: function(){
+        var length = this.tradeUserNo.length;
+        if (length > 10) {
+            this.tradeUserNo = this.tradeUserNo.substring(0, 10);
+        }
+        if (length == 10) {
+          alert(1)
+        }
+        if(length < 10){
+          this.name = '交易商姓名';
+          this.phone = '交易商手机号码';
+        }
+      },
+      sendCodes:function(){
+        this.$refs.timerbtn.start();
+      },
+      tip: function(){
+        this.create = true;
+        var this_ = this;
+        clearTimeout(t)
+        var t = setTimeout(function (){
+            this_.create = false;
+        }, 3000);
+      }
+    }
+  };
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+  .msalist
+    overflow: hidden
+    li
+      padding: 0.12rem
+      position: relative
+      overflow: hidden
+      &::after
+        content: ''
+        width: 100%
+        position: absolute
+        left: 0
+        bottom: 0
+        height: 1px
+        background-color: #ccc
+        transform: scaleY(0.5)
+      &:nth-last-child(1)::after
+        display: none
+      span
+        float: left
+        width: 50%
+        font-size: 0.13rem
+        line-height: 0.32rem
+  button
+    outline: none
+  .SCommission_box
+    padding: 0.2rem 0.3rem
+    background-color: #FFF
+    font-size: 0.14rem
+    line-height: 0.4rem
+    &.msa p span
+      width: 1.2rem
+    &.msa p.yzm span
+     width: 0.8rem 
+    p
+      position: relative
+      width: 100%
+      margin: 0.05rem 0
+      &:nth-child(1)::after,&:nth-last-child(2)::after,&:nth-last-child(3)::after,&.account::after
+        position: absolute
+        bottom: 0
+        left: 0
+        content: ''
+        width: 100%
+        border-bottom: 1px solid #ff6000
+        transform: scaleY(0.5)
+      span
+        display: inline-block
+        width: 1rem
+      input
+        display: inline-block
+        width: 1.2rem
+        border: none
+        outline: none
+      b
+        color: #999999
+      & > i
+        font-style: normal
+        i
+          font-style: normal
+          font-size: 0.12rem
+          color: #999999
+      .SCommissionOption
+        position: relative
+        display: inline-block
+        color: #000
+        border: 1px solid #ff6000
+        width: 1.05rem
+        height: 0.32rem
+        line-height: 0.31rem
+        padding: 0 0.1rem
+        border-radius: 0.05rem
+        .jian
+          position: absolute
+          top: 0.015rem
+          right: 0.015rem
+          width: 0.26rem
+          height: 0.26rem
+          text-align: center
+          line-height: 0.26rem
+          color: #fff
+          border-radius: 0.03rem
+          background: #ff6000 url(../../../assets/v_03.png) center center no-repeat
+          background-size: 80%
+        .optioList
+          display block
+          position: absolute
+          z-index: 1
+          top: 0.37rem
+          left: 0
+          width: 100%
+          text-align: center
+          border: 1px solid #ff6000
+          background-color: #FFF
+          border-radius: 0.05rem
+          padding: 0 0.06rem
+          z-index: 100000002
+          i
+            position: relative
+            display: block
+            font-style: normal
+            height: 0.42rem
+            line-height: 0.42rem
+            color: #000
+            &::after
+              position: absolute
+              content: ''
+              width: 100%
+              border-bottom: 1px solid #ccc
+              bottom: 0
+              left: 0
+              transform: scaleY(0.5)
+            &:nth-last-child(1)::after
+              border: none
+      &.newname::after
+        display: none
+    .commissionSubmit
+      text-align: center
+      margin-top: 0.2rem
+      span
+        padding: 0.1rem 0.8rem
+        background-color: #ff6000
+        color: #fff
+        border-radius: 0.5rem
+        font-size: 0.15rem
+</style>

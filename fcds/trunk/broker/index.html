@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>首页</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+	<div class="home_header">
+		<div class="h_user_info_box">
+			<div class="h_user_box">
+				<div class="h_user_bg"></div>
+				<div class="h_user_img" style="background-image: url(images/34.jpg);"></div>
+			</div>
+			<div class="h_user_info_d">
+				<div class="h_user_info_d_box" id="user_info">
+					<!-- <P>马云</P>
+					<P>4301020001</P>
+					<P>团队总人数：86人</P>
+					<P>归属地：广东省广州一市</P>
+					<span class="grade"></span> -->
+					<!-- <span class="logout" id="logout">退出登录</span> -->
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="home_query" id="home_query">
+		<!-- <div class="home_package">
+			<div class="home_package_header border_1px">
+				<span class="home_package_header_icon"><img src="images/icon_03.png" alt=""></span>
+				<p class="theme_title">商品包配额排名</p>
+				<p class="time">2016-12-24</p>
+				<i>查看排名</i>
+			</div>
+			<div class="home_package_num">
+				<p><i>3</i>（名）</p>
+				<p>恭喜您已超过全国90%经纪商</p>
+			</div>
+		</div>
+
+		<div class="home_package">
+			<div class="home_package_header border_1px">
+				<span class="home_package_header_icon"><img src="images/icon_06.png" alt=""></span>
+				<p class="theme_title">商品包</p>
+				<p class="time">2016-12-24</p>
+				<i>查看资产包</i>
+			</div>
+			<div class="home_package_num">
+				<p><i>234</i>（包）</p>
+				<p>第四期预计商品包配额</p>
+			</div>
+		</div> -->
+	</div>
+	<div style="height:70px"></div>
+	<script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/common.js"></script>
+	<script type="text/javascript">
+		$(function(){
+
+			$(".loader_cover_box").css("display","block");
+
+			var session_token = new Object();
+			session_token.session_token=$.cookie('session_token');
+			var session = JSON.stringify(session_token);
+			// 交易商信息
+			$.ajax({  
+			    type: "post",
+			    url: "/member-server-front/broker/queryBrokerUser",
+			    data:session,
+			    dataType: "json",
+			    success: function(data) {
+
+			    	if(data.status < 0){
+			    		window.location.href="login.html";
+			    	}else{
+			    		$(".loader_cover_box").css("display","none");
+		                function userInfoHtml(name,accountNo,count,brokerUserName,level) {
+
+			                var html = '<P>'+name+'</P><P>'+accountNo+'</P><P>团队总人数：'+count+'人</P><P>归属地：'+brokerUserName+'</P><span class="grade '+level+'"></span><span class="logout" id="logout">退出登录</span>';
+
+			                return html;
+		                }
+		                
+		                $(data.data).each(function(i){
+		                	var infoHtml = userInfoHtml(this.name,this.accountNo,this.count,this.brokerUserName,this.level);
+		                	$('#user_info').append(infoHtml);
+		                  })
+		                
+			    	}
+
+			    },
+			    error: function(err) {
+	                alert(data.message)
+			    }     
+			});
+
+
+			// 首页查询信息
+			$.ajax({  
+			    type: "post",
+			    url: "/member-server-front/index/queryData",
+			    data:session,
+			    dataType: "json",
+			    success: function(data) {
+			    	if(data.status < 0){
+			    		window.location.href="login.html";
+			    	}else{
+
+			    		var links = '<div class="Nav"><div class="navin"><ul><li class="curr" onclick="window.location = \'index.html?pid='+data.data.productId+'\'"><a href="#" class="homebox"><i class="home"></i>首页</a></li><li onclick="window.location= \'package.html?pid='+data.data.productId+'\'"><a href="#" class="cartbox"><i class="shopcart"></i>商品包</a></li><li onclick="window.location= \'detailed.html?pid='+data.data.productId+'\'"><a href="#" class="comdybox"><i class="comdy"></i>出售明细</a></li></ul></div></div>'
+			    		$("body").append(links);
+
+		                function queryHtml(productId,date,ranking,rate,assetPackageNum,productNo,state,firstBrokerUserCount) {
+
+		                	var state_info = '';
+		                	if(state == 'Y'){
+		                		state_info = ''
+		                	}else{
+		                		state_info = '预计'
+		                	}
+
+		                	if(ranking == null){
+		                		ranking = '--';
+		                	}else{
+		                		ranking = ranking
+		                	}
+
+		                	if (assetPackageNum == null) {
+		                		assetPackageNum = '--';
+		                	}else{
+		                		assetPackageNum = assetPackageNum;
+		                	}
+
+		                	if(date == null){
+		                		date = '--';
+		                	}else{
+		                		date = date;
+		                	}
+
+		                	if(productNo == null){
+		                		productNo = '--';
+		                	}else{
+		                		productNo = parseInt(productNo);
+		                	}
+
+		                	var rateText = '';
+		                	if(ranking > 2 ){
+		                		rateText = '<p>您已经落后'+(ranking-1)+'位经纪商，撸起袖子加油干！</p>';
+		                	}else{
+		                		// rateText = '<p>恭喜您已超过全国'+rate+'经纪商</p>';
+		                		rateText = '<p>恭喜您！您已暂时领先，继续加油干！</p>';
+		                	}
+
+			                var html = '<div class="home_package"><div class="home_package_header border_1px"><span class="home_package_header_icon"><img src="images/icon_03.png" alt=""></span><p class="theme_title">第'+productNo+'期综合排名</p><p class="time">'+date+'</p><i onclick="javascript:window.location.href=\'package_ranking.html?pid='+productId+'\'">查看排名</i></div><div class="home_package_num teshu"><p><i class="teshu">'+ranking+'</i>（名）</p>'+rateText+'</div></div>'+'<div class="home_package"><div class="home_package_header border_1px"><span class="home_package_header_icon"><img src="images/icon_06.png" alt=""></span><p class="theme_title">商品包考核配额</p><p class="time">'+date+'</p><i onclick="javascript:window.location.href=\'package.html?pid='+productId+'\'">查看商品包</i></div><div class="home_package_num teshu" ><p><i class="teshu">'+assetPackageNum+'</i>（包）</p><p>'+state_info+'第'+productNo+'期商品包考核配额</p></div></div>'+'<div class="home_package"><div class="home_package_header border_1px"><span class="home_package_header_icon"><img src="images/icon_03.png" alt=""></span><p class="theme_title">一级考核排名</p><p class="time">'+date+'</p><i onclick="javascript:window.location.href=\'first_level_ranking.html?pid='+productId+'\'">查看排名</i></div><div class="home_package_num teshu"><p><i class="teshu">'+firstBrokerUserCount+'</i>（人）</p>'+'<p>一级经纪商总人数</p></div>';
+
+			                return html;
+		                }
+		                
+		                $(data.data).each(function(i){
+		                	var queryInfoHtml = queryHtml(this.productId,this.date,this.ranking,this.rate,this.assetPackageNum,this.productNo,this.state,this.firstBrokerUserCount);
+		                	$('#home_query').append(queryInfoHtml);
+		                  })
+
+		                var outdate = new Date();  
+		                outdate.setTime(outdate.getTime() + (10*60*1000)); 
+		                $.cookie('placingId', data.data.placingId,{expires:outdate});
+
+			    	}      
+
+			    },
+			    error: function(err) {
+			        alert(data.message);
+			    }     
+			});
+
+			$(document).on("click","#logout",function(){
+				$.cookie('session_token', null);
+	     		window.location.href="login.html";
+			})
+
+		});	
+	</script>
+</body>
+</html>

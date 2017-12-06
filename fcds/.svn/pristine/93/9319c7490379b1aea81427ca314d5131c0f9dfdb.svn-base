@@ -1,0 +1,275 @@
+<template>
+	<div v-title="'首页'">
+		<!-- 轮播图 -->
+		<swiper :options="swiperOption" ref="mySwiperA">
+		  	<!-- 幻灯内容 -->
+		  	<swiper-slide><img src="../../assets/banner/banner1.jpg"></swiper-slide>
+		  	<swiper-slide><img src="../../assets/banner/banner2.jpg" alt=""></swiper-slide>
+		  	<!-- <swiper-slide><img src="../../assets/banner/banner3.jpg" alt=""></swiper-slide> -->
+		  	<!-- 以下控件元素均为可选 -->
+		  	<div class="swiper-pagination" slot="pagination"></div>
+		  	<!-- <div class="swiper-button-prev" slot="button-prev"></div> -->
+		  	<!-- <div class="swiper-button-next" slot="button-next"></div> -->
+		  	<!-- <div class="swiper-scrollbar"  slot="scrollbar"></div> -->
+		</swiper>
+		
+		<!-- 返佣总览 -->
+		<div class="section">
+			<div class="hd">
+				<div class="hd-inner">
+					<span class="hd-title">返佣总览</span>
+				</div>
+			</div>
+			<div class="content">
+				<div class="overview-rebate">
+					<canvas id="canvas" class="canvas"> </canvas>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 第n期综合考核排名 -->
+		<div class="section">
+			<div class="hd">
+				<div class="hd-inner">
+					<span class="hd-title">第{{parseInt(findAssessmentRankingData.productNo)}}期综合考核排名</span>
+				</div>
+			</div>
+			<div class="content">
+				<div class="comprehensive-ranking">
+					<div class="comprehensive-ranking_left">
+						<img src="../../assets/comprehensive-ranking_icon.png">
+					</div>
+					<div class="comprehensive-ranking_right">
+						<p><i v-show="senior">全国</i><i v-show="ones">高级体系下</i>排名第<b>{{findAssessmentRankingData.rankingNo}}</b> 名</p>
+						<p>撸起袖子加油干!!</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 第6期配额 -->
+		<div class="section" v-show="senior">
+			<div class="hd">
+				<div class="hd-inner">
+					<span class="hd-title">第{{parseInt(findPackageQuotaData.productNo)}}期配额</span>
+				</div>
+			</div>
+			<div class="content">
+				<div class="comprehensive-ranking quota">
+					<div class="comprehensive-ranking_left">
+						<img src="../../assets/quota_icon.png">
+					</div>
+					<div class="comprehensive-ranking_right">
+						<p v-bind:class="{lh: ones}">考核配额总数：<b>{{findPackageQuotaData.assessmentQuota}}</b> 块</p>
+						<p v-show="senior">基础配额总数：<b>{{findPackageQuotaData.baseQuota}}</b> 块</p>
+						<p v-show="senior">
+							<router-link to="/packageH">
+								<span>出售商品包</span>
+							</router-link>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+const ERR_OK = 'success';
+ export default{
+ 	data(){
+ 	    return {
+ 	        swiperOption: {
+ 	          	autoplay: 3000,
+ 	          	grabCursor : true,
+ 	          	setWrapperSize :true,
+ 	          	autoHeight: true,
+ 	          	pagination : '.swiper-pagination',
+ 	          	paginationClickable :true,
+ 	          	mousewheelControl : true,
+ 	          	observeParents:true,
+ 	          	loop: true,
+ 	          	onTransitionStart(swiper){
+ 	           		
+ 	          	}
+ 	      	},
+ 	      	sessionToken: localStorage.getItem("sessionToken"),
+ 	      	findRebateSummaryData: {}, //返佣总览
+ 	      	findAssessmentRankingData: {},//第N期综合考核排名
+ 	      	findPackageQuotaData: {}, // 第N期配额
+ 	      	senior: false,
+ 	      	ones: false
+ 	    }
+ 	},
+ 	created(){
+ 		this.getLoginAccountRole();
+ 	},
+	methods:{
+		// 返佣总览环状图
+	    wagonRebate: function(el,totalRebate,poundageRebate,packageRebate,transBizFranchiseRebate,scoreRebate){
+	    	var option = {
+	    		el: el,
+	    		data: {value:totalRebate, name: '返佣总额', title: '历史返佣总计'},
+	    		series:{
+	    			data:[
+	    				{value:poundageRebate, name: '手续费返佣', color: '#68d0b5', describe:poundageRebate},
+	    				{value:packageRebate, name: '商品包返佣', color: '#fece94', describe:packageRebate},
+	    				{value:transBizFranchiseRebate, name: '加盟费返佣', color: '#ff9d5c', describe:transBizFranchiseRebate},
+	    				{value:scoreRebate, name: '积分返佣', color: '#92d2ff', describe:scoreRebate}
+	    			]
+	    		},
+	    		r: 130,
+	    		arcwidth: 40
+	    	}
+	    	this.toolHelper.wagon(option);
+	    },
+	    findRebateSummary: function(){
+	    	this.$http.get('/api/findRebateSummary',{params:{ sessionToken: this.sessionToken}}).then((response) => { 
+	    		if(response.body.result == ERR_OK){ 
+	    			this.findRebateSummaryData = response.body.data;
+	    			var a = parseFloat(this.findRebateSummaryData.totalRebate);
+	    			var b = parseFloat(this.findRebateSummaryData.poundageRebate);
+	    			var c = parseFloat(this.findRebateSummaryData.packageRebate);
+	    			var d = parseFloat(this.findRebateSummaryData.transBizFranchiseRebate);
+	    			var e = parseFloat(this.findRebateSummaryData.scoreRebate);
+	    			this.wagonRebate('canvas', a, b,c,d,e);
+	    		}else{
+	    			
+	    		}		
+	    	}).then((error)=> this.error = error)
+	    },
+	    findAssessmentRanking: function(){
+	    	this.$http.get('/api/findAssessmentRanking',{params:{ sessionToken: this.sessionToken}}).then((response) => { 
+	    		if(response.body.result == ERR_OK){ 
+	    			this.findAssessmentRankingData = response.body.data;
+	    		}else{
+	    			
+	    		}		
+	    	}).then((error)=> this.error = error)
+	    },
+	    findPackageQuota: function(){
+	    	this.$http.get('/api/findPackageQuota',{params:{ sessionToken: this.sessionToken}}).then((response) => { 
+	    		if(response.body.result == ERR_OK){ 
+	    			this.findPackageQuotaData = response.body.data;
+	    		}else{
+	    			
+	    		}		
+	    	}).then((error)=> this.error = error)
+	    },
+	    getLoginAccountRole: function(sessionToken){
+	    	this.$http.get('/api/getLoginAccountRole',{params:{ sessionToken: this.sessionToken}}).then((response) => { 
+	    		if(response.body.result == ERR_OK){ 
+	    			if(response.body.data.role == 'ROLE_TOP'){
+	    				this.senior = true;
+	    				this.ones = false;
+	    			}else{
+	    				this.senior = false;
+	    				this.ones = true;
+	    			}
+	    			if(response.body.data.role == 'ROLE_PLACING'){
+	    				this.$router.push({ path: '/packageH' });
+	    			}
+	    		}else{
+	    			$("#tip").html('<span class="tip_text">'+response.body.message+'</span>')
+	    		}
+	    	}).then((error)=> this.error = error)
+	    }
+	},
+	mounted() {
+	    this.findRebateSummary();
+	    this.findAssessmentRanking();
+	    this.findPackageQuota();
+	}
+ };
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+	// 轮播图
+	.swiper-container
+		height: 1.65rem
+		width: 100%
+		.swiper-wrapper
+			width: 100%!important
+			height: 1.65rem!important
+			.swiper-slide
+				width: 100%!important
+				height: 100%!important
+				background: center center no-repeat
+				background-size: cover
+				img
+					width: 100%
+					height: 100%
+		.swiper-pagination
+			text-align: right
+			.swiper-pagination-bullet
+				width: 14px
+				border-radius: 4px
+				&.swiper-pagination-bullet-active
+					background: #ff6000
+	// 返佣总览
+	.overview-rebate
+		width: 100%
+		height: 2rem
+		position: relative
+		background-color: #FFF
+		overflow: hidden
+		.canvas
+			position: absolute
+			top: 50%
+			left: 50%
+			transform: translateX(-50%) translateY(-50%) scale(0.5)
+	// 第n期综合考核排名
+	.comprehensive-ranking
+		width: 100%
+		height: 1.25rem
+		position: relative
+		padding: 0 0 0 1.5rem
+		&.quota
+			height: 1.45rem
+		.comprehensive-ranking_left
+			width: 1.5rem
+			height: 100%
+			position absolute
+			top: 0
+			left: 0
+			&::after
+				position: absolute
+				right: 0
+				top: 0
+				display: block
+				content: ''
+				width: 0
+				height: 100%
+				border-right: 1px solid #ccc
+				transform: scaleX(0.5) scaleY(0.7)
+			img
+				position absolute
+				top: 50%
+				left:50%
+				width: 0.96rem
+				height: 0.6rem
+				margin: -0.3rem -0.48rem
+		.comprehensive-ranking_right
+			text-align: center
+			padding: 0.25rem 0
+			p
+				font-size: 0.14rem
+				line-height: 0.32rem
+				&.lh
+					padding: 0.3rem 0
+				b
+					font-size: 0.28rem
+					color: #ff6600
+					font-weight: 500
+					font-family: "HelveticaNeue"!important
+				i
+					font-style: normal
+					font-size: 0.14rem
+				span
+					padding: 0.05rem 0.45rem
+					background-color: #ff7f2a
+					color: #fff
+					border-radius: 0.5rem
+					margin: 0.1rem 0;
+</style>

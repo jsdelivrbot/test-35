@@ -1,0 +1,277 @@
+<template>
+  <div v-title="'客户分析'">
+    <div class="section">
+      <div class="hd">
+        <div class="hd-inner">
+          <span class="hd-title">客户分析</span>
+          <span class="dete-control"></span>
+          <span id="demo1" class="brfd">{{curdate}}</span>
+        </div>
+      </div>
+      <div class="content">
+        <ul class="customerList">
+        	<li>活跃客户：<b>{{customerAnalysisData.activeUserCount}}</b></li>
+        	<li>交易客户：<b>{{customerAnalysisData.tradeUserCount}}</b></li>
+        	<li>大入金客户：<b>{{customerAnalysisData.bigInMoneyUserCount}}</b></li>
+        	<li>大出金客户：<b>{{customerAnalysisData.bigOutMoneyUserCount}}</b></li>
+        	<li>入场客户：<b>{{customerAnalysisData.inUserCount}}</b></li>
+        	<li>离场客户：<b>{{customerAnalysisData.outUserCount}}</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 返佣汇总详情 -->
+    <div class="section">
+        <div class="content" style="padding:0;">
+          <div class="rebate-details">
+            <p>
+              <span>活跃客户</span>        
+              <span>交易客户</span>
+              <span>大入金客户</span>
+            </p>
+            <p>
+              <span>大出金客户</span>
+              <span>入场客户</span>
+              <span>离场客户</span>
+            </p>
+          </div>
+        </div>
+    </div>
+
+    <!-- 近7日客户分析趋势(折线图) -->
+    <div class="section">
+        <div class="hd">
+          <div class="hd-inner">
+              <span class="hd-title">近7日客户分析趋势</span>
+              <div class="legend">
+                <span>入场客户</span>
+                <span>离场客户</span>
+              </div>
+              <!-- <span class="dete-control" @click="pieRequest"></span> -->
+              <!-- <span class="curdate" id="J-xl-2"></span> -->
+          </div>
+        </div>
+        <div class="content">
+        	<div id="main-polyline" style="width:100%;height:200px;"></div>
+        </div>
+    </div>
+    <!-- 背景遮罩 -->
+    <div class="stage-cover" v-show="coverShow" @click="coverHide"></div>
+
+  </div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+import 'common/js/jquery-1.8.3.min.js';
+import 'common/js/laydate.dev.js';
+
+const ERR_OK = 'success';
+
+export default{
+  data(){
+      return {
+          coverShow: false, //背景遮罩状态
+          onesf: false,
+          sessionToken: localStorage.getItem("sessionToken"),
+          findCycleRebateLineDataData: {},
+          motlistSta: false,
+          monthList: {},
+          curmonth: null,
+          senior: false,
+          date: null,
+          ones: false,
+          customerAnalysisData: {},
+          curdate: '',
+          customerAnalysisTrendData:{}
+      }
+  },
+  created(){
+    // this.getLoginAccountRole();
+  },
+  methods:{
+    // 背景遮罩隐藏
+    coverHide: function(){
+      this.coverShow = false;
+      this.motlistSta = false;
+      this.onesf = false;
+    },
+      // 2017年n月（上/下）返佣汇总(折线图)日期选择
+      pieRequest: function(){
+        var _this = this;
+        this.coverShow = true;
+        $("#laydate_box").css("display","block");
+        $("#laydate_table").css("display","block");
+          laydate({
+              elem: '#J-xl-2',
+              min: '2016-10-01', //设定最小日期
+              max: laydate.now(-1), //最大日期
+              choose: function(datas){ //选择日期完毕的回调
+                var date = datas;
+                date = date.replace(/-/g,'');
+                  // _this.getPieDete(date);
+                  // _this.findCycleRebateLineData(date);
+                  _this.coverShow = false
+              }
+
+          });
+      },
+      motlistcontrol: function(){
+        this.coverShow = true;
+        this.motlistSta = true;
+      },
+      curmot: function(month){
+        this.coverShow = false;
+        this.motlistSta = false;
+        this.date = month;
+        this.curmonth = month;
+      },
+      oneFranchise: function(){
+        this.coverShow = true;
+        this.onesf = true;
+      },
+      folding: function(el, v1, v2, v3){
+        let folding = echarts.init(document.getElementById(el));
+        let option_folding = {
+            tooltip : {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '2%',
+                right: '7%',
+                bottom: '3%',
+                top: '3%',
+                containLabel: true
+            },
+            xAxis : [
+                {
+                    type : 'category',
+                    boundaryGap : false,
+                    data : v1,
+                    axisLabel: {
+                       interval: 0
+                    },
+                    splitLine: {
+                        show: true,
+                      lineStyle:{
+                        color:"#e1e1e1",
+                        type:"solid"
+                      }
+                     }
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value'
+                }
+            ],
+            series : [
+                {
+                    name:'入场客户',
+                    type:'line',
+                    data:v2,
+                    itemStyle: {
+                      normal: {
+                        color:'#ff6701',
+                         // label: {
+                         //   show: true,
+                         //   position: 'top',
+                         //   formatter: "{c}"
+                         // }
+                      }
+                    }
+                },
+                {
+                    name:'离场客户',
+                    type:'line',
+                    data:v3,
+                    itemStyle: {
+                      normal: {
+                        color:'#54b9ff',
+                         // label: {
+                         //   show: true,
+                         //   position: 'top',
+                         //   formatter: "{c}"
+                         // }
+                      }
+                    }
+                }
+            ]
+        };
+        folding.setOption(option_folding);
+      },
+      customerAnalysis: function(){
+      	this.customerAnalysisData = {};
+      	this.$http.get('/api/customerAnalysis?',{params:{ sessionToken: this.sessionToken, date: this.curdate }}).then((response) => { 
+      	  if(response.body.result == ERR_OK){ 
+      	    this.customerAnalysisData = response.body.data;
+      	    if(this.curdate == '' || this.curdate == null){
+      	      this.curdate = this.customerAnalysisData.showDate;
+      	    }else{
+
+      	    }
+      	  }else{
+      	    
+      	  }  
+      	}).then((error)=> this.error = error)
+      },
+      customerAnalysisTrend: function(){
+      	this.$http.get('/api/customerAnalysisTrend?',{params:{ sessionToken: this.sessionToken }}).then((response) => { 
+      	  if(response.body.result == ERR_OK){ 
+      	    this.customerAnalysisTrendData = response.body.data;
+      	    this.folding('main-polyline', this.customerAnalysisTrendData.dateList, this.customerAnalysisTrendData.inUserCountList, this.customerAnalysisTrendData.outUserCountList);
+      	  }else{
+      	    
+      	  }  
+      	}).then((error)=> this.error = error)
+      }
+  },
+  mounted() {
+      $("body").removeClass('dash');
+      var calendar = new datePicker();
+      var _this = this;
+      calendar.init({
+        'trigger': '#demo1', /*按钮选择器，用于触发弹出插件*/
+        'type': 'date',/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+        'minDate':'1900-1-1',/*最小日期*/
+        'maxDate':'2100-12-31',/*最大日期*/
+        'onSubmit':function(){/*确认时触发事件*/
+          var theSelectData=calendar.value;
+          _this.curdate = calendar.value;
+          _this.customerAnalysis()
+        },
+        'onClose':function(){/*取消时触发事件*/
+        }
+      });
+
+      this.customerAnalysis();
+      this.customerAnalysisTrend();
+  }
+};
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+	.customerList
+		overflow: hidden
+		padding: 0 0.12rem
+		li
+			float: left
+			width: 50%
+			line-height: 0.35rem
+			font-size: 0.14rem
+			b
+				color: #ff6000
+				font-weight: 600
+</style>

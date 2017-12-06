@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>排名</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="css/fcds.css">
+	<link rel="stylesheet" href="css/nav.css">
+	<link rel="stylesheet" href="css/loader.css">
+</head>
+<body>
+
+	<div class="loader_cover_box">
+		<div class="loader">加载中...</div>
+	</div>
+
+	<div class="detailed_header">
+		<div class="search_box r_qi">
+			<div class="search_inner">
+				<div class="search">
+					<div class="r_text">选择考核周期 |</div>
+					<div class="search_left">
+						<select id="period">  
+							<!-- <option>10005</option> -->
+						</select> 
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<div class="search_box">
+			<div class="search_inner">
+				<div class="search">
+					<div class="search_left"><input type="text" placeholder="请您输入高级经纪商账号" id="searchInfo"></div>
+				</div>
+				<div class="inner_left or" id="search"><a href="javascript:;">查 询</a></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="detailed_list" id="detailed_list">
+		<div class="list list_1 cur" id="rankingList" >
+			<!-- <div class="item">
+				<b class="d_grade senior"></b>
+				<p class="user_ifon"><i class="user_name">王健林1</i><i class="user_adderss">广东省广州一市白云一区</i><b class="modify">修改</b></p>
+				<p class="r_low first"><span></span><span>排名</span><span>数量</span></p>
+				<p class="r_low"><span>交易量</span><span>8</span><span>532567</span></p>
+				<p class="r_low"><span>开户量</span><span>6</span><span>16</span></p>
+				<p class="r_low"><span>净入金</span><span>5</span><span>22</span></p>
+				<p class="r_low"><span>一级人数</span><span>6</span><span>38</span></p>
+			</div> -->
+		</div>
+		<!-- <div class="empty_data"><div class="empty"></div></div> -->
+	</div>
+	<div style="height:70px"></div>
+	<p class="tips" id="tips">&nbsp;</p>
+	<script src="js/jquery-1.8.3.min.js"></script>
+	<script src="js/mo.js"></script>
+    <script src="js/jquery.cookie.js"></script>
+    <script src="js/common.js"></script>
+	<script type="text/javascript">
+		$(function() {    
+			
+			$(".loader_cover_box").css("display","block");
+
+        	
+
+			var links = '<div class="Nav"><div class="navin"><ul><li onclick="window.location = \'index.html\'"><a href="#" class="homebox"><i class="home"></i>首页</a></li><li class="curr"><a href="#" class="cartbox" onclick="window.location= \'ranking.html\'"><i class="shopcart"></i>排名</a></li><li ><a href="#" class="comdybox" onclick="window.location= \'broker.html\'"><i class="comdy"></i>交易商</a></li></ul></div></div>'
+			$("body").append(links);
+
+		    // 经济商排名查询
+        	var session_token=$.cookie('session_token');
+			var period = $('#period option:selected').val();
+	        app.ajaxHelper.submitRequest({
+	            url: '/api/listBrokerUserRanking',
+	            data: {
+	                session_token: session_token,
+	                period: period
+	            },
+	            success: function (data) {
+	                var state = data.result;
+	                var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+	                if (state == "success") {
+
+	                    $(".loader_cover_box").css("display","none");
+
+		                function detailedListHtml(netIncomeR,netIncome,tradingVolumeR,tradingVolume,accountOpenCountR,accountOpenCount,brokerUserCountR,brokerUserCount,name,brokerUserName) {
+
+			                var html = '<div class="item"><b class="d_grade senior"></b><p class="user_ifon"><i class="user_name">'+name+'</i><i class="user_adderss">'+brokerUserName+'</i><b class="modify">修改</b></p><p class="r_low first"><span></span><span>排名</span><span>数量</span></p><p class="r_low"><span>交易量</span><span>'+tradingVolumeR+'</span><span>'+tradingVolume+'</span></p><p class="r_low"><span>开户量</span><span>'+accountOpenCountR+'</span><span>'+accountOpenCount+'</span></p><p class="r_low"><span>净入金</span><span>'+netIncomeR+'</span><span>'+netIncome+'</span></p><p class="r_low"><span>一级人数</span><span>'+brokerUserCountR+'</span><span>'+brokerUserCount+'</span></p></div>';
+
+			                return html;
+		                }
+
+                        function productListHtml(productId,productNo,isCurrent) {
+
+                        	if(productId == data.data.productId){
+                        		var html = '<option value='+productId+' selected="selected">'+productNo+'</option>';
+                        	}else{
+                        		var html = '<option value='+productId+'>'+productNo+'</option>';
+                        	}
+        	                
+
+        	                return html;
+                        }
+
+		                $(data.data.rankingList).each(function(i){
+		                	var listHtml = detailedListHtml(this.netIncomeR,this.netIncome,this.tradingVolumeR,this.tradingVolume,this.accountOpenCountR,this.accountOpenCount,this.brokerUserCountR,this.brokerUserCount,this.name,this.brokerUserName);
+		                	$('#rankingList').append(listHtml);
+		                })
+
+		                $(data.data.productList).each(function(i){
+		                	var listHtml = productListHtml(this.productId,this.productNo,this.isCurrent);
+		                	$('#period').append(listHtml);
+		                })
+
+	                } else if (state > "error") {
+	                    $('#rankingList').html(emptyHtml)
+	                } else if (state < "noSession") {
+	                    window.location.href = "login.html";
+	                }
+	            }
+	        })
+
+            // 收索请求
+            $(document).on('click' , '#search' , function(){
+            	$(".loader_cover_box").css("display","block");
+    	        var session_token=$.cookie('session_token');
+    	        var period = $('#period option:selected').val();
+    	        var brokerUserNo = $("#searchInfo").val();
+    	        app.ajaxHelper.submitRequest({
+    	            url: '/api/listBrokerUserRanking',
+    	            data: {
+    	                session_token: session_token,
+    	                period: period,
+    	                brokerUserNo: brokerUserNo
+    	            },
+    	            success: function (data) {
+    	                var state = data.result;
+    	                var emptyHtml = '<div class="empty_data"><div class="empty"></div></div>';
+    	                if (state == "success") {
+
+    	                    $(".loader_cover_box").css("display","none");
+
+    		            	var searchListDate = '';
+
+                            function detailedListHtml(netIncomeR,netIncome,tradingVolumeR,tradingVolume,accountOpenCountR,accountOpenCount,brokerUserCountR,brokerUserCount,name,brokerUserName) {
+
+            	                var html = '<div class="item"><b class="d_grade senior"></b><p class="user_ifon"><i class="user_name">'+name+'</i><i class="user_adderss">'+brokerUserName+'</i><b class="modify">修改</b></p><p class="r_low first"><span></span><span>排名</span><span>数量</span></p><p class="r_low"><span>交易量</span><span>'+tradingVolumeR+'</span><span>'+tradingVolume+'</span></p><p class="r_low"><span>开户量</span><span>'+accountOpenCountR+'</span><span>'+accountOpenCount+'</span></p><p class="r_low"><span>净入金</span><span>'+netIncomeR+'</span><span>'+netIncome+'</span></p><p class="r_low"><span>一级人数</span><span>'+brokerUserCountR+'</span><span>'+brokerUserCount+'</span></p></div>';
+
+            	                return html;
+                            }
+
+    		                $(data.data.rankingList).each(function(i){
+    		                	var listHtml = detailedListHtml(this.netIncomeR,this.netIncome,this.tradingVolumeR,this.tradingVolume,this.accountOpenCountR,this.accountOpenCount,this.brokerUserCountR,this.brokerUserCount,this.name,this.brokerUserName);
+    		                	searchListDate += listHtml
+    		                })
+
+    		                if(data.data.rankingList == ''){
+		                     	$('#rankingList').html(emptyHtml);
+    		                }else{
+    		                	$('#rankingList').html(searchListDate);
+    		                };
+
+    	                } else if (state > "error") {
+    	                    
+    	                } else if (state < "noSession") {
+    	                    window.location.href = "login.html";
+    	                }
+    	            }
+    	        })
+            })
+	        
+		});   
+	</script>
+</body>
+</html>

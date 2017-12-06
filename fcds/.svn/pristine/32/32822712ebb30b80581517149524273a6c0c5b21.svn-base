@@ -1,0 +1,78 @@
+*{margin:0;padding:0;font-family: 'Avenir Next',Avenir,'Helvetica Neue',Helvetica,'Lantinghei SC','Hiragino Sans GB','Microsoft YaHei',"微软雅黑",STHeiti,'WenQuanYi Micro Hei',SimSun,sans-serif;position:relative;}
+body,html{margin:0 auto;width:100%;height:100%;max-width:640px;}
+body{background:url(../images/bg.jpg) center center no-repeat;background-size:cover;-webkit-background-size:cover;}
+a{text-decoration:none;}
+.border_1px::after{position:absolute;bottom:0;left:0;width:100%;height:1px;background-color:#ff6000;content:'';transform:scaleY(.5);}
+.wrapper{position:absolute;top:50%;left:50%;margin:-295px 0 0 -187px;width:375px;height:590px;}
+.wrapper *{box-sizing:border-box;margin:0 auto;-webkit-tap-highlight-color:transparent;}
+.wrapper .logo{margin-top:30px;width:175px;}
+.wrapper .logo img{width:100%;}
+.wrapper .system_name{margin-top:10px;}
+.wrapper .system_name p{color:#fff;text-align:center;font-weight:700;font-size:24px;line-height:30px;}
+.wrapper .login_info{margin-top:10px;width:320px;height:285px;border-radius:5px;}
+.wrapper .login_info .login_header{width:100%;height:44px;background-color:#ff6000;color:#fff;text-align:center;font-size:16px;line-height:44px;}
+.wrapper .login_info p.tip{color:#ff6000;text-align:center;font-size:15px;line-height:40px;min-height:40px;}
+.wrapper .login_info .in_info_box{margin:20px auto;width:300px;height:40px;background-color:rgba(255,255,255,0.8);border-radius:5px;}
+.wrapper .login_info .in_info_box.roleType{display:none;}
+.wrapper .login_info p.in_info{position:relative;overflow:hidden;padding-left:70px;width:256px;height:40px;font-size:15px;line-height:40px;}
+.wrapper .login_info p.in_info.pr{padding-right:90px;padding-left:70px;}
+.wrapper .login_info p.in_info span{position:absolute;bottom:0;left:0;}
+.wrapper .login_info p.in_info input{width:100%;outline:0;border:none;font-size:15px;-webkit-appearance: none;-moz-appearance: textfield;margin: 0; background-color:transparent;}
+::-webkit-input-placeholder{color:#cbcbcb!important;}
+.wrapper .login_info p.verification{float:left;margin:0;padding-left:60px;width:150px;}
+.wrapper .login_info .in_info_box b{display:none;float:right;color:#000;font-weight:400;font-size:15px;line-height:40px;position: absolute;top:0;right: 0;}
+.wrapper .login_info .login_btn{display:block;margin:15px auto;width:300px;height:40px;background-color:#ff6000;color:#fff;text-align:center;line-height:38px;border-radius:5px;}
+.wrapper .login_info p.in_info.teshu{padding-left:60px;}
+::-webkit-input-placeholder{
+	color:#777!important;
+}
+.identity{display:none;}
+.identity span{float:left;width:50%;height:40px;text-align:center;line-height:40px;}
+.identity span.cur{background-color:#ff6000;color:#fff;}
+.identity span:nth-child(1){border-radius:5px 0 0 5px;}
+.identity span:nth-child(2){border-radius:0 5px 5px 0;}
+.tip_text{
+	padding: 2px 10px;
+	background-color: #ff6000;
+	border-radius: 10px;
+	text-align: center;
+	color: #fff;
+	-webkit-animation: note 0s ease 3s forwards;
+}
+.roleType p{text-align: center;line-height:40px}
+.cover *{box-sizing:border-box;}
+.cover{position:fixed;top:0;left:50%;width:100%;height:100%;max-width:640px;transform:translateX(-50%);-webkit-transform:translateX(-50%);background-color:rgba(0,0,0,0.3);display:none;}
+.cover .roleTypeList{position:absolute;bottom:-50px;left:0;width:100%;padding:12px;opacity:0;}
+.cover .roleTypeList ul{list-style:none;background-color: #fff;margin-bottom:10px;border-radius:5px;padding:5px 30px;}
+.cover .roleTypeList ul li{position:relative;width:100%;height:40px;text-align:center;line-height:40px;}
+.cover .roleTypeList ul li::after{position:absolute;left:0;bottom:0;display:block;content:'';width:100%;height:1px;transform:scaleY(0.5);-webkit-transform:scaleY(0.5);background-color:#ccc;}
+.cover .roleTypeList ul li:nth-last-child(1)::after{display:none;}
+.cover .roleTypeList .close{width:100%;height:40px;text-align:center;background-color:#fff;border-radius:5px;line-height:40px;}
+.cover .roleTypeList.fadeIn{-webkit-animation:fadeIn 1s forwards;-ms-animation:fadeIn 1s forwards;-moz-animation:fadeIn 1s forwards;-o-animation:fadeIn 5s;}
+.cover .roleTypeList.fadeOut{-webkit-animation:fadeOut 1s forwards;-ms-animation:fadeOut 1s forwards;-moz-animation:fadeOut 1s forwards;-o-animation:fadeOut 5s;}
+.cover .blank{width:100%;height:100%}
+@keyframes fadeIn
+{
+	from {bottom:-50px;opacity:0;}
+	to {bottom:0;opacity:1;}
+}
+@keyframes fadeOut
+{
+	from {bottom:0;opacity:1;}
+	to {bottom:-50px;opacity:0;}
+}
+@-webkit-keyframes fadeIn
+{
+	from {bottom:-50px;opacity:0;}
+	to {bottom:0;opacity:1;}
+}
+@-webkit-keyframes fadeOut
+{
+	from {bottom:0;opacity:1;}
+	to {bottom:-50px;opacity:0;}
+}
+@-webkit-keyframes note{
+	0%{opacity: 0;}
+	50%{opacity: 1;}
+	100%{opacity: 0;}
+}

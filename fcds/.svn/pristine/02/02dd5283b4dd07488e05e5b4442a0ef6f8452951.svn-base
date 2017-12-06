@@ -1,0 +1,341 @@
+<template>
+	<div>
+		<!-- 第n期考核排名 -->
+		<div class="section">
+		  	<div class="hd">
+			    <div class="hd-inner no">
+			      	<span class="hd-title">第6期考核排名</span>
+			      	<span class="hd-analysis">
+				        <router-link to="/main/transactionAnalysis">
+				          <i>一级考核排名></i>
+				        </router-link>
+			      	</span>
+			    </div>
+		  	</div>
+		</div>
+		<div class="section">
+			<div class="hd">
+				<div class="hd-inner rinking">
+					<span class="item">考核项目</span>
+					<span class="item">名次</span>
+					<span class="item">总计</span>
+				</div>
+			</div>
+			<div class="content">
+				<div class="rinkingList">
+					<ul>
+						<li>
+							<span>日均资产总值</span>
+							<span>16</span>
+							<span>36.47（万元）</span>
+						</li>
+						<li>
+							<span>交易额</span>
+							<span>12</span>
+							<span>7836.47（万元）</span>
+						</li>
+						<li>
+							<span>开户量</span>
+							<span>9</span>
+							<span>4983（人）</span>
+						</li>
+						<li>
+							<span>一级经纪商</span>
+							<span>18</span>
+							<span>63（人）</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- 近7日第n期排名趋势 -->
+		<div class="section">
+		  	<div class="hd">
+			    <div class="hd-inner">
+			      	<span class="hd-title">近7日第6期排名趋势</span>
+	              	<span class="dete-control" @click="pieRequest"></span>
+	              	<span class="curdate" id="J-xl-2"><!-- {{curdate}} --></span>
+			    </div>
+		  	</div>
+		  	<div class="content">
+		    	<div id="polylineRebate" style="width:100%;height:2rem;"></div>
+		    	<div class="ringType">
+		    		<span @click="assetsRanking">日均资产总值</span>
+		    		<span @click="transactionRanking">交易额</span>
+		    		<span @click="openingRanking">开户量</span>
+		    		<span @click="brokerRanking">一级经纪商</span>
+		    	</div>
+		  	</div>
+		</div>
+
+		<!-- 背景遮罩 -->
+		<div class="stage-cover" v-show="coverShow" @click="coverHide"></div>
+
+	</div>
+</template>
+
+<script>
+import echarts from 'common/js/echarts.min.js';
+import 'common/js/jquery-1.8.3.min.js';
+import 'common/js/laydate.dev.js';
+
+export default{
+ 	data(){
+ 	    return {
+ 	        coverShow: false, //背景遮罩状态
+ 	        colorList: {
+ 	        	colorTop: 'rgba(255, 102, 0, 1)',
+	    		colorBottom: 'rgba(255, 102, 0, 0.01)',
+	    		colroLine:'#ff6600'
+ 	        },
+ 	        assetsRankingData:{
+ 	        	date: ['02/25','02/26','02/27','02/28','03/01','03/02','03/03'],
+ 	        	value: [-30, -29, -20, -25, -40, -60, -34]
+ 	        },
+ 	        transactionRankingData:{
+ 	        	date: ['02/25','02/26','02/27','02/28','03/01','03/02','03/03'],
+ 	        	value: [-33, -8, -20, -2, -10, -10, -34]
+ 	        },
+ 	        openingRankingData:{
+ 	        	date: ['02/25','02/26','02/27','02/28','03/01','03/02','03/03'],
+ 	        	value: [-88, -290, -200, -25, -403, -6, -134]
+ 	        },
+ 	        brokerRankingData:{
+ 	        	date: ['02/25','02/26','02/27','02/28','03/01','03/02','03/03'],
+ 	        	value: [-3, -92, -22, -25, -40, -30, -14]
+ 	        }
+ 	    }
+ 	},
+ 	created(){
+ 		
+ 	},
+	methods:{
+		// 背景遮罩隐藏
+		coverHide: function(){
+			this.coverShow = false;
+		},
+	    // 近7日第n期排名趋势折线图
+	    polylineRebate: function(el,colorLists,data){
+	    	let polylineRebate = echarts.init(document.getElementById(el));
+	    	let option = {
+	    	    tooltip : {
+	    	        trigger: 'axis',
+	    	        axisPointer: {
+	    	            type: 'shadow',
+	    	            label: {
+	    	                backgroundColor: '#6a7985'
+	    	            }
+	    	        },
+	    	        formatter: function(params) {
+	    	            // for text color
+	    	            var colorList = ['#ff954b'];
+	    	            var res = '<div>';
+	    	            res += '<strong>' + params[0].name + '</strong>'
+	    	            for (var i = 0, l = params.length; i < l; i++) {
+	    	                res += '<br/><span style="display:inline-block;margin: 0 5px;height:10px;width:10px;border-radius:50%;background-color: '+colorList[i]+'"></span>' + params[i].seriesName + ' : ' + parseInt(-params[i].value)
+	    	            }
+	    	            res += '</div>';
+	    	            return res;
+	    	        }
+	    	    },
+	    	    toolbox: {
+	    	        feature: {
+	    	            saveAsImage: {}
+	    	        }
+	    	    },
+	    	    grid: {
+	    	        left: '2%',
+	    	        right: '6%',
+	    	        bottom: '3%',
+	    	        top: '4%',
+	    	        containLabel: true
+	    	    },
+	    	    color: [colorLists.colroLine],
+	    	    xAxis : [
+	    	        {
+	    	            type : 'category',
+	    	            boundaryGap : false,
+	    	            data : data.date,
+	    	            axisLabel :{  
+		                    interval:0,
+		                },
+		                splitLine: {
+		                    show: true,
+			                lineStyle:{
+			                	color:"#e1e1e1",
+			                	type:"solid"
+			                }
+		                },
+		                axisLine: {onZero: false}
+	    	        }
+	    	    ],
+	    	    yAxis : [
+	    	        {
+	    	            type : 'value',
+	    	            max: 'dataMax',
+            	        axisLabel:{ 
+        	    	        formatter:function(v){ 
+        	    	        	return -v; 
+        	    	        } 
+            	        } 
+	    	        }
+	    	    ],
+	    	    series : [
+	    	        {
+	    	            name:'排名',
+	    	            type:'line',
+	    	            areaStyle: {normal: {}},
+	    	            data: data.value,
+	    	            areaStyle: {
+	    	               normal: {
+	    	                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+	    	                       offset: 0,
+	    	                       color: colorLists.colorTop //'rgba(255, 102, 0, 1)'
+	    	                   }, {
+	    	                       offset: 1,
+	    	                       color: colorLists.colorBottom//'rgba(255, 249, 245, 0.2)'
+	    	                   }])
+	    	               }
+	    	           },
+	    	           lineStyle: {
+		    	            normal: {
+		    	                type: 'solid',
+		    	                color: colorLists.colroLine,
+		    	                opacity :"1"
+		    	            }
+	    	 			}
+	    	        }
+	    	    ]
+	    	};
+	    	polylineRebate.setOption(option);
+	    },
+	    // 近7日第n期排名趋势日期选择
+	    pieRequest: function(){
+	    	var _this = this;
+	    	this.coverShow = true;
+	        laydate({
+	            elem: '#J-xl-2',
+	            min: '2016-10-01', //设定最小日期
+	            max: laydate.now(-1), //最大日期
+	            choose: function(datas){ //选择日期完毕的回调
+	            	var date = datas;
+	            	date = date.replace(/-/g,'');
+	                // _this.getPieDete(date);
+	                alert(date);
+	                _this.coverShow = false;
+	            }
+
+	        });
+	    },
+	    assetsRanking: function(){
+	    	this.colorList = {
+	    		colorTop: 'rgba(255, 102, 0, 1)',
+	    		colorBottom: 'rgba(255, 102, 0, 0.01)',
+	    		colroLine:'#ff6600'
+	    	}
+	    	this.polylineRebate('polylineRebate', this.colorList, this.assetsRankingData);
+	    },
+	    transactionRanking: function(){
+	    	this.colorList = {
+	    		colorTop: 'rgba(84, 185, 255, 1)',
+	    		colorBottom: 'rgba(84, 185, 255, 0.01)',
+	    		colroLine:'#54b9ff'
+	    	}
+	    	this.polylineRebate('polylineRebate', this.colorList, this.transactionRankingData);
+	    },
+	    openingRanking: function(){
+	    	this.colorList = {
+	    		colorTop: 'rgba(254, 179, 88, 1)',
+	    		colorBottom: 'rgba(254, 179, 88, 0.01)',
+	    		colroLine:'#feb358'
+	    	}
+	    	this.polylineRebate('polylineRebate', this.colorList, this.openingRankingData);
+	    },
+	    brokerRanking: function(){
+	    	this.colorList = {
+	    		colorTop: 'rgba(19, 182, 139, 1)',
+	    		colorBottom: 'rgba(19, 182, 139, 0.01)',
+	    		colroLine:'#13b68b'
+	    	}
+	    	this.polylineRebate('polylineRebate', this.colorList, this.brokerRankingData);
+	    }
+	},
+	mounted() {
+	    this.polylineRebate('polylineRebate', this.colorList, this.assetsRankingData);
+	}
+};
+
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+	#laydate_box
+	    right: 10px!important
+	    left: auto!important
+	// 返佣总览
+	.overview-rebate
+		width: 100%
+		height: 2rem
+		position: relative
+		background-color: #FFF
+		overflow: hidden
+		.canvas
+			position: absolute
+			top: 50%
+			left: 50%
+			transform: translateX(-50%) translateY(-50%) scale(0.5)
+	.hd-analysis
+	  	float: right
+	  	i
+	    	font-style: normal
+	    	font-size: 0.12rem
+	    	color: #54b9ff
+	.rinking
+		.item
+			float: left
+			width: 33.33%
+			text-align: center
+	.rinkingList
+		li
+			width: 100%
+			height: 0.5rem
+			span
+				float: left
+				width: 33.33%
+				text-align: center
+				color: #ff6000
+				font-weight: 500
+				line-height: 0.5rem
+				font-size: 0.13rem
+				&:nth-child(1)
+					color: #999999
+					font-weight: normal
+	.ringType
+		overflow: hidden
+		width: 100%
+		height: 0.28rem
+		margin-top: 0.1rem
+		padding: 0 0.1rem;
+		span
+			float: left
+			width: 25%
+			height: 0.28rem
+			text-align: center
+			line-height: 0.28rem
+			&::before
+				display: inline-block
+				content: ''
+				width: 0.12rem
+				height: 0.12rem
+				margin-right: 0.02rem
+				vertical-align: middle
+				margin-bottom: 0.02rem
+			&:nth-child(1)::before
+				background-color: #ff6600
+			&:nth-child(2)::before
+				background-color: #54b9ff
+			&:nth-child(3)::before
+				background-color: #feb358
+			&:nth-child(4)::before
+				background-color: #13b68b
+</style>
